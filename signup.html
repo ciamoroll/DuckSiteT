@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signup</title>
+
+<style>
+/* YOUR ORIGINAL STYLE — 100% UNCHANGED */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
+height:100vh;
+background:url("background.jpg") no-repeat center/cover;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.container{
+background:rgba(255,255,200,0.85);
+padding:30px;
+border-radius:20px;
+width:350px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+border:3px solid #2f6b2f;
+}
+
+h2{
+margin-bottom:20px;
+text-align:center;
+color:#2f6b2f;
+font-weight:bold;
+font-size:22px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:15px;
+border:1px solid #ccc;
+border-radius:5px;
+background:#2f6b2f;
+color:white;
+}
+
+input::placeholder{
+color:#ddd;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+margin-bottom:10px;
+font-weight:bold;
+}
+
+.signup-btn{
+background:#f4e7a1;
+color:#2f6b2f;
+}
+
+.back-btn{
+background:#ccc;
+color:#333;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>🦆 DuckSiteT</h2>
+
+<!-- ADDED FIELDS (NO STYLE CHANGE) -->
+<input type="text" id="firstName" placeholder="First Name">
+<input type="text" id="lastName" placeholder="Last Name">
+
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+
+<button class="signup-btn" onclick="signup()">Create Account</button>
+<button class="back-btn" onclick="goLogin()">Back to Login</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDfTh-4-RYAnNKHiazNNnhH985pDBBDk48",
+  authDomain: "ducksitet-55d89.firebaseapp.com",
+  projectId: "ducksitet-55d89",
+  storageBucket: "ducksitet-55d89.appspot.com",
+  messagingSenderId: "1046771611799",
+  appId: "1:1046771611799:web:9988a2d30c0d5d5cf8d1d2"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.signup = async function(){
+
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+
+    if(!firstName || !lastName || !email || !password){
+        alert("Please fill all fields");
+        return;
+    }
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            role: "student",
+            profileCompleted: false,
+            profileStep: 1,
+            xp: 0,
+            lastLogin: null,
+            createdAt: new Date().toISOString()
+        });
+
+        /* ✅ SAVE FOR LOGIN SYSTEM */
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+
+        users.push({
+            username: email,
+            password: password,
+            firstName: firstName,
+            lastName: lastName
+        });
+
+        localStorage.setItem("users", JSON.stringify(users));
+
+        /* SESSION */
+        localStorage.setItem("userId", user.uid);
+        localStorage.setItem("email", email);
+
+        alert("Account Created!");
+
+        /* ✅ REDIRECT TO PROFILE SETUP FLOW */
+        window.location.href = "profile-setup1.html";
+
+    } catch (error) {
+        alert(error.message);
+        console.error(error);
+    }
+}
+
+window.goLogin = function(){
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

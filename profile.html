@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DuckSiteT Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+
+body{background:#f4d35e;transition:.3s;}
+body.dark{background:#111;color:white;}
+
+/* NAVBAR */
+.navbar{
+display:flex;justify-content:space-between;
+padding:10px;background:#c9a227;font-size:13px;font-weight:bold;
+}
+body.dark .navbar{background:#222;color:white;}
+.navbar a{color:black;text-decoration:none;margin-right:10px;transition:.2s;}
+.navbar a:hover{transform:scale(1.1);color:#fff;}
+body.dark .navbar a{color:white;}
+
+/* TOP */
+.top{
+background:#c9a227;
+padding:20px 20px 40px 20px;
+position:relative;
+}
+
+body.dark .top{background:#333;}
+
+.profile-box{
+background:#2f6b2f;color:white;
+padding:6px 15px;border-radius:15px;
+font-size:11px;display:inline-block;
+}
+
+.name{
+font-size:24px;font-weight:bold;color:white;margin-top:5px;
+text-shadow:2px 2px 4px rgba(0,0,0,.5);
+}
+
+.level{font-size:13px;color:white;margin-top:3px;}
+.email{font-size:10px;color:white;margin-top:3px;}
+
+/* DUCK */
+.duck-area{
+position:absolute;
+right:15px;
+top:25px;
+text-align:center;
+}
+
+.duck{
+width:90px;
+animation:floatDuck 3s ease-in-out infinite;
+}
+
+/* FLOAT ANIMATION */
+@keyframes floatDuck{
+0%{transform:translateY(0);}
+50%{transform:translateY(-8px);}
+100%{transform:translateY(0);}
+}
+
+/* DARK BUTTON */
+.theme-btn{
+margin-top:5px;
+background:#e6d36f;border:none;
+padding:4px 10px;border-radius:10px;
+cursor:pointer;font-size:11px;
+transition:.2s;
+}
+.theme-btn:hover{transform:scale(1.1);}
+
+/* XP BAR */
+.xp-bar{
+margin-top:10px;height:10px;
+background:#e6d36f;border-radius:10px;width:120px;
+overflow:hidden;
+}
+
+.xp-fill{
+height:100%;
+background:#2f6b2f;
+border-radius:10px;
+transition:width 1s ease;
+}
+
+/* CURVE */
+.curve{
+height:35px;background:#2f6b2f;
+border-bottom-left-radius:60% 100%;
+border-bottom-right-radius:60% 100%;
+}
+
+/* CENTER */
+.center{text-align:center;padding:15px;}
+
+.badge-title{
+background:#5b2ca0;color:white;
+padding:5px 18px;border-radius:20px;
+display:inline-block;font-size:11px;
+}
+
+.badge-img{
+width:200px;margin:10px auto;
+display:block;
+transition:.3s;
+}
+
+.badge-img:hover{
+transform:scale(1.05);
+}
+
+/* BOTTOM */
+.bottom{
+background:#2f6b2f;
+padding:15px;
+border-top-left-radius:35px;
+border-top-right-radius:35px;
+color:white;
+}
+
+/* SECTION TITLE */
+.section-title{
+background:#0b3d2e;padding:6px;
+border-radius:10px;text-align:center;
+margin-bottom:10px;font-size:12px;
+}
+
+/* PROGRESS */
+.progress-grid{
+display:grid;grid-template-columns:1fr 1fr;
+gap:8px;margin-bottom:15px;
+}
+
+.card{
+background:#0b3d2e;padding:8px;
+border-radius:8px;font-size:10px;
+transition:.2s;
+}
+
+.card:hover{
+transform:scale(1.05);
+}
+
+.card-header{
+display:flex;align-items:center;gap:5px;
+}
+
+.card img{width:18px;height:18px;}
+
+.bar{
+height:5px;background:#ccc;
+border-radius:10px;margin-top:4px;
+overflow:hidden;
+}
+
+.fill{
+height:100%;
+background:#4caf50;
+border-radius:10px;
+transition:width 1s ease;
+}
+
+/* STATS */
+.stats{
+background:#ddd;color:black;
+padding:8px;border-radius:8px;
+font-size:10px;margin-bottom:12px;
+}
+
+/* BADGES */
+.badges{
+background:#fff;color:black;
+padding:10px;border-radius:10px;
+margin-bottom:12px;
+}
+
+.badge-item{
+display:flex;align-items:center;
+gap:8px;margin-bottom:5px;
+font-size:10px;
+transition:.2s;
+}
+
+.badge-item:hover{
+transform:translateX(5px);
+}
+
+.medal{
+width:15px;height:15px;border-radius:50%;
+}
+
+.gold{background:gold;}
+.silver{background:silver;}
+.copper{background:#b87333;}
+.bronze{background:#cd7f32;}
+.darksilver{background:#555;}
+
+/* GOALS */
+.goals{
+background:#ddd;color:black;
+padding:8px;border-radius:8px;
+font-size:10px;
+}
+
+/* DARK MODE FIX */
+body.dark .stats,
+body.dark .goals{
+background:#333;color:white;
+}
+
+body.dark .badges{
+background:#222;color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+<div>
+<a href="dashboard.html">Dashboard</a>
+<a href="courses.html">Courses</a>
+<a href="profile.html">Profile</a>
+<a href="leaderboard.html">Leaderboard</a>
+</div>
+<div>🏆 <span id="points">0</span></div>
+</div>
+
+<!-- TOP -->
+<div class="top">
+
+<div class="profile-box">PROFILE PLAYER</div>
+
+<div class="name" id="name"></div>
+<div class="level">LEVEL <span id="level">1</span></div>
+<div class="level">TOP 50</div>
+<div class="email" id="email"></div>
+
+<div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+
+<div class="duck-area">
+<img src="duck.png" class="duck">
+<button class="theme-btn" onclick="toggleTheme()">🌙 / ☀️</button>
+</div>
+
+</div>
+
+<div class="curve"></div>
+
+<!-- CENTER -->
+<div class="center">
+<div class="badge-title">BADGES</div>
+<img src="badge-showcase.png" class="badge-img">
+<div class="badge-label" id="badgeLabel">MASTERY LEVEL 1 • 0 XP</div>
+</div>
+
+<!-- BOTTOM -->
+<div class="bottom">
+
+<div class="section-title">LEARNING PROGRESS</div>
+
+<div class="progress-grid">
+
+<div class="card">
+<div class="card-header"><img src="prog.png"> Programming</div>
+<div class="bar"><div class="fill" id="p1"></div></div>
+</div>
+
+<div class="card">
+<div class="card-header"><img src="electronics.png"> Electronics</div>
+<div class="bar"><div class="fill" id="p2"></div></div>
+</div>
+
+<div class="card">
+<div class="card-header"><img src="office.png"> Office</div>
+<div class="bar"><div class="fill" id="p3"></div></div>
+</div>
+
+<div class="card">
+<div class="card-header"><img src="itfund.png"> IT Fundamentals</div>
+<div class="bar"><div class="fill" id="p4"></div></div>
+</div>
+
+</div>
+
+<div class="section-title">GAMIFIED STATS</div>
+<div class="stats">
+✔ Badges Earned: <span id="badges">0</span><br>
+✔ Lessons Completed: <span id="lessons">0</span><br>
+✔ Rank: Top 50<br>
+✔ XP: <span id="xpText">0</span>
+</div>
+
+<div class="section-title">BADGES COLLECTION</div>
+<div class="badges">
+<div class="badge-item"><div class="medal gold"></div> Beginner Ducks</div>
+<div class="badge-item"><div class="medal silver"></div> VS Code Navigator</div>
+<div class="badge-item"><div class="medal copper"></div> Logic Builder</div>
+<div class="badge-item"><div class="medal bronze"></div> Circuit Apprentice</div>
+<div class="badge-item"><div class="medal darksilver"></div> Software Specialist</div>
+</div>
+
+<div class="section-title">NEXT GOALS</div>
+<div class="goals">
+• Complete 3 lessons<br>
+• Earn 300 XP<br>
+• Unlock next badge<br>
+• Reach Level 2
+</div>
+
+</div>
+
+<script>
+
+/* AUTH */
+let currentUserEmail = localStorage.getItem("currentUser");
+if(!currentUserEmail){
+window.location.href="login.html";
+}
+
+/* LOAD USERS */
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let user = users.find(u => u.email === currentUserEmail);
+
+if(!user){
+window.location.href="login.html";
+}
+
+/* DATA */
+let firstName = user.firstName || "Player";
+let lastName = user.lastName || "";
+let email = user.email || "";
+let xp = user.xp || 0;
+let level = user.level || 1;
+
+/* LESSON COUNT */
+let lessons = 0;
+for(let key in localStorage){
+if(key.includes("_done")) lessons++;
+}
+
+/* BADGES */
+let badges = Math.floor(lessons/3);
+
+/* DISPLAY */
+document.getElementById("name").innerText =
+firstName + " " + (lastName ? lastName.charAt(0)+"." : "");
+
+document.getElementById("email").innerText = email;
+document.getElementById("points").innerText = xp;
+document.getElementById("xpText").innerText = xp;
+document.getElementById("level").innerText = level;
+
+document.getElementById("xpFill").style.width = (xp/500*100)+"%";
+document.getElementById("badgeLabel").innerText =
+"MASTERY LEVEL 1 • "+xp+" XP";
+
+document.getElementById("badges").innerText = badges;
+document.getElementById("lessons").innerText = lessons;
+
+/* PROGRESS */
+document.getElementById("p1").style.width = (xp/500*100)+"%";
+document.getElementById("p2").style.width = (xp/500*80)+"%";
+document.getElementById("p3").style.width = (xp/500*60)+"%";
+document.getElementById("p4").style.width = (xp/500*50)+"%";
+
+/* DARK MODE */
+function toggleTheme(){
+document.body.classList.toggle("dark");
+}
+
+/* LOGOUT */
+function logout(){
+localStorage.removeItem("currentUser");
+localStorage.removeItem("role");
+window.location.href="login.html";
+}
+
+</script>
+
+</body>
+</html>
