@@ -92,22 +92,10 @@ color:#333;
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDfTh-4-RYAnNKHiazNNnhH985pDBBDk48",
-  authDomain: "ducksitet-55d89.firebaseapp.com",
-  projectId: "ducksitet-55d89",
-  storageBucket: "ducksitet-55d89.appspot.com",
-  messagingSenderId: "1046771611799",
-  appId: "1:1046771611799:web:9988a2d30c0d5d5cf8d1d2"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+import { app, auth, db } from './firebase-config.js';
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 window.signup = async function(){
 
@@ -138,26 +126,12 @@ window.signup = async function(){
             createdAt: new Date().toISOString()
         });
 
-        /* ✅ SAVE FOR LOGIN SYSTEM */
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-
-        users.push({
-            username: email,
-            password: password,
-            firstName: firstName,
-            lastName: lastName
-        });
-
-        localStorage.setItem("users", JSON.stringify(users));
-
-        /* SESSION */
+        // Optionally, set session info for immediate use
         localStorage.setItem("userId", user.uid);
         localStorage.setItem("email", email);
 
-        alert("Account Created!");
-
-        /* ✅ REDIRECT TO PROFILE SETUP FLOW */
-        window.location.href = "profile-setup1.html";
+        alert("Account Created! Please log in.");
+        window.location.href = "login.html";
 
     } catch (error) {
         alert(error.message);

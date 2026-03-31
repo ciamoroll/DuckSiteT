@@ -250,77 +250,9 @@ U
 
 <!-- COURSES -->
 
+
 <section class="course-container">
-
-<div class="courses">
-
-<div class="course-card" onclick="openCourse('electronics')">
-
-<div class="course-title">Basic Electronics</div>
-<div class="course-sub">Tinkercad</div>
-
-<div class="progress">
-<div class="progress-fill"></div>
-</div>
-
-<div class="progress-text">Progress: 0%</div>
-
-<button class="start-btn">START</button>
-
-</div>
-
-
-<div class="course-card active" onclick="openCourse('programming')">
-
-<div class="course-title">Programming 1</div>
-<div class="course-sub">VSCode</div>
-
-<div class="progress">
-<div class="progress-fill"></div>
-</div>
-
-<div class="progress-text">Progress: 0%</div>
-
-<button class="start-btn">START</button>
-
-</div>
-
-
-
-<div class="course-card" onclick="openCourse('office')">
-
-<div class="course-title">Office Productivity 1</div>
-<div class="course-sub">Microsoft Word/PowerPoint</div>
-
-<div class="progress">
-<div class="progress-fill"></div>
-</div>
-
-<div class="progress-text">Progress: 0%</div>
-
-<button class="start-btn">START</button>
-
-</div>
-
-
-
-<div class="course-card" onclick="openCourse('itfund')">
-
-<div class="course-title">IT Fundamentals</div>
-<div class="course-sub">MsExcel</div>
-
-<div class="progress">
-<div class="progress-fill"></div>
-</div>
-
-<div class="progress-text">Progress: 0%</div>
-
-<button class="start-btn">START</button>
-
-</div>
-
-</div>
-
+	<div class="courses" id="courseContainer"></div>
 </section>
 
 <div class="footer">
@@ -346,40 +278,64 @@ let level = parseInt(localStorage.getItem("level")) || 1;
 document.getElementById("points").innerText = xp + " XP";
 document.getElementById("level").innerText = level;
 
-/* LOAD COURSES FROM ADMIN */
+// Ensure default courses exist in localStorage
+const defaultCourses = [
+	{
+		id: "electronics",
+		name: "Basic Electronics",
+		code: "Tinkercad",
+		lessons: ["Intro to Electronics", "Resistors & Circuits", "Breadboarding", "Tinkercad Simulation"]
+	},
+	{
+		id: "programming",
+		name: "Programming 1",
+		code: "VSCode",
+		lessons: ["Intro to Programming", "Variables", "Loops", "Functions"]
+	},
+	{
+		id: "office",
+		name: "Office Productivity 1",
+		code: "Microsoft Word/PowerPoint",
+		lessons: ["Word Basics", "Formatting Docs", "PowerPoint Slides", "Presentations"]
+	},
+	{
+		id: "itfund",
+		name: "IT Fundamentals",
+		code: "MsExcel",
+		lessons: ["IT Overview", "Hardware vs Software", "Excel Basics", "Data Entry"]
+	}
+];
+
 let courses = JSON.parse(localStorage.getItem("courses")) || [];
 
-function loadCourses(){
-
-let container = document.getElementById("courseContainer");
-container.innerHTML = "";
-
-if(courses.length === 0){
-container.innerHTML = "<p>No courses available yet.</p>";
-return;
-}
-
-courses.forEach((c,i)=>{
-
-container.innerHTML += `
-<div class="course-card" onclick="openCourse(${i})">
-
-<div class="course-title">${c.name}</div>
-<div class="course-sub">${c.code}</div>
-
-<div class="progress">
-<div class="progress-fill" style="width:0%"></div>
-</div>
-
-<div class="progress-text">Progress: 0%</div>
-
-<button class="start-btn">START</button>
-
-</div>
-`;
-
+// Add default courses if not present (by id)
+defaultCourses.forEach(def => {
+	if (!courses.some(c => c.id === def.id)) {
+		courses.push(def);
+	}
 });
+localStorage.setItem("courses", JSON.stringify(courses));
 
+function loadCourses() {
+	let container = document.getElementById("courseContainer");
+	container.innerHTML = "";
+	if (courses.length === 0) {
+		container.innerHTML = "<p>No courses available yet.</p>";
+		return;
+	}
+	courses.forEach((c, i) => {
+		container.innerHTML += `
+			<div class="course-card" onclick="openCourse(${i})">
+				<div class="course-title">${c.name}</div>
+				<div class="course-sub">${c.code}</div>
+				<div class="progress">
+					<div class="progress-fill" style="width:0%"></div>
+				</div>
+				<div class="progress-text">Progress: 0%</div>
+				<button class="start-btn">START</button>
+			</div>
+		`;
+	});
 }
 let firstName = localStorage.getItem("firstName") || "U";
 let lastName = localStorage.getItem("lastName") || "";
@@ -388,9 +344,9 @@ document.getElementById("avatar").innerText =
 (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
 
 /* OPEN COURSE */
-function openCourse(index){
-localStorage.setItem("currentCourseIndex", index);
-window.location.href="lessons.html";
+function openCourse(index) {
+	localStorage.setItem("currentCourseIndex", index);
+	window.location.href = "lessons.html";
 }
 
 /* LOGOUT */

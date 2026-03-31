@@ -119,39 +119,51 @@ margin-top:60px;
 
 .board-section{
 display:grid;
-grid-template-columns:200px 420px 200px;
+grid-template-columns:200px 600px 200px; /* match new board width */
 grid-template-rows:auto auto;
 gap:25px;
 align-items:center;
+justify-items:center; /* Add this for horizontal centering */
 }
 
 /* STAT BOX */
-.stat-box{
-background:rgba(255,215,0,.1);
-padding:25px;
-border-radius:20px;
-text-align:center;
+.stat-box {
+  background: rgba(255,215,0,.1);
+  padding: 0px;
+  border-radius: 20px;
+  text-align: center;
+  width: 180px;
+  height: 190px; /* Increased for more space */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.stat-box img{
-width:35px;
-display:block;
-margin:0 auto 10px auto;
+.stat-box img {
+  width: 35px;
+  margin: 0 0 8px 0; /* Remove auto top margin, add bottom margin only */
+  display: block;
 }
 
 /* GREEN BOARD */
-.green-board{
-grid-column:2;
-grid-row:1 / span 2;
-width:420px;height:160px;
-position:relative;
-display:flex;
-justify-content:center;
-align-items:center
+.green-board {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 600px;
+  height: 250px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  justify-self: center;
 }
 
-.green-board img{
-width:100%;height:100%;object-fit:contain
+.green-board img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .board-score{
@@ -278,7 +290,7 @@ max-width:500px;margin:30px auto
 </div>
 
 <div class="green-board">
-<img id="boardImage">
+<img id="boardImage" src="earnedPoints.png">>
 <div class="board-score" id="boardScore">0</div>
 </div>
 
@@ -349,15 +361,31 @@ let badges=parseInt(localStorage.getItem("badges"))||0;
 let completedChallenges=parseInt(localStorage.getItem("completedChallenges"))||0;
 
 const boardImages={
-1:"board-year1.png",
-2:"board-year2.png",
-3:"board-year3.png",
-4:"board-year4.png"
+  1:"board-year1.jpeg",
+  2:"board-year2.png",
+  3:"board-year3.png",
+  4:"board-year4.png"
 };
 
 function loadBoard(){
 let year = localStorage.getItem("yearLevel") || 1;
-document.getElementById("boardImage").src=boardImages[year];
+let img = document.getElementById("boardImage");
+img.onerror = function() {
+  if (img.src.includes('earnedPoints.png')) {
+    // Both board image and fallback are missing
+    img.style.display = 'none';
+    let errorMsg = document.createElement('div');
+    errorMsg.textContent = 'No board image available.';
+    errorMsg.style.color = 'red';
+    errorMsg.style.textAlign = 'center';
+    errorMsg.style.margin = '20px 0';
+    img.parentNode.insertBefore(errorMsg, img.nextSibling);
+  } else {
+    img.onerror = null; // Prevent infinite loop
+    img.src = 'earnedPoints.png'; // Use your local fallback image
+  }
+};
+img.src = boardImages[year];
 }
 
 function giveLoginReward(){

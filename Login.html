@@ -1,208 +1,201 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-<title>DuckSiteT Login</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <title>DuckSiteT Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<style>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial;
+      }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial;
-}
+      body {
+        background: url("background.jpg") center/cover no-repeat fixed;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+      }
 
-body{
-background:url("background.jpg") center/cover no-repeat fixed;
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-color:white;
-}
+      /* CONTAINER */
+      .container {
+        background: rgba(0, 0, 0, 0.7);
+        padding: 30px;
+        border-radius: 15px;
+        width: 320px;
+        text-align: center;
+      }
 
-/* CONTAINER */
-.container{
-background:rgba(0,0,0,0.7);
-padding:30px;
-border-radius:15px;
-width:320px;
-text-align:center;
-}
+      /* TITLE */
+      h1 {
+        margin-bottom: 20px;
+        color: #ffd700;
+      }
 
-/* TITLE */
-h1{
-margin-bottom:20px;
-color:#ffd700;
-}
+      /* INPUT */
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 5px;
+      }
 
-/* INPUT */
-input{
-width:100%;
-padding:10px;
-margin:8px 0;
-border:none;
-border-radius:5px;
-}
+      /* BUTTON */
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 5px;
+        background: #e6d36f;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+      }
 
-/* BUTTON */
-button{
-width:100%;
-padding:10px;
-margin-top:10px;
-border:none;
-border-radius:5px;
-background:#e6d36f;
-color:black;
-font-weight:bold;
-cursor:pointer;
-}
+      button:hover {
+        background: #ffd700;
+      }
 
-button:hover{
-background:#ffd700;
-}
+      /* TOGGLE */
+      .toggle {
+        margin-top: 15px;
+        font-size: 13px;
+        cursor: pointer;
+        color: #ccc;
+      }
 
-/* TOGGLE */
-.toggle{
-margin-top:15px;
-font-size:13px;
-cursor:pointer;
-color:#ccc;
-}
+      .toggle:hover {
+        color: #fff;
+      }
 
-.toggle:hover{
-color:#fff;
-}
+      /* ADMIN BOX */
+      .admin-box {
+        display: none;
+        margin-top: 15px;
+        border-top: 1px solid #555;
+        padding-top: 15px;
+      }
 
-/* ADMIN BOX */
-.admin-box{
-display:none;
-margin-top:15px;
-border-top:1px solid #555;
-padding-top:15px;
-}
+      /* CREATE ACCOUNT BUTTON */
+      .create-btn {
+        background: #1f4d1f;
+        color: white;
+        margin-top: 10px;
+      }
 
-/* CREATE ACCOUNT BUTTON */
-.create-btn{
-background:#1f4d1f;
-color:white;
-margin-top:10px;
-}
+      .create-btn:hover {
+        background: #163616;
+      }
+    </style>
+    <!-- Firebase SDKs -->
+    <script type="module">
+      import { auth } from "./firebase-config.js";
+      import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+      window.firebaseAuth = auth;
+      window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    </script>
+  </head>
 
-.create-btn:hover{
-background:#163616;
-}
+  <body>
+    <div class="container">
+      <h1>🦆 DuckSiteT</h1>
 
-</style>
-</head>
+      <!-- LOGIN -->
+      <input type="text" id="username" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
 
-<body>
+      <button onclick="login()">Login</button>
 
-<div class="container">
+      <button class="create-btn" onclick="goSignup()">Create Account</button>
 
-<h1>🦆 DuckSiteT</h1>
+      <div class="toggle" onclick="toggleAdmin()">
+        Login as Admin (Professor)
+      </div>
 
-<!-- LOGIN -->
-<input type="text" id="username" placeholder="Username">
-<input type="password" id="password" placeholder="Password">
+      <!-- ADMIN LOGIN -->
+      <div class="admin-box" id="adminBox">
+        <input type="text" id="adminUser" placeholder="Admin Username" />
+        <input type="password" id="adminPass" placeholder="Password" />
 
-<button onclick="login()">Login</button>
+        <button onclick="adminLogin()">Login as Admin</button>
+      </div>
+    </div>
 
-<button class="create-btn" onclick="goSignup()">Create Account</button>
+    <script>
+      // AUTO LOGIN CHECK
+      let role = localStorage.getItem("role");
+      if (role === "student") {
+        window.location.href = "dashboard.html";
+      }
+      if (role === "admin") {
+        window.location.href = "admin-dashboard.html";
+      }
 
-<div class="toggle" onclick="toggleAdmin()">Login as Admin (Professor)</div>
+      // TOGGLE ADMIN
+      function toggleAdmin() {
+        let box = document.getElementById("adminBox");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+      }
 
-<!-- ADMIN LOGIN -->
-<div class="admin-box" id="adminBox">
+      // GO SIGNUP
+      function goSignup() {
+        window.location.href = "signup.html";
+      }
 
-<input type="text" id="adminUser" placeholder="Admin Username">
-<input type="password" id="adminPass" placeholder="Password">
+      // LOGIN (Firebase Auth)
+      async function login() {
+        let username = document.getElementById("username").value;
+        let password = document.getElementById("password").value;
 
-<button onclick="adminLogin()">Login as Admin</button>
+        if (username === "" || password === "") {
+          alert("Fill all fields");
+          return;
+        }
 
-</div>
+        // Use email as username for Firebase Auth
+        try {
+          const userCredential = await window.signInWithEmailAndPassword(
+            window.firebaseAuth,
+            username,
+            password,
+          );
+          // Login successful
+          localStorage.setItem("role", "student");
+          localStorage.setItem(
+            "firstName",
+            userCredential.user.displayName || "Student",
+          );
+          localStorage.setItem("lastName", "");
+          localStorage.setItem("email", username); // Save email for profile
+          if (!localStorage.getItem("xp")) localStorage.setItem("xp", 0);
+          if (!localStorage.getItem("level")) localStorage.setItem("level", 1);
+          window.location.href = "dashboard.html";
+        } catch (error) {
+          alert("Login failed: " + error.message);
+        }
+      }
 
-</div>
-
-<script>
-
-/* AUTO LOGIN CHECK */
-let role = localStorage.getItem("role");
-if(role === "student"){
-window.location.href = "dashboard.html";
-}
-if(role === "admin"){
-window.location.href = "admin-dashboard.html";
-}
-
-/* TOGGLE ADMIN */
-function toggleAdmin(){
-let box = document.getElementById("adminBox");
-box.style.display = box.style.display === "block" ? "none" : "block";
-}
-
-/* GO SIGNUP */
-function goSignup(){
-window.location.href = "signup.html";
-}
-
-/* LOGIN */
-function login(){
-
-let username = document.getElementById("username").value;
-let password = document.getElementById("password").value;
-
-if(username === "" || password === ""){
-alert("Fill all fields");
-return;
-}
-
-let users = JSON.parse(localStorage.getItem("users")) || [];
-
-let found = users.find(u => u.username === username && u.password === password);
-
-if(!found){
-alert("Invalid account!");
-return;
-}
-
-localStorage.setItem("role","student");
-localStorage.setItem("firstName",found.firstName);
-localStorage.setItem("lastName",found.lastName);
-
-/* DEFAULT VALUES */
-if(!localStorage.getItem("xp")) localStorage.setItem("xp",0);
-if(!localStorage.getItem("level")) localStorage.setItem("level",1);
-
-window.location.href = "dashboard.html";
-
-}
-
-/* ADMIN LOGIN */
-function adminLogin(){
-
-let user = document.getElementById("adminUser").value;
-let pass = document.getElementById("adminPass").value;
-
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "12345";
-
-if(user === ADMIN_USER && pass === ADMIN_PASS){
-
-localStorage.setItem("role","admin");
-localStorage.setItem("firstName","Prof.");
-localStorage.setItem("lastName","Cabantog");
-
-window.location.href = "admin-dashboard.html";
-
-}else{
-alert("Invalid admin credentials!");
-}
-
-}
-
-</script>
-
-</body>
+      // ADMIN LOGIN (local only)
+      function adminLogin() {
+        let user = document.getElementById("adminUser").value;
+        let pass = document.getElementById("adminPass").value;
+        const ADMIN_USER = "admin";
+        const ADMIN_PASS = "12345";
+        if (user === ADMIN_USER && pass === ADMIN_PASS) {
+          localStorage.setItem("role", "admin");
+          localStorage.setItem("firstName", "Prof.");
+          localStorage.setItem("lastName", "Cabantog");
+          window.location.href = "admin-dashboard.html";
+        } else {
+          alert("Invalid admin credentials!");
+        }
+      }
+    </script>
+  </body>
 </html>

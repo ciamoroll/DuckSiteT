@@ -1,21 +1,22 @@
 // firebase-config.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// Firebase project credentials (FIXED)
-const firebaseConfig = {
-  apiKey: "AIzaSyDfTh-4-RYAnNKHiazNNhH985pDBBDk48",
-  authDomain: "ducksitet-55d89.firebaseapp.com",
-  projectId: "ducksitet-55d89",
-  storageBucket: "ducksitet-55d89.appspot.com", // ✅ FIXED HERE
-  messagingSenderId: "1046771611799",
-  appId: "1:1046771611799:web:9988a2d30c0d5d5cf8d1d2"
+// Your web app's Firebase configuration
+export const firebaseConfig = {
+  apiKey: "AIzaSyAesYrgoGw83eUbQLUrqAlsYLgr16FjUd8",
+  authDomain: "ducksitet-a5501.firebaseapp.com",
+  projectId: "ducksitet-a5501",
+  storageBucket: "ducksitet-a5501.appspot.com",
+  messagingSenderId: "132133020741",
+  appId: "1:132133020741:web:40cc05208515d479df6f2c",
+  measurementId: "G-5MC1HJMWYZ"
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-export { app, db, auth };
+export const app = initializeApp(firebaseConfig);
+export const analytics = getAnalytics(app);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
