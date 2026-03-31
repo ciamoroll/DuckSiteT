@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitor Progress</title>
+<script src="/admin-guard.js"></script>
+<style>
+/* KEEP YOUR EXISTING STYLES */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#eef2f7;padding:20px;}
+.back-btn{position:fixed;top:15px;right:20px;padding:8px 15px;border:none;border-radius:20px;background:#4c6faf;color:white;font-weight:bold;cursor:pointer;z-index:100;}
+.container{max-width:1200px;margin:auto;background:white;border-radius:10px;padding:20px;box-shadow:0 3px 10px rgba(0,0,0,0.1);}
+.header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.title{font-size:20px;font-weight:bold;}
+.subtitle{font-size:13px;color:#666;}
+.search{padding:7px;border:1px solid #ccc;border-radius:5px;}
+.stats{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap;}
+.stat{flex:1;min-width:120px;padding:15px;border-radius:10px;color:white;}
+.blue{background:#5a8dee;}
+.green{background:#39c16c;}
+.yellow{background:#f4b740;}
+.red{background:#e55353;}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;}
+@media(max-width:900px){.grid{grid-template-columns:1fr;}}
+table{width:100%;border-collapse:collapse;background:white;}
+th,td{padding:10px;font-size:13px;text-align:left;}
+th{background:#f0f2f7;}
+tr{border-bottom:1px solid #eee;}
+.status{padding:5px 8px;border-radius:8px;font-size:11px;color:white;}
+.completed{background:#39c16c;}
+.progress{background:#f4b740;}
+.notstarted{background:#e55353;}
+.progress-bar{height:8px;background:#ddd;border-radius:5px;overflow:hidden;}
+.progress-fill{height:100%;background:#4c6faf;}
+.panel{background:#f5f7fb;padding:15px;border-radius:10px;}
+.pie{width:150px;height:150px;border-radius:50%;margin:auto;}
+.legend{margin-top:15px;font-size:13px;}
+.legend div{margin-bottom:5px;}
+.small{font-size:11px;color:#777;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<button class="back-btn" onclick="goDashboard()">⬅ Back to Dashboard</button>
+
+<div class="container">
+
+<div class="header">
+<div>
+<div class="title">User Progress Overview</div>
+<div class="subtitle">Real-time progress tracking for all users</div>
+</div>
+<input type="text" class="search" placeholder="Search user" id="searchInput">
+</div>
+
+<div class="stats">
+<div class="stat blue"><h2 id="totalUsers">0</h2><p>Total Users</p></div>
+<div class="stat green"><h2 id="completed">0</h2><p>Completed</p></div>
+<div class="stat yellow"><h2 id="inProgress">0</h2><p>In Progress</p></div>
+<div class="stat red"><h2 id="notStarted">0</h2><p>Not Started</p></div>
+</div>
+
+<div class="grid">
+<div>
+<table>
+<thead>
+<tr>
+<th>User Name</th>
+<th>Task/Module</th>
+<th>Progress</th>
+<th>Status</th>
+<th>Last Updated</th>
+</tr>
+</thead>
+<tbody id="progressTable"></tbody>
+</table>
+<div class="small" id="tableInfo">Showing 0 users</div>
+</div>
+
+<div class="panel">
+<h4>Status Distribution</h4>
+<div class="pie" id="pieChart"></div>
+<div class="legend">
+<div>🟢 Completed - <span id="legendCompleted">0%</span></div>
+<div>🟡 In Progress - <span id="legendProgress">0%</span></div>
+<div>🔴 Not Started - <span id="legendNotStarted">0%</span></div>
+</div>
+<div class="small">System status: Active</div>
+<button class="back-btn" onclick="goDashboard()">⬅ Back to Dashboard</button>
+
+<script>
+function goDashboard() {
+    window.location.href = "/admin/dashboard";
+}
+</script>
+</div>
+</div>
+
+</div>
+
+<script src="/runtime-config.js"></script>
+<script src="/admin-api-client.js"></script>
+<script type="module">
+
+let usersProgress = [];
+
+function goDashboard(){ window.location.href = "/admin/dashboard"; }
+
+/* LOAD DATA FROM BACKEND */
+async function loadProgress(){
+    try {
+      const payload = await window.AdminApi.get("/api/progress");
+      usersProgress = (payload.rows || []).map((row) => ({
+        ...row,
+        lastUpdated: row.lastUpdated || row.last_updated || "-"
+      }));
+    } catch (error) {
+      console.error("Error loading user progress:", error);
+      alert(error.message);
+      return;
+    }
+    displayProgress(usersProgress);
+    updateStats(usersProgress);
+}
+
+/* DISPLAY TABLE */
+function displayProgress(list){
+    const table = document.getElementById("progressTable");
+    table.innerHTML = "";
+    list.forEach(u=>{
+        let statusClass = u.status.toLowerCase();
+        table.innerHTML += `
+        <tr>
+            <td>${u.name}</td>
+            <td>${u.module}</td>
+            <td>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:${u.progress}%"></div>
+                </div>
+            </td>
+            <td><span class="status ${statusClass}">${u.status}</span></td>
+            <td>${u.lastUpdated || '-'}</td>
+        </tr>
+        `;
+    });
+    document.getElementById("tableInfo").innerText = `Showing 1 to ${list.length} users`;
+}
+
+/* UPDATE STATS AND PIE */
+function updateStats(list){
+    const total = list.length;
+    const completed = list.filter(u=>u.status==='Completed').length;
+    const progress = list.filter(u=>u.status==='In Progress').length;
+    const notStarted = list.filter(u=>u.status==='Not Started').length;
+
+    document.getElementById("totalUsers").innerText = total;
+    document.getElementById("completed").innerText = completed;
+    document.getElementById("inProgress").innerText = progress;
+    document.getElementById("notStarted").innerText = notStarted;
+
+    const pctCompleted = total ? Math.round((completed/total)*100) : 0;
+    const pctProgress = total ? Math.round((progress/total)*100) : 0;
+    const pctNotStarted = total ? 100 - pctCompleted - pctProgress : 0;
+
+    document.getElementById("pieChart").style.background = 
+        `conic-gradient(#39c16c 0% ${pctCompleted}%, #f4b740 ${pctCompleted}% ${pctCompleted+pctProgress}%, #e55353 ${pctCompleted+pctProgress}% 100%)`;
+
+    document.getElementById("legendCompleted").innerText = `${pctCompleted}%`;
+    document.getElementById("legendProgress").innerText = `${pctProgress}%`;
+    document.getElementById("legendNotStarted").innerText = `${pctNotStarted}%`;
+}
+
+/* SEARCH FILTER */
+document.getElementById("searchInput").addEventListener("input",(e)=>{
+    const filtered = usersProgress.filter(u=>u.name.toLowerCase().includes(e.target.value.toLowerCase()));
+    displayProgress(filtered);
+});
+
+/* INIT */
+loadProgress();
+
+</script>
+
+</body>
+</html>
+
+

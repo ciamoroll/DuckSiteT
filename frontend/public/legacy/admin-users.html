@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Management</title>
+<script src="/admin-guard.js"></script>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f4f6fb;
+}
+
+/* HEADER */
+.header{
+background:#e9edf5;
+padding:20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.header-left{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.header-left img{
+width:50px;
+}
+
+.title{
+font-size:22px;
+font-weight:bold;
+}
+
+.subtitle{
+font-size:13px;
+color:#777;
+}
+
+/* SEARCH */
+.search{
+padding:8px;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+/* FILTER BAR */
+.filters{
+padding:15px 20px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+align-items:center;
+}
+
+select, .btn{
+padding:8px 10px;
+border-radius:5px;
+border:1px solid #ccc;
+background:white;
+cursor:pointer;
+}
+
+.add-btn{
+background:#4c6faf;
+color:white;
+border:none;
+}
+
+/* STATS */
+.stats{
+display:flex;
+gap:15px;
+padding:0 20px;
+margin-bottom:15px;
+}
+
+.stat{
+flex:1;
+padding:15px;
+border-radius:10px;
+color:white;
+}
+
+.blue{background:#5a8dee;}
+.green{background:#39c16c;}
+.orange{background:#f4b740;}
+.red{background:#e55353;}
+
+/* TABLE */
+.table-container{
+padding:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+border-radius:10px;
+overflow:hidden;
+}
+
+th, td{
+padding:12px;
+text-align:left;
+font-size:13px;
+}
+
+th{
+background:#f0f2f7;
+color:#555;
+}
+
+tr{
+border-bottom:1px solid #eee;
+}
+
+/* STATUS */
+.status{
+padding:5px 10px;
+border-radius:10px;
+font-size:12px;
+color:white;
+}
+
+.active{background:#39c16c;}
+.pending{background:#f4b740;}
+.inactive{background:#e55353;}
+
+/* ACTIONS */
+.actions button{
+border:none;
+background:#eee;
+padding:5px 8px;
+margin-right:5px;
+cursor:pointer;
+border-radius:5px;
+}
+
+.actions button:hover{
+background:#ddd;
+}
+
+/* FOOTER */
+.footer{
+padding:10px 20px;
+font-size:12px;
+color:#555;
+}
+
+/* ========================= */
+/* 🔥 ADD USER MODAL */
+/* ========================= */
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+justify-content:center;
+align-items:center;
+z-index:1000;
+}
+
+.modal-content{
+background:white;
+padding:25px;
+border-radius:10px;
+width:400px;
+}
+
+.modal-content h2{
+margin-bottom:15px;
+}
+
+.modal-content input,
+.modal-content select{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+.modal-actions{
+display:flex;
+justify-content:flex-end;
+gap:10px;
+}
+
+.modal-actions button{
+padding:8px 12px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.save-btn{
+background:#4c6faf;
+color:white;
+}
+
+.cancel-btn{
+background:#ccc;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+<div class="header-left">
+<img src="/images/misc/users.png">
+<div>
+<div class="title">User Management</div>
+<div class="subtitle">Manage and verify student accounts</div>
+</div>
+</div>
+
+<input type="text" class="search" placeholder="Search user">
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+<select><option>All Statuses</option></select>
+<select><option>All Departments</option></select>
+<select><option>All Roles</option></select>
+<select><option>All Learning</option></select>
+
+<button class="btn">Bulk Actions</button>
+<button class="btn add-btn" onclick="openModal()">Add User</button>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+<div class="stat blue"><h2 id="totalUsers">0</h2><p>Total Users</p></div>
+<div class="stat green"><h2 id="activeUsers">0</h2><p>Active</p></div>
+<div class="stat orange"><h2 id="pendingUsers">0</h2><p>Pending</p></div>
+<div class="stat red"><h2 id="inactiveUsers">0</h2><p>Inactive</p></div>
+</div>
+
+<!-- TABLE -->
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th><input type="checkbox"></th>
+<th>User Name</th>
+<th>User ID</th>
+<th>Email</th>
+<th>Status</th>
+<th>Department</th>
+<th>Role</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="userTable">
+</tbody>
+</table>
+</div>
+
+<div class="footer">
+Showing users
+</div>
+
+<!-- ========================= -->
+<!-- 🔥 ADD USER MODAL -->
+<!-- ========================= -->
+
+<div class="modal" id="userModal">
+<div class="modal-content">
+
+<h2>Add User</h2>
+
+<input type="text" id="name" placeholder="Full Name">
+<input type="text" id="userid" placeholder="User ID">
+<input type="email" id="email" placeholder="Email">
+
+<select id="status">
+<option>Active</option>
+<option>Pending</option>
+<option>Inactive</option>
+</select>
+
+<select id="department">
+<option>Science</option>
+<option>Mathematics</option>
+<option>Literature</option>
+</select>
+
+<select id="role">
+<option>Student</option>
+<option>Admin</option>
+</select>
+
+<div class="modal-actions">
+<button class="cancel-btn" onclick="closeModal()">Cancel</button>
+<button class="save-btn" onclick="saveUser()">Save</button>
+</div>
+
+</div>
+</div>
+
+<script src="/runtime-config.js"></script>
+<script src="/admin-api-client.js"></script>
+<script type="module">
+
+/* =========================
+   🔥 FIREBASE FUNCTIONS
+========================= */
+
+let users = [];
+let editingUserId = null;
+
+/* LOAD USERS FROM SUPABASE */
+async function loadUsersFromFirestore(){
+  users = [];
+  try {
+    const payload = await window.AdminApi.get("/api/users");
+    users = (payload.users || []).map((u) => ({
+    id: u.id,
+    name: u.name || [u.first_name, u.last_name].filter(Boolean).join(" ") || "",
+    userid: u.userid || u.student_id || "",
+    email: u.email || "",
+    status: u.status || "Active",
+    department: u.department || "",
+    role: u.role || "Student"
+    }));
+  } catch (error) {
+    console.error("Error loading users:", error);
+    alert(error.message);
+    return;
+  }
+  displayUsers();
+  updateStats();
+}
+
+/* DISPLAY USERS IN TABLE */
+function displayUsers(){
+  const table = document.getElementById("userTable");
+  table.innerHTML = "";
+  users.forEach((u)=>{
+    table.innerHTML += `
+<tr>
+<td><input type="checkbox"></td>
+<td>${u.name}</td>
+<td>${u.userid || ""}</td>
+<td>${u.email}</td>
+<td><span class="status ${u.status.toLowerCase()}">${u.status}</span></td>
+<td>${u.department || ""}</td>
+<td>${u.role || ""}</td>
+<td class="actions">
+<button onclick="editUser('${u.id}')">✏️</button>
+<button onclick="deleteUser('${u.id}')">🗑️</button>
+</td>
+</tr>
+    `;
+  });
+}
+
+/* UPDATE STATS */
+function updateStats(){
+  document.getElementById("totalUsers").textContent = users.length;
+  document.getElementById("activeUsers").textContent = users.filter(u=>u.status==="Active").length;
+  document.getElementById("pendingUsers").textContent = users.filter(u=>u.status==="Pending").length;
+  document.getElementById("inactiveUsers").textContent = users.filter(u=>u.status==="Inactive").length;
+}
+
+/* OPEN MODAL */
+function openModal(){
+  document.getElementById("userModal").style.display="flex";
+}
+
+/* CLOSE MODAL */
+function closeModal(){
+  document.getElementById("userModal").style.display="none";
+  editingUserId = null;
+}
+
+/* SAVE OR UPDATE USER */
+async function saveUser(){
+  let user = {
+    name: document.getElementById("name").value,
+    userid: document.getElementById("userid").value,
+    email: document.getElementById("email").value,
+    status: document.getElementById("status").value,
+    department: document.getElementById("department").value,
+    role: document.getElementById("role").value
+  };
+
+  if(user.name === "" || user.userid === "" || user.email === ""){
+    alert("Fill all fields");
+    return;
+  }
+
+  try{
+    if(editingUserId){
+      // UPDATE USER
+      await window.AdminApi.put(`/api/users/${editingUserId}`, user);
+      console.log("User updated:", editingUserId);
+    }else{
+      const payload = await window.AdminApi.post("/api/users", user);
+      const data = payload.user;
+      console.log("User added with ID:", data?.id);
+    }
+    closeModal();
+    loadUsersFromFirestore();
+  }catch(e){
+    console.error("Error saving user:", e);
+    alert(e.message);
+  }
+}
+
+/* EDIT USER */
+function editUser(id){
+  const user = users.find(u=>u.id===id);
+  if(!user) return;
+  editingUserId = id;
+  document.getElementById("name").value = user.name;
+  document.getElementById("userid").value = user.userid || "";
+  document.getElementById("email").value = user.email;
+  document.getElementById("status").value = user.status;
+  document.getElementById("department").value = user.department || "";
+  document.getElementById("role").value = user.role || "";
+  openModal();
+}
+
+/* DELETE USER */
+async function deleteUser(id){
+  if(!confirm("Delete this user?")) return;
+  try{
+    await window.AdminApi.delete(`/api/users/${id}`);
+    console.log("User deleted:", id);
+    loadUsersFromFirestore();
+  }catch(e){
+    console.error("Error deleting user:", e);
+    alert(e.message);
+  }
+}
+
+/* =========================
+   🔥 INIT
+========================= */
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.saveUser = saveUser;
+window.editUser = editUser;
+window.deleteUser = deleteUser;
+
+loadUsersFromFirestore();
+</script>
+</body>
+</html>
+
+

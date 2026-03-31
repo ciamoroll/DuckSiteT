@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile Setup - Step 3</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+height:100vh;
+background:url("/images/backgrounds/background.jpg") no-repeat center center/cover;
+}
+
+/* Header */
+
+.header{
+position:absolute;
+top:15px;
+left:20px;
+font-size:20px;
+font-weight:bold;
+color:#ffd84d;
+}
+
+/* Container */
+
+.container{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* Card */
+
+.card{
+width:600px;
+padding:30px;
+border-radius:20px;
+background:rgba(255,255,200,0.8);
+border:3px solid #2f6b2f;
+backdrop-filter:blur(6px);
+}
+
+/* Title */
+
+.title{
+text-align:center;
+font-size:24px;
+font-weight:bold;
+color:#1f4d1f;
+margin-bottom:15px;
+}
+
+/* Row */
+
+.top-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.profile-text{
+font-weight:bold;
+color:#1f4d1f;
+}
+
+.profile-icon{
+width:50px;
+height:50px;
+border-radius:50%;
+background:#2f6b2f;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+font-size:24px;
+}
+
+/* Progress */
+
+.progress-container{
+margin-top:10px;
+}
+
+.progress-labels{
+display:flex;
+justify-content:space-between;
+font-weight:bold;
+color:#1f4d1f;
+font-size:14px;
+}
+
+.progress-bar{
+height:10px;
+background:#2f6b2f;
+border-radius:10px;
+margin-top:5px;
+overflow:hidden;
+}
+
+.progress-fill{
+width:100%;
+height:100%;
+background:#f4e7a1;
+}
+
+/* Year buttons */
+
+.year-container{
+margin-top:25px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+.year-btn{
+padding:15px;
+border-radius:30px;
+border:none;
+background:#2f6b2f;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.year-btn.selected{
+background:#1f4d1f;
+border:3px solid #f4e7a1;
+}
+
+/* Bottom buttons */
+
+.buttons{
+margin-top:35px;
+display:flex;
+justify-content:space-between;
+}
+
+button.action{
+padding:12px 40px;
+border-radius:25px;
+border:none;
+background:#f4e7a1;
+font-weight:bold;
+cursor:pointer;
+}
+
+button.action:hover{
+background:#e6d98a;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+🦆 DuckSiteT
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<div class="title">Welcome to DuckSiteT!</div>
+
+<div class="top-row">
+<div class="profile-text">Profile Setup</div>
+<div class="profile-icon">👤</div>
+</div>
+
+<div class="progress-container">
+<div class="progress-labels">
+<span></span>
+<span>Step 3 of 3</span>
+</div>
+
+<div class="progress-bar">
+<div class="progress-fill"></div>
+</div>
+</div>
+
+<div class="year-container">
+<button class="year-btn" onclick="selectYear(this)">First year</button>
+<button class="year-btn" onclick="selectYear(this)">Second year</button>
+<button class="year-btn" onclick="selectYear(this)">Third year</button>
+<button class="year-btn" onclick="selectYear(this)">Fourth year</button>
+</div>
+
+<div class="buttons">
+<button class="action" onclick="goBack()">Back</button>
+<button class="action" onclick="finishSetup()">Finish</button>
+</div>
+
+</div>
+</div>
+
+<script type="module">
+import { supabase, getCurrentUser } from "/lib-supabase-client.js";
+
+let selectedYear = "";
+
+window.selectYear = function(button){
+    document.querySelectorAll(".year-btn").forEach(btn => btn.classList.remove("selected"));
+    button.classList.add("selected");
+    selectedYear = button.innerText;
+}
+
+window.finishSetup = async function(){
+
+    let userId = localStorage.getItem("userId");
+
+    if(selectedYear === ""){
+        alert("Please select your year level");
+        return;
+    }
+
+    try{
+        if (!userId) {
+            const user = await getCurrentUser();
+            userId = user?.id || null;
+        }
+        if (!userId) throw new Error("No active user session found.");
+
+        const { error } = await supabase
+          .from("users")
+          .update({
+            year_level: selectedYear,
+            profile_completed: true,
+            profile_step: 3,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", userId);
+        if (error) throw error;
+
+        localStorage.setItem("yearLevel", selectedYear);
+        localStorage.setItem("profileCompleted", true);
+
+        alert("Profile Setup Complete!");
+
+        window.location.href = "/dashboard";
+
+    }catch(e){
+        alert("Error saving data");
+    }
+}
+
+window.goBack = function(){
+    window.location.href = "/profile-step2";
+}
+</script>
+
+</body>
+</html>
+

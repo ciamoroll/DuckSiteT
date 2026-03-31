@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DuckSiteT Leaderboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+
+body{
+background:url("/images/backgrounds/background.jpeg") center/cover no-repeat fixed;
+color:white;
+}
+
+/* NAVBAR */
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 30px;
+background:linear-gradient(90deg,#0d0d0d,#7a6a22,#c9ad45);
+border-bottom:2px solid rgba(255,215,0,0.4);
+}
+
+.logo{
+display:flex;
+align-items:center;
+font-weight:bold;
+font-size:18px;
+}
+
+.logo img{
+width:35px;
+margin-right:8px;
+}
+
+nav{
+display:flex;
+gap:18px;
+}
+
+nav a{
+text-decoration:none;
+color:white;
+font-size:14px;
+opacity:.8;
+}
+
+nav a:hover{color:#ffd700;}
+nav a.active{color:#ffd700;font-weight:bold;}
+
+.user{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.level{
+background:#e6d36f;
+color:black;
+padding:4px 10px;
+border-radius:15px;
+font-weight:bold;
+font-size:12px;
+}
+
+.avatar{
+background:#e6d36f;
+color:black;
+border-radius:50%;
+width:32px;
+height:32px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-weight:bold;
+}
+
+/* MAIN */
+.container{
+text-align:center;
+padding:40px 20px;
+}
+
+.title{
+font-size:40px;
+color:#ffd700;
+font-weight:bold;
+}
+
+.subtitle{
+margin-bottom:20px;
+}
+
+/* BOARD */
+.board{
+max-width:800px;
+margin:auto;
+background:rgba(0,0,0,0.6);
+padding:20px;
+border-radius:20px;
+}
+
+.row{
+background:#e0e0e0;
+color:black;
+border-radius:20px;
+padding:12px;
+margin:12px 0;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.left{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.rank{
+width:30px;
+font-weight:bold;
+}
+
+.avatar-small{
+width:35px;
+height:35px;
+border-radius:50%;
+background:black;
+}
+
+.name{
+color:green;
+font-weight:bold;
+}
+
+.stats{
+font-size:12px;
+color:red;
+}
+
+.play{
+background:#b7e4b7;
+padding:6px 12px;
+border-radius:10px;
+}
+
+.gold{color:gold;}
+.silver{color:silver;}
+.bronze{color:#cd7f32;}
+
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+<div class="logo">
+<img src="/images/logos/duck-logo.png">
+DuckSiteT
+</div>
+
+<nav>
+<a href="/dashboard">Dashboard</a>
+<a href="/courses">Courses</a>
+<a href="/profile">Profile</a>
+<a href="/leaderboard" class="active">Leaderboard</a>
+</nav>
+
+<div class="user">
+🏆 <span id="points">0 pts</span>
+<div class="level">Level <span id="level">1</span></div>
+<div class="avatar" id="avatar">U</div>
+</div>
+
+</header>
+
+<div class="container">
+
+<div class="title">LEADERBOARD</div>
+<div class="subtitle">Top Ducks This Week</div>
+
+<div class="board" id="leaderboard"></div>
+
+</div>
+
+<script>
+
+/* AUTH */
+let role = localStorage.getItem("role");
+if(!role){ window.location.href = "/login"; }
+
+/* GLOBAL */
+function getXP(){ return parseInt(localStorage.getItem("xp"))||0; }
+function getLevel(){ return parseInt(localStorage.getItem("level"))||1; }
+
+/* LOAD */
+let xp=getXP();
+let level=getLevel();
+
+let firstName=localStorage.getItem("firstName")||"User";
+let lastName=localStorage.getItem("lastName")||"";
+
+document.getElementById("points").innerText=xp+" XP";
+document.getElementById("level").innerText=level;
+
+document.getElementById("avatar").innerText=
+(firstName.charAt(0)+lastName.charAt(0)).toUpperCase();
+
+let players=[
+{name:"Alex",level:20,badges:15,points:1200},
+{name:"Kim",level:15,badges:14,points:1180},
+{name:firstName+" "+lastName,level:level,badges:3,points:xp}
+];
+
+players.sort((a,b)=>b.points-a.points);
+
+let board=document.getElementById("leaderboard");
+
+players.forEach((p,i)=>{
+
+let medal=i==0?"🥇":i==1?"🥈":i==2?"🥉":i+1;
+
+board.innerHTML+=`
+<div class="row">
+<div class="left">
+<div class="rank">${medal}</div>
+<div class="avatar-small"></div>
+<div>
+<div class="name">${p.name}</div>
+<div class="stats">Level ${p.level} | ${p.points} XP</div>
+</div>
+</div>
+<div class="play">▶</div>
+</div>
+`;
+
+});
+
+</script>
+
+</body>
+</html>
+

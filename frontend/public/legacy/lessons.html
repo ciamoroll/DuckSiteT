@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DuckSiteT Lessons</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:url("pond-/images/backgrounds/background.jpg") center/cover no-repeat;
+min-height:100vh;
+color:white;
+}
+
+/* NAVBAR */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 20px;
+background:linear-gradient(90deg,#0d0d0d,#7a6a22,#c9ad45);
+flex-wrap:wrap;
+}
+
+.logo{
+font-weight:bold;
+font-size:18px;
+}
+
+.nav-links{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+}
+
+.nav-links a{
+text-decoration:none;
+color:white;
+opacity:.8;
+font-size:14px;
+}
+
+.nav-links a:hover{
+color:#ffd700;
+}
+
+.user{
+display:flex;
+align-items:center;
+gap:10px;
+margin-top:5px;
+}
+
+.level{
+background:#e6d36f;
+color:black;
+padding:4px 10px;
+border-radius:15px;
+font-size:12px;
+font-weight:bold;
+}
+
+.avatar{
+background:#e6d36f;
+color:black;
+width:30px;
+height:30px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+/* TITLE */
+
+.course-title{
+text-align:center;
+margin-top:25px;
+font-size:22px;
+font-weight:bold;
+padding:0 10px;
+}
+
+/* LESSON GRID */
+
+.lesson-container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+gap:40px;
+padding:40px 20px;
+justify-items:center;
+}
+
+/* LESSON */
+
+.lesson{
+width:160px;
+height:100px;
+background:#f4c542;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+font-weight:bold;
+color:black;
+cursor:pointer;
+position:relative;
+transition:.3s;
+padding:10px;
+}
+
+.lesson:hover{
+transform:scale(1.08);
+}
+
+.lesson::before{
+content:"🦆 🦆 🦆";
+position:absolute;
+top:-28px;
+font-size:12px;
+}
+
+/* STATES */
+
+.locked{
+background:#888;
+opacity:.6;
+cursor:not-allowed;
+}
+
+.locked::after{
+content:"🔒";
+position:absolute;
+bottom:-22px;
+font-size:14px;
+}
+
+.unlocked{
+border:3px solid #2e7d32;
+}
+
+.completed{
+border:4px solid #2e7d32;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+<div class="logo">🦆 DuckSiteT</div>
+
+<div class="nav-links">
+<a href="/dashboard">Dashboard</a>
+<a href="/courses">Courses</a>
+<a href="/profile">Profile</a>
+</div>
+
+<div class="user">
+🏆 <span id="points">0</span>
+<div class="level">Level <span id="level">1</span></div>
+<div class="avatar" id="avatar">U</div>
+</div>
+
+</div>
+
+<!-- COURSE TITLE -->
+
+<div class="course-title" id="courseTitle"></div>
+
+<!-- LESSONS -->
+
+<div class="lesson-container" id="lessonContainer"></div>
+
+<script>
+
+/* AUTH */
+let role = localStorage.getItem("role");
+if(!role){ window.location.href = "/login"; }
+
+/* GLOBAL */
+function getXP(){ return parseInt(localStorage.getItem("xp"))||0; }
+function setXP(v){ localStorage.setItem("xp",v); }
+function getLevel(){ return parseInt(localStorage.getItem("level"))||1; }
+function setLevel(v){ localStorage.setItem("level",v); }
+
+function updateLevel(){
+let xp=getXP(), level=getLevel();
+while(xp>=500){ xp-=500; level++; }
+setXP(xp); setLevel(level);
+}
+
+/* ========================= */
+/* 🔥 GET COURSE FROM ADMIN */
+/* ========================= */
+
+let courses = JSON.parse(localStorage.getItem("courses")) || [];
+let index = localStorage.getItem("currentCourseIndex");
+
+if(index === null || !courses[index]){
+alert("No course found. Redirecting...");
+window.location.href = "/courses";
+}
+
+let course = courses[index];
+
+/* SET TITLE */
+document.getElementById("courseTitle").innerText = course.name;
+
+/* USER INFO */
+let xp=getXP();
+let level=getLevel();
+
+document.getElementById("points").innerText=xp;
+document.getElementById("level").innerText=level;
+
+let firstName=localStorage.getItem("firstName")||"User";
+let lastName=localStorage.getItem("lastName")||"";
+
+document.getElementById("avatar").innerText=
+(firstName.charAt(0)+lastName.charAt(0)).toUpperCase();
+
+/* LESSONS FROM ADMIN */
+let lessons = course.lessons || [];
+const unlockCost = 100;
+
+/* LOAD LESSONS */
+function loadLessons(){
+
+let container=document.getElementById("lessonContainer");
+container.innerHTML="";
+
+if(lessons.length === 0){
+container.innerHTML = "<p>No lessons yet.</p>";
+return;
+}
+
+lessons.forEach((lesson,index)=>{
+
+let div=document.createElement("div");
+div.classList.add("lesson");
+
+let unlockKey = "course_"+course.id+"_lesson_"+index+"_unlocked";
+let doneKey   = "course_"+course.id+"_lesson_"+index+"_done";
+
+/* FIRST LESSON AUTO UNLOCK */
+if(index===0){ localStorage.setItem(unlockKey,"true"); }
+
+/* STATE */
+if(localStorage.getItem(unlockKey)){
+div.classList.add("unlocked");
+}else{
+div.classList.add("locked");
+}
+
+if(localStorage.getItem(doneKey)){
+div.classList.add("completed");
+}
+
+/* TEXT */
+div.innerText=lesson;
+
+/* CLICK */
+div.onclick=function(){ handleLesson(index); };
+
+container.appendChild(div);
+
+});
+
+}
+
+/* HANDLE CLICK */
+function handleLesson(index){
+
+let unlockKey = "course_"+course.id+"_lesson_"+index+"_unlocked";
+
+if(!localStorage.getItem(unlockKey)){
+
+let prevDone = localStorage.getItem(
+"course_"+course.id+"_lesson_"+(index-1)+"_done"
+);
+
+if(!prevDone){
+alert("Finish previous lesson first");
+return;
+}
+
+if(xp < unlockCost){
+alert("Need "+unlockCost+" XP");
+return;
+}
+
+if(!confirm("Unlock for "+unlockCost+" XP?")) return;
+
+xp -= unlockCost;
+setXP(xp);
+
+localStorage.setItem(unlockKey,"true");
+
+updateLevel();
+xp=getXP();
+
+document.getElementById("points").innerText=xp;
+
+loadLessons();
+return;
+}
+
+/* 👉 OPEN LESSON VIEW */
+localStorage.setItem("currentLessonIndex", index);
+window.location.href = "/lesson-view";
+
+}
+
+/* INIT */
+loadLessons();
+
+</script>
+
+</body>
+</html>
+
