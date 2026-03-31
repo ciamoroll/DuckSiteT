@@ -14,7 +14,7 @@ font-family:Arial;
 }
 
 body{
-background:url("pond-/images/backgrounds/background.jpg") center/cover no-repeat;
+background:url("/images/backgrounds/background.jpg") center/cover no-repeat;
 min-height:100vh;
 color:white;
 }
@@ -216,6 +216,7 @@ window.location.href = "/courses";
 }
 
 let course = courses[index];
+localStorage.setItem("currentCourseId", course.id);
 
 /* SET TITLE */
 document.getElementById("courseTitle").innerText = course.name;

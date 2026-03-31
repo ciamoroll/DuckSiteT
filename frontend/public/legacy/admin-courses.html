@@ -222,13 +222,6 @@ margin-bottom:5px;
 <div class="modal-actions">
 <button class="cancel-btn" onclick="closeModal()">Cancel</button>
 <button class="save-btn" onclick="saveCourse()">Save</button>
-<button class="back-btn" onclick="goDashboard()">⬅ Back to Dashboard</button>
-
-<script>
-function goDashboard() {
-    window.location.href = "/admin/dashboard";
-}
-</script>
 </div>
 </div>
 </div>
@@ -244,6 +237,7 @@ let courses = [];
 let classes = [];
 let assigned = [];
 let lessons = [];
+let editingCourseId = null;
 
 /* NAV */
 function goDashboard(){
@@ -323,6 +317,11 @@ function openModal(){
 function closeModal(){ 
   document.getElementById("modal").style.display="none";
   assigned=[]; lessons=[];
+  editingCourseId = null;
+  document.querySelector(".modal-content h3").innerText = "Create Course";
+  document.getElementById("courseName").value = "";
+  document.getElementById("courseCode").value = "";
+  document.getElementById("description").value = "";
 }
 
 /* LOAD COURSES */
@@ -362,17 +361,16 @@ function displayCourses(){
 async function editCourse(id){
   const c = courses.find((course) => String(course.id) === String(id));
   if(!c) return;
-  const name = prompt("Edit course name:", c.name || "");
-  if(!name) return;
-  const code = prompt("Edit course code:", c.code || "");
-  if(!code) return;
-  const description = prompt("Edit description:", c.description || "") ?? "";
-  try{
-    await window.AdminApi.put(`/api/courses/${id}`, { name, code, description });
-    loadCoursesFromFirestore();
-  }catch(e){
-    alert(e.message);
-  }
+  editingCourseId = id;
+  document.querySelector(".modal-content h3").innerText = "Edit Course";
+  document.getElementById("courseName").value = c.name || "";
+  document.getElementById("courseCode").value = c.code || "";
+  document.getElementById("description").value = c.description || "";
+  assigned = Array.isArray(c.classes) ? c.classes : [];
+  lessons = Array.isArray(c.lessons) ? c.lessons : [];
+  updateAssigned();
+  updateLessons();
+  openModal();
 }
 
 /* SAVE COURSE */
@@ -383,14 +381,19 @@ async function saveCourse(){
   if(!name||!code){ alert("Fill required fields"); return; }
 
   try{
-    await window.AdminApi.post("/api/courses", {
+    const payload = {
       name:name,
       code:code,
       description:desc,
       classes:assigned,
       lessons:lessons,
       materials:[]
-    });
+    };
+    if (editingCourseId) {
+      await window.AdminApi.put(`/api/courses/${editingCourseId}`, payload);
+    } else {
+      await window.AdminApi.post("/api/courses", payload);
+    }
     closeModal();
     loadCoursesFromFirestore();
   }catch(e){ console.error("Error adding course:",e); alert(e.message);}

@@ -186,6 +186,7 @@ DuckSiteT
 
 </div>
 
+<script src="/runtime-config.js"></script>
 <script>
 
 /* AUTH */
@@ -195,6 +196,7 @@ if(!role){ window.location.href = "/login"; }
 /* GLOBAL */
 function getXP(){ return parseInt(localStorage.getItem("xp"))||0; }
 function getLevel(){ return parseInt(localStorage.getItem("level"))||1; }
+const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) || "http://localhost:4000";
 
 /* LOAD */
 let xp=getXP();
@@ -209,35 +211,40 @@ document.getElementById("level").innerText=level;
 document.getElementById("avatar").innerText=
 (firstName.charAt(0)+lastName.charAt(0)).toUpperCase();
 
-let players=[
-{name:"Alex",level:20,badges:15,points:1200},
-{name:"Kim",level:15,badges:14,points:1180},
-{name:firstName+" "+lastName,level:level,badges:3,points:xp}
-];
-
-players.sort((a,b)=>b.points-a.points);
-
-let board=document.getElementById("leaderboard");
-
-players.forEach((p,i)=>{
-
-let medal=i==0?"🥇":i==1?"🥈":i==2?"🥉":i+1;
-
-board.innerHTML+=`
-<div class="row">
-<div class="left">
-<div class="rank">${medal}</div>
-<div class="avatar-small"></div>
-<div>
-<div class="name">${p.name}</div>
-<div class="stats">Level ${p.level} | ${p.points} XP</div>
-</div>
-</div>
-<div class="play">▶</div>
-</div>
-`;
-
-});
+async function renderLeaderboard() {
+  const board=document.getElementById("leaderboard");
+  board.innerHTML = `<div class="row"><div class="left">Loading leaderboard...</div></div>`;
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/public/leaderboard`);
+    const payload = await response.json();
+    const players = (payload.leaderboard || []);
+    if (!players.length) {
+      board.innerHTML = `<div class="row"><div class="left">No leaderboard data yet.</div></div>`;
+      return;
+    }
+    board.innerHTML = "";
+    players.forEach((p,i)=>{
+      let medal=i==0?"🥇":i==1?"🥈":i==2?"🥉":i+1;
+      board.innerHTML+=`
+      <div class="row">
+      <div class="left">
+      <div class="rank">${medal}</div>
+      <div class="avatar-small"></div>
+      <div>
+      <div class="name">${p.name}</div>
+      <div class="stats">Level ${p.level} | ${p.xp} XP</div>
+      </div>
+      </div>
+      <div class="play">▶</div>
+      </div>
+      `;
+    });
+  } catch (_error) {
+    board.innerHTML = `<div class="row"><div class="left">Failed to load leaderboard.</div></div>`;
+  }
+}
+renderLeaderboard();
+setInterval(renderLeaderboard, 10000);
 
 </script>
 

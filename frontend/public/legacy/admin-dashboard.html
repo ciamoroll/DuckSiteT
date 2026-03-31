@@ -55,7 +55,7 @@ background:#e0e0e0;
 }
 
 .logout-btn{
-background:#2f6b2f;
+background:#e55353;
 color:white;
 }
 
@@ -128,11 +128,10 @@ background:#3a5a96;
 
 <div class="header-left">
 <!-- <img src="admin-avatar.png"> --> <!-- Removed -->
-<div class="header-title">Prof. Cabantog</div>
+<div class="header-title" id="adminName">Professor</div>
 </div>
 
 <div class="header-right">
-<button class="back-btn" onclick="goDashboard()">⬅ Back to Dashboard</button>
 <button class="dashboard-btn">Admin Dashboard</button>
 <button class="logout-btn" onclick="logout()">Logout</button>
 </div>
@@ -204,6 +203,9 @@ Welcome Admin! Manage users, classes, courses, materials, challenges, and monito
 <script>
 
 /* NAVIGATION FUNCTIONS */
+const storedFirstName = localStorage.getItem("firstName") || "Prof.";
+const storedLastName = localStorage.getItem("lastName") || "";
+document.getElementById("adminName").innerText = `${storedFirstName} ${storedLastName}`.trim();
 
 function goUsers(){
 window.location.href = "/admin/users";

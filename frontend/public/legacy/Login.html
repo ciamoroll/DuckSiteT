@@ -128,6 +128,10 @@
     </div>
 
     <script>
+      function isStrongPassword(value) {
+        return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
+      }
+
       // AUTO LOGIN CHECK
       let role = localStorage.getItem("role");
       if (role === "student") {
@@ -159,6 +163,12 @@
 
         if (username === "" || password === "") {
           alert("Fill all fields");
+          return;
+        }
+        if (!isStrongPassword(password)) {
+          alert(
+            "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
+          );
           return;
         }
 
@@ -210,6 +220,12 @@
       function adminLogin() {
         let user = document.getElementById("adminUser").value;
         let pass = document.getElementById("adminPass").value;
+        if (!isStrongPassword(pass)) {
+          alert(
+            "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
+          );
+          return;
+        }
         fetch(`${window.apiBaseUrl}/api/auth/admin-login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

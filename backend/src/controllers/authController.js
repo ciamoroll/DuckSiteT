@@ -1,6 +1,12 @@
 const { supabase } = require("../services/supabaseService");
 const { errorResponse } = require("../utils/response");
 const jwt = require("jsonwebtoken");
+const PASSWORD_POLICY_MESSAGE =
+  "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.";
+
+function isStrongPassword(value) {
+  return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
+}
 
 async function withTimeout(promise, ms, message) {
   let timeoutId;
@@ -19,6 +25,9 @@ async function login(req, res) {
     const { email, password } = req.body || {};
     if (!email || !password) {
       return errorResponse(res, 400, "email and password are required");
+    }
+    if (!isStrongPassword(password)) {
+      return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
     }
 
     const { data, error } = await withTimeout(
@@ -50,6 +59,9 @@ async function signup(req, res) {
     const { firstName, lastName, email, password } = req.body || {};
     if (!firstName || !lastName || !email || !password) {
       return errorResponse(res, 400, "firstName, lastName, email, and password are required");
+    }
+    if (!isStrongPassword(password)) {
+      return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
     }
 
     const normalizedEmail = String(email).trim().toLowerCase();
@@ -138,9 +150,12 @@ async function adminLogin(req, res) {
     if (!username || !password) {
       return errorResponse(res, 400, "username and password are required");
     }
+    if (!isStrongPassword(password)) {
+      return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
+    }
 
     const adminUser = process.env.ADMIN_USER || "admin";
-    const adminPass = process.env.ADMIN_PASS || "12345";
+    const adminPass = process.env.ADMIN_PASS || "Admin@123";
 
     // Legacy static admin credential path.
     if (username === adminUser && password === adminPass) {
@@ -209,6 +224,9 @@ async function adminSignup(req, res) {
         400,
         "firstName, lastName, email, password, and setupKey are required",
       );
+    }
+    if (!isStrongPassword(password)) {
+      return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
     }
 
     const expectedKey = process.env.ADMIN_SETUP_KEY || "ducksite-admin-setup";

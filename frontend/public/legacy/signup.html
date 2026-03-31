@@ -95,6 +95,9 @@ color:#333;
 <script type="module">
 import { supabase } from "/lib-supabase-client.js";
 window.apiBaseUrl = window.APP_CONFIG?.API_BASE_URL || "http://localhost:4000";
+function isStrongPassword(value){
+  return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
+}
 
 window.signup = async function(){
 
@@ -105,6 +108,10 @@ window.signup = async function(){
 
     if(!firstName || !lastName || !email || !password){
         alert("Please fill all fields");
+        return;
+    }
+    if(!isStrongPassword(password)){
+        alert("Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.");
         return;
     }
 

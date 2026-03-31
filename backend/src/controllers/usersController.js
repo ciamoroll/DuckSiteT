@@ -34,6 +34,7 @@ async function getUserById(req, res) {
 async function createUser(req, res) {
   try {
     const payload = req.body || {};
+    if (payload.role) payload.role = String(payload.role).toLowerCase();
     if (!payload.email) {
       return errorResponse(res, 400, "email is required");
     }
@@ -51,6 +52,7 @@ async function updateUser(req, res) {
   try {
     const { id } = req.params;
     const payload = req.body || {};
+    if (payload.role) payload.role = String(payload.role).toLowerCase();
     const { data, error } = await supabase
       .from("users")
       .update(payload)

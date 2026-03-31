@@ -198,13 +198,6 @@ border-radius:5px;
 <div class="modal-actions">
 <button class="cancel-btn" onclick="closeModal()">Cancel</button>
 <button class="save-btn" onclick="saveClass()">Save</button>
-<button class="back-btn" onclick="goDashboard()">⬅ Back to Dashboard</button>
-
-<script>
-function goDashboard() {
-    window.location.href = "/admin/dashboard";
-}
-</script>
 </div>
 </div>
 </div>
@@ -217,6 +210,7 @@ function goDashboard() {
    🔥 FIREBASE CLASSES
 ========================= */
 let classes = [];
+let editingClassId = null;
 
 async function loadClassesFromFirestore(){
   classes = [];
@@ -252,18 +246,12 @@ function displayClasses(){
 async function editClass(id){
   const classItem = classes.find((c) => String(c.id) === String(id));
   if(!classItem) return;
-  const name = prompt("Edit class name:", classItem.name || "");
-  if(!name) return;
-  const code = prompt("Edit class code:", classItem.code || "");
-  if(!code) return;
-  const instructor = prompt("Edit instructor:", classItem.instructor || "");
-  if(!instructor) return;
-  try{
-    await window.AdminApi.put(`/api/classes/${id}`, { name, code, instructor });
-    loadClassesFromFirestore();
-  }catch(e){
-    alert(e.message);
-  }
+  editingClassId = id;
+  document.querySelector(".modal-content h3").innerText = "Edit Class";
+  document.getElementById("className").value = classItem.name || "";
+  document.getElementById("classCode").value = classItem.code || "";
+  document.getElementById("instructor").value = classItem.instructor || "";
+  openModal();
 }
 
 /* BACK */
@@ -278,6 +266,11 @@ function openModal(){
 
 function closeModal(){
   document.getElementById("modal").style.display="none";
+  editingClassId = null;
+  document.querySelector(".modal-content h3").innerText = "Create New Class";
+  document.getElementById("className").value = "";
+  document.getElementById("classCode").value = "";
+  document.getElementById("instructor").value = "";
 }
 
 /* SAVE CLASS */
@@ -295,12 +288,16 @@ async function saveClass(){
   }
 
   try{
-    await window.AdminApi.post("/api/classes", {
-      name: name,
-      code: code,
-      instructor: instructor,
-      students: studentCount || 0
-    });
+    if (editingClassId) {
+      await window.AdminApi.put(`/api/classes/${editingClassId}`, { name, code, instructor, students: studentCount || 0 });
+    } else {
+      await window.AdminApi.post("/api/classes", {
+        name: name,
+        code: code,
+        instructor: instructor,
+        students: studentCount || 0
+      });
+    }
     closeModal();
     loadClassesFromFirestore();
   }catch(e){

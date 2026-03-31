@@ -13,9 +13,19 @@ export default function AdminSignupPage() {
   const [password, setPassword] = useState("");
   const [setupKey, setSetupKey] = useState("");
 
+  function validatePassword(value) {
+    return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(value || "");
+  }
+
   async function createAdminAccount() {
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !setupKey) {
       alert("Please fill all fields");
+      return;
+    }
+    if (!validatePassword(password)) {
+      alert(
+        "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
+      );
       return;
     }
 

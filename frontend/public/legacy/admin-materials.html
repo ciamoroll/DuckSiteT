@@ -76,20 +76,12 @@ textarea{resize:none;height:80px;}
 <div class="footer">
 <button class="btn upload-btn" onclick="uploadMaterial()">⬆ Upload Material</button>
 <button class="btn secondary-btn" onclick="goBack()">⬅ Back to Materials</button>
-<button class="back-btn" onclick="goDashboard()">⬅ Back to Dashboard</button>
-
-<script>
-function goDashboard() {
-    window.location.href = "/admin/dashboard";
-}
-</script>
 </div>
 </div>
 
 <script src="/runtime-config.js"></script>
 <script src="/admin-api-client.js"></script>
 <script type="module">
-import { supabase } from "/lib-supabase-client.js";
 
 let courses = [];
 let materials = [];
@@ -184,14 +176,14 @@ async function uploadMaterial(){
         return;
     }
 
-    // Upload file to Supabase Storage (bucket: materials)
-    const storagePath = `${Date.now()}_${uploadedFile.name}`;
-    const { error: uploadError } = await supabase.storage
-      .from("materials")
-      .upload(storagePath, uploadedFile, { upsert: false });
-    if (uploadError) throw uploadError;
-    const { data: publicData } = supabase.storage.from("materials").getPublicUrl(storagePath);
-    const fileURL = publicData.publicUrl;
+    const formData = new FormData();
+    formData.append("file", uploadedFile);
+    const uploadPayload = await window.AdminApi.request("/api/materials/upload", {
+      method: "POST",
+      body: formData,
+      headers: {},
+    });
+    const fileURL = uploadPayload.file_url;
 
     await window.AdminApi.post("/api/materials", {
         title: title,

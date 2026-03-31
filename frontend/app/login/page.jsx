@@ -20,9 +20,19 @@ export default function LoginPage() {
     if (role === "admin") router.replace("/admin/dashboard");
   }, [router]);
 
+  function validatePassword(value) {
+    return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(value || "");
+  }
+
   async function login() {
     if (!username || !password) {
       alert("Fill all fields");
+      return;
+    }
+    if (!validatePassword(password)) {
+      alert(
+        "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
+      );
       return;
     }
     try {
@@ -61,6 +71,11 @@ export default function LoginPage() {
   function adminLogin() {
     (async () => {
       try {
+        if (!validatePassword(adminPass)) {
+          throw new Error(
+            "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
+          );
+        }
         const response = await fetch(`${API_BASE_URL}/api/auth/admin-login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

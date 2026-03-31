@@ -231,14 +231,14 @@ background:#ccc;
 </div>
 </div>
 
-<input type="text" class="search" placeholder="Search user">
+<input type="text" class="search" id="searchInput" placeholder="Search user">
 </div>
 
 <!-- FILTERS -->
 <div class="filters">
-<select><option>All Statuses</option></select>
-<select><option>All Departments</option></select>
-<select><option>All Roles</option></select>
+<select id="statusFilter"><option value="">All Statuses</option><option>Active</option><option>Pending</option><option>Inactive</option></select>
+<select id="departmentFilter"><option value="">All Departments</option></select>
+<select id="roleFilter"><option value="">All Roles</option><option value="student">student</option><option value="admin">admin</option></select>
 <select><option>All Learning</option></select>
 
 <button class="btn">Bulk Actions</button>
@@ -347,14 +347,30 @@ async function loadUsersFromFirestore(){
     return;
   }
   displayUsers();
+  refreshDepartmentFilter();
   updateStats();
 }
 
 /* DISPLAY USERS IN TABLE */
 function displayUsers(){
   const table = document.getElementById("userTable");
+  const query = (document.getElementById("searchInput").value || "").toLowerCase();
+  const statusFilter = document.getElementById("statusFilter").value;
+  const departmentFilter = document.getElementById("departmentFilter").value;
+  const roleFilter = document.getElementById("roleFilter").value;
+  const filteredUsers = users.filter((u) => {
+    const matchesQuery =
+      !query ||
+      (u.name || "").toLowerCase().includes(query) ||
+      (u.email || "").toLowerCase().includes(query) ||
+      String(u.userid || "").toLowerCase().includes(query);
+    const matchesStatus = !statusFilter || String(u.status || "") === statusFilter;
+    const matchesDepartment = !departmentFilter || String(u.department || "") === departmentFilter;
+    const matchesRole = !roleFilter || String(u.role || "").toLowerCase() === roleFilter;
+    return matchesQuery && matchesStatus && matchesDepartment && matchesRole;
+  });
   table.innerHTML = "";
-  users.forEach((u)=>{
+  filteredUsers.forEach((u)=>{
     table.innerHTML += `
 <tr>
 <td><input type="checkbox"></td>
@@ -379,6 +395,16 @@ function updateStats(){
   document.getElementById("activeUsers").textContent = users.filter(u=>u.status==="Active").length;
   document.getElementById("pendingUsers").textContent = users.filter(u=>u.status==="Pending").length;
   document.getElementById("inactiveUsers").textContent = users.filter(u=>u.status==="Inactive").length;
+}
+
+function refreshDepartmentFilter() {
+  const select = document.getElementById("departmentFilter");
+  const current = select.value;
+  const departments = [...new Set(users.map((u) => u.department).filter(Boolean))];
+  select.innerHTML = `<option value="">All Departments</option>${departments
+    .map((d) => `<option value="${d}">${d}</option>`)
+    .join("")}`;
+  if (departments.includes(current)) select.value = current;
 }
 
 /* OPEN MODAL */
@@ -463,6 +489,10 @@ window.editUser = editUser;
 window.deleteUser = deleteUser;
 
 loadUsersFromFirestore();
+document.getElementById("searchInput").addEventListener("input", displayUsers);
+document.getElementById("statusFilter").addEventListener("change", displayUsers);
+document.getElementById("departmentFilter").addEventListener("change", displayUsers);
+document.getElementById("roleFilter").addEventListener("change", displayUsers);
 </script>
 </body>
 </html>

@@ -12,10 +12,20 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  function validatePassword(value) {
+    return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(value || "");
+  }
+
   async function signup() {
     const normalizedEmail = email.trim().toLowerCase();
     if (!firstName.trim() || !lastName.trim() || !normalizedEmail || !password) {
       alert("Please fill all fields");
+      return;
+    }
+    if (!validatePassword(password)) {
+      alert(
+        "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
+      );
       return;
     }
     try {

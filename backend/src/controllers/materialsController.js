@@ -34,4 +34,21 @@ async function deleteMaterial(req, res) {
   }
 }
 
-module.exports = { listMaterials, createMaterial, deleteMaterial };
+async function uploadMaterialFile(req, res) {
+  try {
+    if (!req.file) return errorResponse(res, 400, "file is required");
+    const fileName = `${Date.now()}_${req.file.originalname}`.replace(/\s+/g, "_");
+    const path = `materials/${fileName}`;
+    const { error: uploadError } = await supabase.storage.from("materials").upload(path, req.file.buffer, {
+      contentType: req.file.mimetype,
+      upsert: false,
+    });
+    if (uploadError) return errorResponse(res, 400, uploadError.message);
+    const { data } = supabase.storage.from("materials").getPublicUrl(path);
+    return res.status(201).json({ ok: true, file_url: data.publicUrl, path });
+  } catch (err) {
+    return errorResponse(res, 500, "Unexpected uploadMaterialFile error", { error: err.message });
+  }
+}
+
+module.exports = { listMaterials, createMaterial, deleteMaterial, uploadMaterialFile };

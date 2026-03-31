@@ -269,6 +269,7 @@ Use the controls below to understand the difference between an Open and Closed c
 
 <button class="done" onclick="completeLesson()">DONE</button>
 
+<script src="/runtime-config.js"></script>
 <script>
 
 /* AUTH */
@@ -295,10 +296,38 @@ document.getElementById("points").innerText=xp;
 document.getElementById("level").innerText=level;
 
 /* COMPLETE */
-function completeLesson(){
+async function syncProgressToBackend(progressPercent) {
+  try {
+    const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) || "http://localhost:4000";
+    await fetch(`${API_BASE_URL}/api/public/progress-upsert`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: localStorage.getItem("email"),
+        firstName: localStorage.getItem("firstName"),
+        lastName: localStorage.getItem("lastName"),
+        module: currentCourse?.name || "General Track",
+        progress: progressPercent,
+        xp: getXP(),
+      }),
+    });
+  } catch (_e) {
+    // keep local progression even if backend sync fails
+  }
+}
 
-let course=localStorage.getItem("currentCourse");
-let key=course+"_lesson_0_done";
+const courses = JSON.parse(localStorage.getItem("courses") || "[]");
+const currentCourseIndex = Number(localStorage.getItem("currentCourseIndex") || 0);
+const currentCourse = courses[currentCourseIndex];
+const currentLessonIndex = Number(localStorage.getItem("currentLessonIndex") || 0);
+if (currentCourse) {
+  document.querySelector(".header h1").innerText = currentCourse.name || "Course";
+  document.querySelector(".header h2").innerText = `Lesson ${currentLessonIndex + 1}: ${currentCourse.lessons?.[currentLessonIndex] || "Lesson"}`;
+}
+
+async function completeLesson(){
+const courseId = currentCourse?.id || localStorage.getItem("currentCourseId");
+let key=`course_${courseId}_lesson_${currentLessonIndex}_done`;
 
 /* NO FARMING */
 if(localStorage.getItem(key)){
@@ -310,7 +339,7 @@ let reward=150;
 xp+=reward;
 
 setXP(xp);
-localStorage.setItem(key,"done");
+localStorage.setItem(key,"true");
 
 /* BADGE */
 let badges=parseInt(localStorage.getItem("badges"))||0;
@@ -320,7 +349,18 @@ localStorage.setItem("badges",badges);
 updateLevel();
 
 alert("+"+reward+" XP!");
-
+const totalLessons = Array.isArray(currentCourse?.lessons) ? currentCourse.lessons.length : 0;
+let completedLessons = 0;
+for (let idx = 0; idx < totalLessons; idx += 1) {
+  if (localStorage.getItem(`course_${courseId}_lesson_${idx}_done`) === "true") completedLessons += 1;
+}
+const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+if (progressPercent >= 100) {
+  localStorage.setItem(`course_${courseId}_completed`, "true");
+  const nextCourse = courses[currentCourseIndex + 1];
+  if (nextCourse?.id) localStorage.setItem(`course_${nextCourse.id}_unlocked`, "true");
+}
+await syncProgressToBackend(progressPercent);
 window.location.href = "/lessons";
 
 }
