@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import StudentRouteGuard from "@/components/StudentRouteGuard";
 import { apiRequest } from "@/lib/api";
@@ -64,6 +65,14 @@ export default function StudentDashboardPage() {
     router.push("/login");
   }
 
+  function openCourse(course) {
+    if (course?.id) {
+      router.push(`/courses/${course.id}`);
+      return;
+    }
+    router.push("/courses");
+  }
+
   const firstName = profile?.first_name || "Student";
   const studentId = profile?.student_id || "N/A";
   const yearLevel = profile?.year_level || "N/A";
@@ -78,6 +87,50 @@ export default function StudentDashboardPage() {
     attempts.filter((a) => a?.is_correct).map((a) => Number(a.challenge_id))
   ).size;
   const totalBadges = Math.floor(completedChallenges / 5);
+  const achievementBadges = [
+    {
+      id: "joined",
+      title: "Joined DuckSiteT",
+      note: "Welcome badge for joining the platform.",
+      icon: "🤝",
+      unlocked: true,
+    },
+    {
+      id: "first-challenge",
+      title: "First Correct Answer",
+      note: "Earned after solving your first challenge.",
+      icon: "✅",
+      unlocked: completedChallenges >= 1,
+    },
+    {
+      id: "course-starter",
+      title: "Course Starter",
+      note: "Unlocked once you enroll in a course.",
+      icon: "📘",
+      unlocked: courses.length >= 1,
+    },
+    {
+      id: "level-up",
+      title: "Level Up",
+      note: "Reach Level 2 by gaining more XP.",
+      icon: "⭐",
+      unlocked: level >= 2,
+    },
+    {
+      id: "streak-5",
+      title: "Challenge Streak",
+      note: "Complete 5 challenges to unlock this.",
+      icon: "🔥",
+      unlocked: completedChallenges >= 5,
+    },
+    {
+      id: "badge-collector",
+      title: "Badge Collector",
+      note: "Collect 3 badges in total.",
+      icon: "🏅",
+      unlocked: totalBadges >= 3,
+    },
+  ];
 
 
 
@@ -87,7 +140,9 @@ export default function StudentDashboardPage() {
         <div className={styles.bgLayer} />
         <div className={styles.shell}>
           <header className={styles.topBar}>
-            <div className={styles.brand}>DuckSiteT</div>
+            <div className={styles.brand}>
+              <Image src="/images/DucksiteT-logo.png" alt="DuckSiteT" width={220} height={56} className={styles.brandLogo} priority />
+            </div>
             <nav className={styles.topNav}>
               <button type="button" className={styles.active} onClick={() => router.push("/dashboard")}>Dashboard</button>
               <button type="button" onClick={() => router.push("/courses")}>Courses</button>
@@ -145,13 +200,44 @@ export default function StudentDashboardPage() {
                     <p className={styles.muted}>You are not enrolled in any course yet.</p>
                   ) : (
                     courses.slice(0, 8).map((course) => (
-                      <article key={course.id || course.code || course.name} className={styles.courseCard}>
+                      <article
+                        key={course.id || course.code || course.name}
+                        className={`${styles.courseCard} ${styles.courseCardInteractive}`}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => openCourse(course)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            openCourse(course);
+                          }
+                        }}
+                      >
                         <h4>{course.name || "Untitled Course"}</h4>
                         <p>{course.code || "No code"}</p>
                         <span>Continue Learning</span>
                       </article>
                     ))
                   )}
+                </div>
+              </section>
+
+              <section className={styles.panelWide}>
+                <h2>Achievements & Badge Collection</h2>
+                <div className={styles.achievementsGrid}>
+                  {achievementBadges.map((badge) => (
+                    <article
+                      key={badge.id}
+                      className={`${styles.achievementCard} ${badge.unlocked ? styles.achievementUnlocked : styles.achievementLocked}`}
+                    >
+                      <span className={styles.achievementIcon}>{badge.icon}</span>
+                      <div>
+                        <h4>{badge.title}</h4>
+                        <p>{badge.note}</p>
+                        <small>{badge.unlocked ? "Unlocked" : "Locked"}</small>
+                      </div>
+                    </article>
+                  ))}
                 </div>
               </section>
             </>

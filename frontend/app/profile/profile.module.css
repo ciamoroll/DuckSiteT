@@ -61,6 +61,14 @@
   font-weight: 800;
   letter-spacing: 0.4px;
   font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+  display: flex;
+  align-items: center;
+}
+
+.brandLogo {
+  height: 34px;
+  width: auto;
+  display: block;
 }
 
 .topNav {
@@ -88,6 +96,13 @@
 .topNav .active {
   background: rgba(135, 171, 48, 0.8);
   color: #fff8d8;
+  pointer-events: none;
+  cursor: default;
+}
+
+.topNav .active:hover {
+  background: rgba(135, 171, 48, 0.8);
+  border-color: rgba(255, 230, 145, 0.35);
 }
 
 .playerMeta {
@@ -187,6 +202,23 @@
   height: 280px;
   object-fit: contain;
   filter: drop-shadow(0 4px 16px rgba(255, 215, 115, 0.2));
+}
+
+.scrollCue {
+  border: 1px solid rgba(255, 230, 145, 0.35);
+  background: rgba(84, 95, 41, 0.6);
+  color: #fff0b6;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scrollCue:hover {
+  background: rgba(100, 113, 49, 0.8);
+  border-color: rgba(255, 230, 145, 0.6);
 }
 
 .settingsCard {
@@ -568,6 +600,10 @@
     font-size: 12px;
   }
 
+  .topNav {
+    gap: 6px;
+  }
+
   .playerMeta {
     justify-content: flex-start;
   }
@@ -578,6 +614,10 @@
 
   .brand {
     font-size: 18px;
+  }
+
+  .brandLogo {
+    height: 28px;
   }
 
   .profilePlayerSection {
@@ -642,7 +682,7 @@
   .profileCard,
   .card,
   .settingsCard {
-    padding: 14px;
+    padding: 12px;
   }
 
   .profileCard h2,
@@ -652,6 +692,21 @@
 
   .settingsCard h3 {
     font-size: 16px;
+  }
+
+  .settingsSubtitle {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .reviewItem .label,
+  .reviewItem .value {
+    font-size: 12px;
+  }
+
+  .scrollCue {
+    padding: 8px 12px;
+    font-size: 12px;
   }
 
   .progress {

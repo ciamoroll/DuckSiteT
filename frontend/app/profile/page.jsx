@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getRole, getStudentToken } from "@/lib/auth";
 import { apiRequest } from "@/lib/api";
@@ -204,7 +205,9 @@ export default function ProfileSetupPage() {
         <div className={styles.bgLayer} />
         <div className={styles.shell}>
           <header className={styles.topBar}>
-            <div className={styles.brand}>DuckSiteT</div>
+            <div className={styles.brand}>
+              <Image src="/images/DucksiteT-logo.png" alt="DuckSiteT" width={220} height={56} className={styles.brandLogo} priority />
+            </div>
             <nav className={styles.topNav}>
               <button type="button" onClick={() => router.push("/dashboard")}>Dashboard</button>
               <button type="button" onClick={() => router.push("/courses")}>Courses</button>
@@ -233,9 +236,17 @@ export default function ProfileSetupPage() {
                  <img src="/images/duck_profile_image.png" alt="Profile" className={styles.avatarImage} />
               </div>
             </div>
+
+            <button
+              type="button"
+              className={styles.scrollCue}
+              onClick={() => document.getElementById("profile-lower-sections")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            >
+              Scroll for Profile Info ↓
+            </button>
           </section>
 
-          <div className={styles.settingsGrid}>
+          <div id="profile-lower-sections" className={styles.settingsGrid}>
             <section className={styles.settingsCard}>
               <h3>Profile Information</h3>
               <p className={styles.settingsSubtitle}>Your profile details</p>
@@ -332,7 +343,9 @@ export default function ProfileSetupPage() {
       <div className={styles.bgLayer} />
       <div className={styles.shell}>
         <header className={styles.topBar}>
-          <div className={styles.brand}>DuckSiteT</div>
+          <div className={styles.brand}>
+            <Image src="/images/DucksiteT-logo.png" alt="DuckSiteT" width={220} height={56} className={styles.brandLogo} priority />
+          </div>
           <nav className={styles.topNav}>
             <button type="button" onClick={() => router.push("/dashboard")}>Dashboard</button>
             <button type="button" onClick={() => router.push("/courses")}>Courses</button>

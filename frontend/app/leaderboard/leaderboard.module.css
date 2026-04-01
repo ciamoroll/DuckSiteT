@@ -42,6 +42,14 @@
   font-weight: 800;
   letter-spacing: 0.4px;
   font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+  display: flex;
+  align-items: center;
+}
+
+.brandLogo {
+  height: 34px;
+  width: auto;
+  display: block;
 }
 
 .topNav {
@@ -69,6 +77,13 @@
 .topNav .active {
   background: rgba(135, 171, 48, 0.8);
   color: #fff8d8;
+  pointer-events: none;
+  cursor: default;
+}
+
+.topNav .active:hover {
+  background: rgba(135, 171, 48, 0.8);
+  border-color: rgba(255, 230, 145, 0.35);
 }
 
 .playerMeta {
@@ -246,6 +261,10 @@
 
   .brand {
     font-size: 18px;
+  }
+
+  .brandLogo {
+    height: 28px;
   }
 
   .topNav button {

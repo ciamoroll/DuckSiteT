@@ -42,6 +42,14 @@
   font-weight: 800;
   letter-spacing: 0.4px;
   font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+  display: flex;
+  align-items: center;
+}
+
+.brandLogo {
+  height: 34px;
+  width: auto;
+  display: block;
 }
 
 .topNav {
@@ -69,6 +77,13 @@
 .topNav .active {
   background: rgba(135, 171, 48, 0.8);
   color: #fff8d8;
+  pointer-events: none;
+  cursor: default;
+}
+
+.topNav .active:hover {
+  background: rgba(135, 171, 48, 0.8);
+  border-color: rgba(255, 230, 145, 0.35);
 }
 
 .playerMeta {
@@ -247,6 +262,22 @@
   gap: 8px;
 }
 
+.courseCardInteractive {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.courseCardInteractive:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  border-color: rgba(255, 234, 153, 0.45);
+}
+
+.courseCardInteractive:focus-visible {
+  outline: 2px solid rgba(255, 223, 126, 0.9);
+  outline-offset: 2px;
+}
+
 .courseCard h4,
 .catalogCard h4,
 .challengeCard h4 {
@@ -266,6 +297,87 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 10px;
+}
+
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.achievementCard {
+  border: 1px solid rgba(255, 227, 146, 0.24);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(56, 52, 24, 0.8), rgba(31, 29, 16, 0.8));
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 10px;
+  align-items: start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.achievementCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+  border-color: rgba(255, 234, 153, 0.45);
+}
+
+.achievementCard:hover .achievementIcon {
+  border-color: rgba(255, 235, 154, 0.6);
+  background: rgba(255, 221, 120, 0.3);
+}
+
+.achievementCard:focus-within {
+  outline: 2px solid rgba(255, 223, 126, 0.85);
+  outline-offset: 2px;
+}
+
+.achievementIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  background: rgba(255, 221, 120, 0.22);
+  border: 1px solid rgba(255, 230, 145, 0.35);
+}
+
+.achievementCard h4 {
+  margin: 0;
+  font-size: 13px;
+  color: #ffe28a;
+}
+
+.achievementCard p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #e8dcae;
+  line-height: 1.35;
+}
+
+.achievementCard small {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.achievementUnlocked small {
+  color: #9be97e;
+}
+
+.achievementLocked {
+  opacity: 0.72;
+}
+
+.achievementLocked .achievementIcon {
+  filter: grayscale(0.45);
+}
+
+.achievementLocked small {
+  color: #cbbf8e;
 }
 
 .optionsWrap {
@@ -313,5 +425,13 @@
 
   .topNav {
     flex-wrap: wrap;
+  }
+
+  .brandLogo {
+    height: 28px;
+  }
+
+  .achievementsGrid {
+    grid-template-columns: 1fr;
   }
 }

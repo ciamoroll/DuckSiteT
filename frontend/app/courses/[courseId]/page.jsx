@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import StudentRouteGuard from "@/components/StudentRouteGuard";
 import { apiRequest } from "@/lib/api";
@@ -100,7 +101,9 @@ export default function CourseStagesPage() {
         <div className={styles.bgLayer} />
         <div className={styles.overlay}>
           <header className={styles.topBar}>
-            <div className={styles.brand}>DuckSiteT</div>
+            <div className={styles.brand}>
+              <Image src="/images/DucksiteT-logo.png" alt="DuckSiteT" width={220} height={56} className={styles.brandLogo} priority />
+            </div>
             <nav className={styles.topNav}>
               <button type="button" onClick={() => router.push("/dashboard")}>Dashboard</button>
               <button type="button" onClick={() => router.push("/courses")} className={styles.active}>Courses</button>
