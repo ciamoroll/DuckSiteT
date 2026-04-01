@@ -1,0 +1,300 @@
+.page {
+  min-height: 100vh;
+  position: relative;
+  padding: 18px;
+  overflow-x: hidden;
+}
+
+.bgLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 230, 130, 0.25), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(142, 188, 79, 0.2), transparent 45%),
+    linear-gradient(160deg, #3a3418 0%, #1f2212 52%, #232f1a 100%);
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+  width: min(1200px, 96vw);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+
+.topBar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 233, 170, 0.25);
+  background: linear-gradient(180deg, rgba(62, 56, 25, 0.85), rgba(36, 32, 14, 0.85));
+  backdrop-filter: blur(6px);
+}
+
+.brand {
+  color: #f8d96f;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+.topNav {
+  display: flex;
+  gap: 8px;
+}
+
+.topNav button {
+  border: 1px solid rgba(255, 230, 145, 0.35);
+  background: rgba(84, 95, 41, 0.6);
+  color: #fff0b6;
+  border-radius: 999px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.topNav button:hover {
+  background: rgba(100, 113, 49, 0.8);
+  border-color: rgba(255, 230, 145, 0.6);
+}
+
+.playerMeta {
+  display: flex;
+  gap: 8px;
+  color: #f4e9ba;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.playerMeta span {
+  background: rgba(74, 84, 35, 0.78);
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 221, 139, 0.35);
+}
+
+.loadingCard,
+.hero,
+.panelWide,
+.leaderRow,
+.yourRankRow {
+  border: 1px solid rgba(255, 227, 146, 0.24);
+  background: linear-gradient(180deg, rgba(56, 52, 24, 0.76), rgba(31, 29, 16, 0.76));
+  border-radius: 14px;
+  color: #f7f0d2;
+}
+
+.loadingCard {
+  padding: 20px;
+  text-align: center;
+  color: #ffd773;
+  font-size: 16px;
+}
+
+.hero {
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #ffd773;
+  font-family: "Trebuchet MS", "Lucida Sans", sans-serif;
+}
+
+.hero p {
+  margin: 0;
+  color: #f5e8b0;
+  font-size: 14px;
+}
+
+.panelWide {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.panelWide h2 {
+  margin: 0;
+  color: #ffd773;
+  font-size: 20px;
+}
+
+.muted {
+  color: #f2e4a7;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 14px;
+}
+
+.leaderList {
+  display: grid;
+  gap: 8px;
+}
+
+.leaderRow,
+.yourRankRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  transition: all 0.2s ease;
+}
+
+.leaderRow:hover {
+  background: linear-gradient(180deg, rgba(70, 65, 30, 0.86), rgba(40, 35, 20, 0.86));
+}
+
+.currentUserRow {
+  border-color: rgba(138, 225, 114, 0.4);
+  background: linear-gradient(180deg, rgba(70, 75, 40, 0.8), rgba(40, 45, 25, 0.8));
+}
+
+.rankInfo {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.rankNumber {
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffd773;
+  min-width: 40px;
+  text-align: center;
+}
+
+.rankInfo h4 {
+  margin: 0;
+  color: #ffdf82;
+  font-size: 16px;
+}
+
+.rankInfo p {
+  margin: 4px 0 0;
+  color: #f5e8b0;
+  font-size: 12px;
+}
+
+.pointsInfo {
+  text-align: right;
+}
+
+.xpValue {
+  display: block;
+  color: #8ae472;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.yourRankRow {
+  border-color: rgba(138, 225, 114, 0.4);
+  background: linear-gradient(180deg, rgba(70, 75, 40, 0.8), rgba(40, 45, 25, 0.8));
+}
+
+@media (max-width: 980px) {
+  .topBar {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .topNav {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+  }
+
+  .playerMeta {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 12px;
+  }
+
+  .shell {
+    gap: 10px;
+  }
+
+  .topBar {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .brand {
+    font-size: 18px;
+  }
+
+  .topNav button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .playerMeta span {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .hero {
+    padding: 12px;
+  }
+
+  .hero h1 {
+    font-size: 22px;
+  }
+
+  .hero p {
+    font-size: 13px;
+  }
+
+  .panelWide {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .panelWide h2 {
+    font-size: 18px;
+  }
+
+  .leaderRow,
+  .yourRankRow {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .rankNumber {
+    font-size: 16px;
+    min-width: 35px;
+  }
+
+  .rankInfo h4 {
+    font-size: 14px;
+  }
+
+  .rankInfo p {
+    font-size: 11px;
+  }
+
+  .xpValue {
+    font-size: 14px;
+  }
+}
+

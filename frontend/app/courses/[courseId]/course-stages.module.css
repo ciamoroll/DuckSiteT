@@ -1,0 +1,152 @@
+.page {
+  min-height: 100vh;
+  position: relative;
+}
+
+.bgLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(142, 195, 76, 0.35), transparent 36%),
+    radial-gradient(circle at 88% 18%, rgba(255, 218, 120, 0.22), transparent 40%),
+    linear-gradient(155deg, #20331b 0%, #2f4b2a 50%, #183722 100%);
+}
+
+.overlay {
+  position: relative;
+  z-index: 1;
+  width: min(1280px, 96vw);
+  margin: 0 auto;
+  padding: 14px 0 28px;
+  display: grid;
+  gap: 14px;
+}
+
+.topBar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(246, 227, 143, 0.25);
+  background: linear-gradient(180deg, rgba(53, 60, 28, 0.9), rgba(32, 37, 15, 0.9));
+}
+
+.brand {
+  color: #f4d56e;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.topNav {
+  display: flex;
+  gap: 8px;
+}
+
+.topNav button {
+  border: 1px solid rgba(250, 232, 154, 0.35);
+  background: rgba(96, 116, 48, 0.72);
+  color: #fff2c8;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.topNav .active {
+  background: rgba(130, 166, 44, 0.9);
+}
+
+.meta {
+  display: flex;
+  gap: 8px;
+}
+
+.meta span {
+  background: rgba(78, 95, 37, 0.84);
+  border: 1px solid rgba(255, 231, 150, 0.35);
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #fff4c8;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.heading,
+.loading {
+  border: 1px solid rgba(255, 231, 144, 0.2);
+  border-radius: 12px;
+  background: rgba(33, 45, 24, 0.74);
+  color: #fff5cb;
+  padding: 14px;
+}
+
+.heading h1 {
+  margin: 0;
+  color: #ffe085;
+}
+
+.heading p {
+  margin: 6px 0 0;
+}
+
+.lilyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.pad {
+  border: 2px solid rgba(40, 64, 22, 0.95);
+  border-radius: 999px;
+  min-height: 210px;
+  background: radial-gradient(circle at 50% 20%, #f4d45e, #d8b138 72%);
+  color: #1f2a10;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 8px;
+  padding: 18px;
+  box-shadow: 0 14px 24px rgba(10, 16, 8, 0.32);
+}
+
+.padTop {
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.pad p {
+  margin: 0;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.pad small {
+  color: #273610;
+  font-weight: 700;
+}
+
+.pad button {
+  border: 0;
+  border-radius: 999px;
+  background: #4f7136;
+  color: #fde877;
+  padding: 8px 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pad button:disabled {
+  background: #6e6a50;
+  color: #d5ccaa;
+  cursor: not-allowed;
+}
+
+@media (max-width: 920px) {
+  .topBar {
+    grid-template-columns: 1fr;
+  }
+}

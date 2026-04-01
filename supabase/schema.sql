@@ -121,6 +121,8 @@ alter table public.challenges add column if not exists question_text text;
 alter table public.challenges add column if not exists options jsonb default '[]'::jsonb;
 alter table public.challenges add column if not exists correct_answer text;
 alter table public.challenges add column if not exists explanation text;
+alter table public.challenges add column if not exists lesson_order int default 1;
+alter table public.challenges add column if not exists required_xp int default 0;
 
 create table if not exists public.challenge_attempts (
   id bigint generated always as identity primary key,

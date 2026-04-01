@@ -17,6 +17,8 @@ export default function ChallengesPage() {
     optionsText: "",
     correct_answer: "",
     explanation: "",
+    lesson_order: 1,
+    required_xp: 0,
     points: 10,
     status: "Active",
     completed: 0,
@@ -62,6 +64,8 @@ export default function ChallengesPage() {
       options,
       correct_answer: formData.correct_answer.trim(),
       explanation: formData.explanation,
+      lesson_order: Number(formData.lesson_order || 1),
+      required_xp: Number(formData.required_xp || 0),
       points: Number(formData.points || 0),
       status: formData.status,
       completed: Number(formData.completed || 0),
@@ -90,6 +94,8 @@ export default function ChallengesPage() {
         optionsText: "",
         correct_answer: "",
         explanation: "",
+        lesson_order: 1,
+        required_xp: 0,
         points: 10,
         status: "Active",
         completed: 0,
@@ -110,6 +116,8 @@ export default function ChallengesPage() {
       optionsText: Array.isArray(challenge.options) ? challenge.options.join("\n") : "",
       correct_answer: challenge.correct_answer || "",
       explanation: challenge.explanation || "",
+      lesson_order: Number(challenge.lesson_order || 1),
+      required_xp: Number(challenge.required_xp || 0),
       points: challenge.points || 10,
       status: challenge.status || "Active",
       completed: challenge.completed || 0,
@@ -150,6 +158,8 @@ export default function ChallengesPage() {
             <textarea placeholder="Options (one per line)" value={formData.optionsText} onChange={(e) => setFormData({ ...formData, optionsText: e.target.value })} required />
             <input type="text" placeholder="Correct answer (must match one option)" value={formData.correct_answer} onChange={(e) => setFormData({ ...formData, correct_answer: e.target.value })} required />
             <textarea placeholder="Explanation (optional)" value={formData.explanation} onChange={(e) => setFormData({ ...formData, explanation: e.target.value })} />
+            <input type="number" placeholder="Lesson Order (1,2,3...)" value={formData.lesson_order} onChange={(e) => setFormData({ ...formData, lesson_order: parseInt(e.target.value) || 1 })} min={1} />
+            <input type="number" placeholder="Required XP to unlock" value={formData.required_xp} onChange={(e) => setFormData({ ...formData, required_xp: parseInt(e.target.value) || 0 })} min={0} />
             <input type="number" placeholder="Points" value={formData.points} onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })} />
             <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
               <option value="Active">Active</option>
@@ -165,7 +175,7 @@ export default function ChallengesPage() {
         {loading ? <p>Loading...</p> : challenges.length === 0 ? <p>No challenges found</p> : (
           <table className={styles.table}>
             <thead>
-              <tr><th>Title</th><th>Course</th><th>Points</th><th>Status</th><th>Completed</th><th>Actions</th></tr>
+              <tr><th>Title</th><th>Course</th><th>Lesson</th><th>Unlock XP</th><th>Points</th><th>Status</th><th>Completed</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {challenges.map((challenge) => {
@@ -174,6 +184,8 @@ export default function ChallengesPage() {
                   <tr key={challenge.id}>
                     <td>{challenge.title || "—"}</td>
                     <td>{courseName}</td>
+                    <td>{Number(challenge.lesson_order || 1)}</td>
+                    <td>{Number(challenge.required_xp || 0)}</td>
                     <td>{challenge.points || 0}</td>
                     <td>{challenge.status || "Active"}</td>
                     <td>{challenge.completed || 0}</td>

@@ -165,7 +165,7 @@ async function listPublicChallenges(req, res) {
     const courseId = req.query?.courseId;
     let query = supabase
       .from("challenges")
-      .select("id, title, course_id, question_text, options, points, status, created_at")
+      .select("id, title, course_id, question_text, options, points, required_xp, lesson_order, status, created_at")
       .eq("status", "Active")
       .order("id", { ascending: false });
 
@@ -312,7 +312,7 @@ async function listMyChallenges(req, res) {
 
         const { data: challenges, error: challengesError } = await supabase
           .from("challenges")
-          .select("id, title, course_id, question_text, options, points, status, created_at")
+          .select("id, title, course_id, question_text, options, points, required_xp, lesson_order, status, created_at")
           .eq("status", "Active")
           .in("course_id", allowedCourseIds)
           .order("id", { ascending: false });
@@ -349,7 +349,7 @@ async function listMyChallenges(req, res) {
 
     const { data: challenges, error: challengesError } = await supabase
       .from("challenges")
-      .select("id, title, course_id, question_text, options, points, status, created_at")
+      .select("id, title, course_id, question_text, options, points, required_xp, lesson_order, status, created_at")
       .eq("status", "Active")
       .in("course_id", allowedCourseIds)
       .order("id", { ascending: false });
@@ -358,6 +358,47 @@ async function listMyChallenges(req, res) {
     return res.status(200).json({ ok: true, challenges: challenges || [] });
   } catch (err) {
     return errorResponse(res, 500, "Unexpected listMyChallenges error", { error: err.message });
+  }
+}
+
+async function listMyAttempts(req, res) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return errorResponse(res, 401, "Authenticated user is required");
+
+    const { data: profile, error: profileError } = await supabase
+      .from("users")
+      .select("id, role")
+      .eq("id", userId)
+      .single();
+    if (profileError || !profile) return errorResponse(res, 404, "Student profile not found");
+    if (profile.role !== "student") return errorResponse(res, 403, "Only students can access attempts");
+
+    const courseId = req.query?.courseId ? Number(req.query.courseId) : null;
+
+    let query = supabase
+      .from("challenge_attempts")
+      .select("id, challenge_id, is_correct, awarded_xp, attempts_count, last_attempt_at, created_at")
+      .eq("user_id", userId)
+      .order("last_attempt_at", { ascending: false });
+
+    if (courseId) {
+      const { data: challenges, error: challengeError } = await supabase
+        .from("challenges")
+        .select("id")
+        .eq("course_id", courseId);
+      if (challengeError) return errorResponse(res, 400, challengeError.message);
+
+      const challengeIds = (challenges || []).map((row) => Number(row.id)).filter((id) => Number.isInteger(id));
+      if (challengeIds.length === 0) return res.status(200).json({ ok: true, attempts: [] });
+      query = query.in("challenge_id", challengeIds);
+    }
+
+    const { data, error } = await query;
+    if (error) return errorResponse(res, 400, error.message);
+    return res.status(200).json({ ok: true, attempts: data || [] });
+  } catch (err) {
+    return errorResponse(res, 500, "Unexpected listMyAttempts error", { error: err.message });
   }
 }
 
@@ -627,6 +668,7 @@ module.exports = {
   debugPublicRoutes,
   listMyCourses,
   listMyChallenges,
+  listMyAttempts,
   enrollMyCourse,
   upsertPublicProgress,
   submitChallengeAttempt,

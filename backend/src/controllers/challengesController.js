@@ -30,6 +30,8 @@ async function createChallenge(req, res) {
       options,
       correct_answer: raw.correct_answer,
       explanation: raw.explanation,
+      lesson_order: Math.max(1, Number(raw.lesson_order || 1)),
+      required_xp: Math.max(0, Number(raw.required_xp || 0)),
       points: raw.points,
       completed: raw.completed,
       status: raw.status || "Active",
@@ -71,6 +73,8 @@ async function updateChallenge(req, res) {
     if (raw.options !== undefined) payload.options = toOptionsArray(raw.options);
     if (raw.correct_answer !== undefined) payload.correct_answer = raw.correct_answer;
     if (raw.explanation !== undefined) payload.explanation = raw.explanation;
+    if (raw.lesson_order !== undefined) payload.lesson_order = Math.max(1, Number(raw.lesson_order || 1));
+    if (raw.required_xp !== undefined) payload.required_xp = Math.max(0, Number(raw.required_xp || 0));
     if (raw.points !== undefined) payload.points = raw.points;
     if (raw.completed !== undefined) payload.completed = raw.completed;
     if (raw.status !== undefined) payload.status = raw.status;

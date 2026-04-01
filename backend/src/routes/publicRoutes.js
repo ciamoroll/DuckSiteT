@@ -9,6 +9,7 @@ const {
   debugPublicRoutes,
   listMyCourses,
   listMyChallenges,
+  listMyAttempts,
   enrollMyCourse,
   submitChallengeAttempt,
 } = require("../controllers/publicController");
@@ -24,6 +25,7 @@ router.get("/challenges", listPublicChallenges);
 router.get("/debug-routes", debugPublicRoutes);
 router.get("/my-courses", authMiddleware, listMyCourses);
 router.get("/my-challenges", authMiddleware, listMyChallenges);
+router.get("/my-attempts", authMiddleware, listMyAttempts);
 router.post("/my-courses/enroll", authMiddleware, enrollMyCourse);
 router.post("/progress-upsert", authMiddleware, upsertPublicProgress);
 router.post("/challenges/:id/attempt", authMiddleware, submitChallengeAttempt);

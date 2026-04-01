@@ -1,0 +1,304 @@
+.page {
+  min-height: 100vh;
+  position: relative;
+  padding: 18px;
+  overflow-x: hidden;
+}
+
+.bgLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 230, 130, 0.25), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(142, 188, 79, 0.2), transparent 45%),
+    linear-gradient(160deg, #3a3418 0%, #1f2212 52%, #232f1a 100%);
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+  width: min(1200px, 96vw);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+
+.topBar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 233, 170, 0.25);
+  background: linear-gradient(180deg, rgba(62, 56, 25, 0.85), rgba(36, 32, 14, 0.85));
+  backdrop-filter: blur(6px);
+}
+
+.brand {
+  color: #f8d96f;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+}
+
+.topNav {
+  display: flex;
+  gap: 8px;
+}
+
+.topNav button {
+  border: 1px solid rgba(255, 230, 145, 0.35);
+  background: rgba(84, 95, 41, 0.6);
+  color: #fff0b6;
+  border-radius: 999px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.playerMeta {
+  display: flex;
+  gap: 8px;
+  color: #f4e9ba;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.playerMeta span {
+  background: rgba(74, 84, 35, 0.78);
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 221, 139, 0.35);
+}
+
+.loadingCard,
+.hero,
+.panel,
+.panelWide,
+.statsGrid article,
+.courseCard,
+.catalogCard,
+.challengeCard,
+.resultBox,
+.leaderRow {
+  border: 1px solid rgba(255, 227, 146, 0.24);
+  background: linear-gradient(180deg, rgba(56, 52, 24, 0.76), rgba(31, 29, 16, 0.76));
+  border-radius: 14px;
+  color: #f7f0d2;
+}
+
+.loadingCard {
+  padding: 20px;
+}
+
+.hero {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 14px;
+  align-items: center;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #ffd773;
+  font-family: "Trebuchet MS", "Lucida Sans", sans-serif;
+}
+
+.hero p {
+  margin: 6px 0 0;
+  color: #f5e8b0;
+}
+
+.levelBox {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.levelTrack {
+  width: 100%;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.levelFill {
+  height: 100%;
+  background: linear-gradient(90deg, #f2e26e, #8dd13b);
+  transition: width 260ms ease;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.statsGrid article {
+  padding: 14px;
+  text-align: center;
+}
+
+.statsGrid h3 {
+  margin: 0;
+  color: #ffe383;
+  font-size: 24px;
+}
+
+.statsGrid p {
+  margin: 4px 0 0;
+  color: #f7e9af;
+  font-size: 13px;
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.panel {
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.panel h2,
+.panelWide h2 {
+  margin: 0;
+  color: #ffd773;
+  font-size: 20px;
+}
+
+.inputLabel {
+  font-size: 13px;
+  color: #f6e8ad;
+}
+
+.select {
+  width: 100%;
+  border: 1px solid rgba(255, 234, 153, 0.35);
+  background: rgba(34, 39, 20, 0.9);
+  color: #fff5cb;
+  border-radius: 10px;
+  padding: 9px 10px;
+}
+
+.editBtn,
+.catalogCard button,
+.submitBtn,
+.optionBtn,
+.optionActive {
+  border: 1px solid rgba(255, 232, 147, 0.35);
+  background: rgba(100, 113, 49, 0.75);
+  color: #fff2c1;
+  border-radius: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.leaderList {
+  display: grid;
+  gap: 8px;
+}
+
+.leaderRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+
+.panelWide {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.courseRail {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.courseCard,
+.catalogCard,
+.challengeCard {
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.courseCard h4,
+.catalogCard h4,
+.challengeCard h4 {
+  margin: 0;
+  color: #ffdf82;
+}
+
+.courseCard span,
+.reward {
+  color: #8ae472;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.catalogGrid,
+.challengeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.optionsWrap {
+  display: grid;
+  gap: 6px;
+}
+
+.optionActive {
+  background: rgba(134, 164, 46, 0.88);
+}
+
+.resultBox {
+  padding: 10px;
+  font-size: 13px;
+}
+
+.resultBox p,
+.muted {
+  margin: 0;
+  color: #f2e4a7;
+}
+
+@media (max-width: 980px) {
+  .topBar {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .topNav {
+    flex-wrap: wrap;
+  }
+}

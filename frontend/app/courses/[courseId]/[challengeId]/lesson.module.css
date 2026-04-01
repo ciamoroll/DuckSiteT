@@ -1,0 +1,148 @@
+.page {
+  min-height: 100vh;
+  position: relative;
+}
+
+.bgLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 222, 109, 0.24), transparent 44%),
+    radial-gradient(circle at 86% 18%, rgba(136, 188, 67, 0.2), transparent 42%),
+    linear-gradient(150deg, #2c2a15, #242912 50%, #1f2b17);
+}
+
+.overlay {
+  position: relative;
+  z-index: 1;
+  width: min(1180px, 96vw);
+  margin: 0 auto;
+  padding: 14px 0 28px;
+  display: grid;
+  gap: 14px;
+}
+
+.topBar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 226, 146, 0.24);
+  background: linear-gradient(180deg, rgba(55, 60, 31, 0.9), rgba(36, 39, 18, 0.9));
+}
+
+.brand {
+  font-size: 24px;
+  color: #f5d971;
+  font-weight: 800;
+  font-family: "Trebuchet MS", sans-serif;
+}
+
+.topNav {
+  display: flex;
+  gap: 8px;
+}
+
+.topNav button {
+  border: 1px solid rgba(249, 230, 151, 0.35);
+  background: rgba(90, 107, 45, 0.72);
+  color: #fff3c7;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.topNav .active {
+  background: rgba(129, 166, 43, 0.9);
+}
+
+.meta {
+  display: flex;
+  gap: 8px;
+}
+
+.meta span {
+  background: rgba(78, 94, 37, 0.85);
+  border: 1px solid rgba(255, 232, 153, 0.36);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #fff4ca;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.loading,
+.lessonWrap {
+  border: 1px solid rgba(255, 231, 142, 0.22);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(56, 49, 24, 0.78), rgba(31, 29, 16, 0.78));
+  color: #fff4ca;
+  padding: 18px;
+}
+
+.lessonWrap h1,
+.lessonWrap h2 {
+  margin: 0;
+  color: #ffdf86;
+}
+
+.question {
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.reward {
+  color: #9fe17c;
+  font-weight: 800;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.optionBtn,
+.optionActive,
+.actions button {
+  border: 1px solid rgba(250, 230, 148, 0.35);
+  background: rgba(95, 114, 47, 0.72);
+  color: #fff3c4;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.optionActive {
+  background: rgba(128, 164, 45, 0.9);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.resultBox {
+  border: 1px solid rgba(255, 232, 151, 0.33);
+  border-radius: 10px;
+  background: rgba(40, 47, 22, 0.74);
+  padding: 10px;
+}
+
+.success {
+  color: #9fe17c;
+  font-weight: 700;
+}
+
+@media (max-width: 920px) {
+  .topBar {
+    grid-template-columns: 1fr;
+  }
+}
