@@ -17,6 +17,7 @@ export default function LessonChallengePage() {
   const [profile, setProfile] = useState(null);
   const [course, setCourse] = useState(null);
   const [challenge, setChallenge] = useState(null);
+  const [courseLessons, setCourseLessons] = useState([]);
   const [lessonIndex, setLessonIndex] = useState(0);
   const [attempts, setAttempts] = useState([]);
   const [selected, setSelected] = useState("");
@@ -54,11 +55,13 @@ export default function LessonChallengePage() {
         setProfile(me?.profile || null);
         setCourse(selectedCourse);
         setChallenge(found);
+        setCourseLessons(lessonRows);
         setLessonIndex(index);
         setAttempts(myAttempts?.attempts || []);
       } catch (_err) {
         if (!alive) return;
         setChallenge(null);
+        setCourseLessons([]);
       } finally {
         if (alive) setLoading(false);
       }
@@ -80,11 +83,36 @@ export default function LessonChallengePage() {
   const xp = Number(profile?.xp || 0);
   const level = Math.floor(xp / 500) + 1;
   const requiredXp = useMemo(() => Number(challenge?.required_xp ?? lessonIndex * 100), [challenge, lessonIndex]);
-  const isUnlocked = xp >= requiredXp;
 
   const solved = useMemo(() => {
     return (attempts || []).some((row) => Number(row.challenge_id) === challengeId && row.is_correct);
   }, [attempts, challengeId]);
+
+  const solvedSet = useMemo(() => {
+    return new Set(
+      (attempts || [])
+        .filter((row) => row?.is_correct)
+        .map((row) => Number(row.challenge_id))
+        .filter((id) => Number.isInteger(id))
+    );
+  }, [attempts]);
+
+  const previousLessonNo = lessonIndex > 0 ? lessonIndex : null;
+  const previousChallengeId = lessonIndex > 0 ? Number(courseLessons[lessonIndex - 1]?.id) : null;
+  const meetsXp = xp >= requiredXp;
+  const meetsPrerequisite = previousChallengeId == null ? true : solvedSet.has(previousChallengeId);
+  const isUnlocked = meetsXp && meetsPrerequisite;
+
+  const lockMessage = useMemo(() => {
+    if (isUnlocked) return "";
+    if (!meetsXp && previousLessonNo != null && !meetsPrerequisite) {
+      return `This lesson is locked. You need ${requiredXp} XP and must finish Lesson ${previousLessonNo} first.`;
+    }
+    if (!meetsXp) {
+      return `This lesson is locked. You need ${requiredXp} XP to unlock it.`;
+    }
+    return `This lesson is locked. Finish Lesson ${previousLessonNo} first.`;
+  }, [isUnlocked, meetsXp, meetsPrerequisite, requiredXp, previousLessonNo]);
 
   async function submitAnswer() {
     if (!selected) {
@@ -140,7 +168,7 @@ export default function LessonChallengePage() {
           ) : !challenge ? (
             <section className={styles.loading}>Lesson not found or not accessible.</section>
           ) : !isUnlocked ? (
-            <section className={styles.loading}>This lesson is locked. You need {requiredXp} XP to unlock it.</section>
+            <section className={styles.loading}>{lockMessage}</section>
           ) : (
             <section className={styles.lessonWrap}>
               <h1>{course?.name || "Course"}</h1>

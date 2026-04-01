@@ -13,7 +13,7 @@ export default function AdminDashboardPage() {
       description: "View, verify, and manage student accounts.",
       action: "Manage Users",
       href: "/admin/users",
-      icon: "🪪",
+      icon: "🎓",
     },
     {
       title: "Create Classes",

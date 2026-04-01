@@ -129,7 +129,8 @@
 
 .courseCard {
   padding: 14px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   box-shadow: 0 8px 20px rgba(12, 14, 7, 0.25);
 }
@@ -137,14 +138,22 @@
 .courseCard h3 {
   margin: 0;
   font-family: "Trebuchet MS", "Lucida Sans", sans-serif;
-  font-size: 34px;
-  line-height: 1;
+  font-size: 22px;
+  line-height: 1.05;
+  min-height: 3.15em;
+  max-height: 3.15em;
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .courseCard p {
   margin: 0;
   font-size: 14px;
   font-weight: 700;
+  min-height: 18px;
 }
 
 .track {
@@ -164,6 +173,7 @@
   color: #273310;
   font-size: 12px;
   font-weight: 700;
+  min-height: 16px;
 }
 
 .startBtn {
@@ -174,8 +184,11 @@
   font-size: 14px;
   font-weight: 800;
   padding: 9px 12px;
-  width: 120px;
+  width: 140px;
+  min-height: 44px;
+  margin-top: auto;
   justify-self: center;
+  align-self: center;
   cursor: pointer;
 }
 

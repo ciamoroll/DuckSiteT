@@ -518,6 +518,56 @@ async function submitChallengeAttempt(req, res) {
 
     if (!allowedForClass) return errorResponse(res, 403, "This challenge is not available for your class");
 
+    const { data: courseChallenges, error: courseChallengesError } = await supabase
+      .from("challenges")
+      .select("id, required_xp, lesson_order, status")
+      .eq("course_id", challenge.course_id)
+      .eq("status", "Active");
+    if (courseChallengesError) return errorResponse(res, 400, courseChallengesError.message);
+
+    const sortedChallenges = (courseChallenges || []).sort((a, b) => {
+      const orderA = Number(a.lesson_order || 9999);
+      const orderB = Number(b.lesson_order || 9999);
+      if (orderA !== orderB) return orderA - orderB;
+      return Number(a.id) - Number(b.id);
+    });
+
+    const lessonIndex = sortedChallenges.findIndex((row) => Number(row.id) === challengeId);
+    if (lessonIndex < 0) return errorResponse(res, 404, "Challenge not found in course");
+
+    const orderedChallengeIds = sortedChallenges
+      .map((row) => Number(row.id))
+      .filter((id) => Number.isInteger(id) && id > 0);
+
+    const { data: solvedAttempts, error: solvedAttemptsError } = await supabase
+      .from("challenge_attempts")
+      .select("challenge_id")
+      .eq("user_id", userId)
+      .eq("is_correct", true)
+      .in("challenge_id", orderedChallengeIds);
+    if (solvedAttemptsError) return errorResponse(res, 400, solvedAttemptsError.message);
+
+    const solvedSet = new Set(
+      (solvedAttempts || [])
+        .map((row) => Number(row.challenge_id))
+        .filter((id) => Number.isInteger(id) && id > 0)
+    );
+
+    const requiredXp = Number(challenge.required_xp ?? lessonIndex * 100);
+    const meetsXp = Number(profile.xp || 0) >= requiredXp;
+    const previousChallengeId = lessonIndex > 0 ? Number(sortedChallenges[lessonIndex - 1]?.id) : null;
+    const meetsPrerequisite = previousChallengeId == null ? true : solvedSet.has(previousChallengeId);
+
+    if (!meetsXp || !meetsPrerequisite) {
+      if (!meetsXp && previousChallengeId != null && !meetsPrerequisite) {
+        return errorResponse(res, 403, `Lesson is locked. Requires ${requiredXp} XP and completion of the previous lesson.`);
+      }
+      if (!meetsXp) {
+        return errorResponse(res, 403, `Lesson is locked. Requires ${requiredXp} XP.`);
+      }
+      return errorResponse(res, 403, "Lesson is locked. Complete the previous lesson first.");
+    }
+
     const normalizedAnswer = answer.toLowerCase();
     const normalizedCorrect = String(challenge.correct_answer || "").trim().toLowerCase();
     const isCorrect = normalizedCorrect && normalizedAnswer === normalizedCorrect;

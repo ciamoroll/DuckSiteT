@@ -122,53 +122,160 @@
 .lilyGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  gap: 34px;
 }
 
 .pad {
-  border: 2px solid rgba(40, 64, 22, 0.95);
-  border-radius: 999px;
-  min-height: 210px;
-  background: radial-gradient(circle at 50% 20%, #f4d45e, #d8b138 72%);
+  position: relative;
+  isolation: isolate;
+  border: 2px solid rgba(63, 102, 33, 0.95);
+  border-radius: 48% 48% 44% 44% / 52% 52% 42% 42%;
+  min-height: 240px;
+  background: radial-gradient(circle at 50% 10%, #f6dd73, #e4c049 62%, #cca32f 100%);
   color: #1f2a10;
   display: grid;
   place-content: center;
   text-align: center;
-  gap: 8px;
-  padding: 18px;
-  box-shadow: 0 14px 24px rgba(10, 16, 8, 0.32);
+  gap: 7px;
+  padding: 22px 16px 18px;
+  box-shadow: 0 14px 24px rgba(10, 16, 8, 0.32), inset 0 -12px 18px rgba(126, 89, 17, 0.18);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.pad::before,
+.pad::after {
+  content: "";
+  position: absolute;
+  top: 90px;
+  width: 42px;
+  height: 64px;
+  background: linear-gradient(180deg, rgba(236, 199, 77, 0.95), rgba(199, 154, 43, 0.95));
+  border: 1px solid rgba(117, 84, 21, 0.34);
+  border-radius: 60% 60% 46% 46%;
+  z-index: -1;
+}
+
+.pad::before {
+  left: -14px;
+  transform: rotate(-18deg);
+}
+
+.pad::after {
+  right: -14px;
+  transform: rotate(18deg);
+}
+
+.pad::before,
+.pad::after {
+  transition: transform 0.22s ease;
+}
+
+.pad:hover {
+  transform: translateY(-8px) rotate(-0.4deg);
+  box-shadow: 0 22px 30px rgba(10, 16, 8, 0.4), inset 0 -12px 18px rgba(126, 89, 17, 0.18);
+}
+
+.pad:hover::before {
+  transform: rotate(-28deg) translateX(-2px);
+}
+
+.pad:hover::after {
+  transform: rotate(28deg) translateX(2px);
+}
+
+.duckEyes {
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+  margin-top: 4px;
+}
+
+.eye {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #17200f;
+  box-shadow: inset -3px -3px 0 rgba(255, 255, 255, 0.25);
+}
+
+.duckBill {
+  width: 62px;
+  height: 24px;
+  margin: -2px auto 0;
+  background: linear-gradient(180deg, #ffb34a, #e38a2e);
+  border: 1px solid rgba(149, 83, 21, 0.5);
+  border-radius: 999px;
+  position: relative;
+  transition: transform 0.18s ease;
+}
+
+.pad:hover .duckBill {
+  transform: scale(1.06);
+}
+
+.duckBill::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 10px;
+  height: 2px;
+  background: rgba(124, 63, 14, 0.4);
 }
 
 .padTop {
   font-weight: 800;
-  font-size: 20px;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.unlockMeta {
+  color: #4b5f1d;
+  font-weight: 700;
+  font-size: 12px;
+  min-height: 16px;
 }
 
 .pad p {
   margin: 0;
   font-weight: 800;
-  font-size: 18px;
+  font-size: 20px;
+  line-height: 1.2;
+  min-height: 2.4em;
 }
 
 .pad small {
   color: #273610;
   font-weight: 700;
+  min-height: 18px;
 }
 
 .pad button {
   border: 0;
   border-radius: 999px;
-  background: #4f7136;
-  color: #fde877;
-  padding: 8px 14px;
+  background: linear-gradient(180deg, #ffbf56, #e59033);
+  color: #4e2a08;
+  padding: 6px 12px;
+  min-width: 92px;
+  min-height: 36px;
+  margin-top: 6px;
+  align-self: center;
+  border: 1px solid rgba(138, 83, 26, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 232, 182, 0.55);
   font-weight: 800;
   cursor: pointer;
 }
 
+.pad button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffc96c, #ec9c45);
+}
+
 .pad button:disabled {
-  background: #6e6a50;
-  color: #d5ccaa;
+  background: #a99872;
+  color: #efe7ce;
   cursor: not-allowed;
+  border-color: rgba(121, 108, 77, 0.45);
+  box-shadow: none;
 }
 
 @media (max-width: 920px) {

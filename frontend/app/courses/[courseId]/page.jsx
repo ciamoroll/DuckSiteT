@@ -17,6 +17,7 @@ export default function CourseStagesPage() {
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [solvedSet, setSolvedSet] = useState(new Set());
+  const [attemptedSet, setAttemptedSet] = useState(new Set());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,15 +51,23 @@ export default function CourseStagesPage() {
             .filter((id) => Number.isInteger(id))
         );
 
+        const attempted = new Set(
+          (myAttempts?.attempts || [])
+            .map((row) => Number(row.challenge_id))
+            .filter((id) => Number.isInteger(id))
+        );
+
         setProfile(me?.profile || null);
         setCourse(selectedCourse);
         setLessons(challengeRows);
         setSolvedSet(solved);
+        setAttemptedSet(attempted);
       } catch (_error) {
         if (!alive) return;
         setCourse(null);
         setLessons([]);
         setSolvedSet(new Set());
+        setAttemptedSet(new Set());
       } finally {
         if (alive) setLoading(false);
       }
@@ -83,17 +92,43 @@ export default function CourseStagesPage() {
   const lessonsView = useMemo(() => {
     return lessons.map((lesson, index) => {
       const requiredXp = Number(lesson.required_xp ?? index * 100);
-      const isUnlocked = xp >= requiredXp;
+      const meetsXp = xp >= requiredXp;
+      const previousLessonId = index > 0 ? Number(lessons[index - 1]?.id) : null;
+      const meetsPrerequisite = previousLessonId == null ? true : solvedSet.has(previousLessonId);
+      const isUnlocked = meetsXp && meetsPrerequisite;
       const solved = solvedSet.has(Number(lesson.id));
+      const attempted = attemptedSet.has(Number(lesson.id));
+
+      let actionLabel = "Locked";
+      if (isUnlocked && solved) actionLabel = "Review";
+      else if (isUnlocked && attempted) actionLabel = "Continue";
+      else if (isUnlocked) actionLabel = "Open";
+
+      let lockMessage = "Unlocked";
+      if (solved) lockMessage = "Completed";
+      else if (!isUnlocked && !meetsXp && previousLessonId != null && !meetsPrerequisite) {
+        lockMessage = `Locked: ${requiredXp} XP and Lesson ${index} completion required`;
+      } else if (!isUnlocked && !meetsXp) {
+        lockMessage = `Locked: ${requiredXp} XP required`;
+      } else if (!isUnlocked && previousLessonId != null && !meetsPrerequisite) {
+        lockMessage = `Locked: Finish Lesson ${index} first`;
+      }
+
       return {
         ...lesson,
         lessonNo: index + 1,
         requiredXp,
+        meetsXp,
+        meetsPrerequisite,
+        previousLessonNo: previousLessonId == null ? null : index,
         isUnlocked,
         solved,
+        attempted,
+        actionLabel,
+        lockMessage,
       };
     });
-  }, [lessons, xp, solvedSet]);
+  }, [lessons, xp, solvedSet, attemptedSet]);
 
   return (
     <StudentRouteGuard>
@@ -130,21 +165,26 @@ export default function CourseStagesPage() {
             <section className={styles.lilyGrid}>
               {lessonsView.map((lesson) => (
                 <article key={lesson.id} className={styles.pad}>
+                  <div className={styles.duckEyes} aria-hidden="true">
+                    <span className={styles.eye} />
+                    <span className={styles.eye} />
+                  </div>
+                  <div className={styles.duckBill} aria-hidden="true" />
                   <div className={styles.padTop}>Lesson {lesson.lessonNo}</div>
-                  <p>{lesson.title || `Lesson ${lesson.lessonNo}`}</p>
-                  <small>
-                    {lesson.solved
-                      ? "Completed"
-                      : lesson.isUnlocked
-                        ? "Unlocked"
-                        : `Locked: ${lesson.requiredXp} XP required`}
-                  </small>
+                  {!lesson.isUnlocked ? (
+                    <div className={styles.unlockMeta}>
+                      {!lesson.meetsXp
+                        ? `Unlocks at ${lesson.requiredXp} XP`
+                        : `Finish Lesson ${lesson.previousLessonNo} to unlock`}
+                    </div>
+                  ) : null}
+                  <small>{lesson.lockMessage}</small>
                   <button
                     type="button"
                     disabled={!lesson.isUnlocked}
                     onClick={() => router.push(`/courses/${courseId}/${lesson.id}`)}
                   >
-                    {lesson.isUnlocked ? "Open" : "Locked"}
+                    {lesson.actionLabel}
                   </button>
                 </article>
               ))}
