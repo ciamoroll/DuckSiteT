@@ -86,8 +86,7 @@ export default function StudentDashboardPage() {
   const completedChallenges = new Set(
     attempts.filter((a) => a?.is_correct).map((a) => Number(a.challenge_id))
   ).size;
-  const totalBadges = Math.floor(completedChallenges / 5);
-  const achievementBadges = [
+  const baseAchievementBadges = [
     {
       id: "joined",
       title: "Joined DuckSiteT",
@@ -123,14 +122,22 @@ export default function StudentDashboardPage() {
       icon: "🔥",
       unlocked: completedChallenges >= 5,
     },
+  ];
+
+  const unlockedBaseBadges = baseAchievementBadges.filter((badge) => badge.unlocked).length;
+
+  const achievementBadges = [
+    ...baseAchievementBadges,
     {
       id: "badge-collector",
       title: "Badge Collector",
       note: "Collect 3 badges in total.",
       icon: "🏅",
-      unlocked: totalBadges >= 3,
+      unlocked: unlockedBaseBadges >= 3,
     },
   ];
+
+  const totalBadges = achievementBadges.filter((badge) => badge.unlocked).length;
 
 
 
