@@ -3,20 +3,12 @@
 import { useRouter } from "next/navigation";
 import { clearSession } from "@/lib/auth";
 import { storage } from "@/lib/storage";
-
-const links = [
-  { href: "/admin/dashboard", label: "Dashboard" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/classes", label: "Classes" },
-  { href: "/admin/courses", label: "Courses" },
-  { href: "/admin/materials", label: "Materials" },
-  { href: "/admin/challenges", label: "Challenges" },
-  { href: "/admin/progress", label: "Progress" },
-];
+import styles from "./AdminShell.module.css";
 
 export default function AdminShell({ title, children }) {
   const router = useRouter();
   const firstName = storage.get("firstName", "Prof.");
+  const lastName = storage.get("lastName", "Cabantog");
 
   function logout() {
     clearSession();
@@ -24,23 +16,29 @@ export default function AdminShell({ title, children }) {
   }
 
   return (
-    <main className="page-wrap stack">
-      <div className="panel stack">
-        <h1>{title}</h1>
-        <p>Admin: {firstName}</p>
-        <div className="nav">
-          {links.map((item) => (
-            <button key={item.href} className="secondary" onClick={() => router.push(item.href)}>
-              {item.label}
-            </button>
-          ))}
-        </div>
-        <button className="danger" onClick={logout}>
-          Logout
-        </button>
-      </div>
+    <main className={styles.page}>
+      <div className={styles.shell}>
+        <header className={styles.topBar}>
+          <div className={styles.adminIdentity}>
+            <div className={styles.avatar}>👩‍🏫</div>
+            <div>
+              <h1 className={styles.adminName}>{firstName} {lastName}</h1>
+              <p className={styles.adminRole}>Teacher&apos;s Admin</p>
+            </div>
+          </div>
+          <div className={styles.topActions}>
+            <button type="button" className={styles.headerBtn} onClick={() => router.push("/admin/dashboard")}>Admin Dashboard</button>
+            <button type="button" className={styles.headerBtn} onClick={logout}>Logout</button>
+          </div>
+        </header>
 
-      <div className="panel">{children}</div>
+        <section className={styles.intro}>
+          <h2>{title}</h2>
+          <p>Welcome Admin! Manage users, classes, courses, materials, challenges, and monitor student progress.</p>
+        </section>
+
+        <section className={styles.contentWrap}>{children}</section>
+      </div>
     </main>
   );
 }

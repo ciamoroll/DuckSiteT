@@ -161,6 +161,41 @@ async function adminLogin(req, res) {
     }
 
     if (adminUser && adminPass && username === adminUser && password === adminPass) {
+      const normalized = String(username).trim().toLowerCase();
+      let resolvedFirstName = process.env.ADMIN_FIRST_NAME || "Prof.";
+      let resolvedLastName = process.env.ADMIN_LAST_NAME || "Cabantog";
+
+      // Prefer profile name from DB when the env admin username matches an admin email.
+      const { data: profileByEmail } = await withTimeout(
+        supabase
+          .from("users")
+          .select("first_name, last_name, role")
+          .eq("email", normalized)
+          .maybeSingle(),
+        10000,
+        "Timed out while reading env admin profile",
+      );
+      if (profileByEmail && profileByEmail.role === "admin") {
+        resolvedFirstName = profileByEmail.first_name || resolvedFirstName;
+        resolvedLastName = profileByEmail.last_name || resolvedLastName;
+      } else {
+        // If ADMIN_USER is a username and not an email, use a DB admin profile as fallback.
+        const { data: anyAdminProfile } = await withTimeout(
+          supabase
+            .from("users")
+            .select("first_name, last_name")
+            .eq("role", "admin")
+            .limit(1)
+            .maybeSingle(),
+          10000,
+          "Timed out while reading fallback admin profile",
+        );
+        if (anyAdminProfile) {
+          resolvedFirstName = anyAdminProfile.first_name || resolvedFirstName;
+          resolvedLastName = anyAdminProfile.last_name || resolvedLastName;
+        }
+      }
+
       const token = jwt.sign({ role: "admin", username }, adminJwtSecret, {
         expiresIn: "8h",
       });
@@ -170,8 +205,8 @@ async function adminLogin(req, res) {
         message: "Admin login successful",
         token,
         role: "admin",
-        firstName: "Prof.",
-        lastName: "Cabantog",
+        firstName: resolvedFirstName,
+        lastName: resolvedLastName,
       });
     }
 

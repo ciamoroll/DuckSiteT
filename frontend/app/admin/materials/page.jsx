@@ -112,27 +112,31 @@ export default function MaterialsPage() {
         )}
 
         {loading ? <p>Loading...</p> : materials.length === 0 ? <p>No materials found</p> : (
-          <table className={styles.table}>
-            <thead>
-              <tr><th>Title</th><th>Course</th><th>File URL</th><th>Actions</th></tr>
-            </thead>
-            <tbody>
-              {materials.map((material) => {
-                const courseName = courses.find((c) => c.id === material.course_id)?.name || "—";
-                return (
-                  <tr key={material.id}>
-                    <td>{material.title || "—"}</td>
-                    <td>{courseName}</td>
-                    <td>{material.file_url ? <a href={material.file_url} target="_blank">View</a> : "—"}</td>
-                    <td className={styles.actions}>
-                      <button className={styles.btn_edit} onClick={() => handleEdit(material)}>Edit</button>
-                      <button className={styles.btn_delete} onClick={() => handleDelete(material.id)}>Delete</button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
+              <thead>
+                <tr><th>Title</th><th>Course</th><th>File URL</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                {materials.map((material) => {
+                  const courseName = courses.find((c) => c.id === material.course_id)?.name || "—";
+                  return (
+                    <tr key={material.id}>
+                      <td>{material.title || "—"}</td>
+                      <td>{courseName}</td>
+                      <td>{material.file_url ? <a href={material.file_url} target="_blank">View</a> : "—"}</td>
+                      <td className={styles.actions}>
+                        <div className={styles.actionButtons}>
+                          <button className={styles.btn_edit} onClick={() => handleEdit(material)}>Edit</button>
+                          <button className={styles.btn_delete} onClick={() => handleDelete(material.id)}>Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </AdminShell>

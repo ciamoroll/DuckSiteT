@@ -177,8 +177,10 @@ export default function UsersPage() {
                     <td><span className={`${styles.badge} ${styles[`badge_${user.role}`]}`}>{user.role}</span></td>
                     <td>{user.year_level || "—"}</td>
                     <td className={styles.actions}>
-                      <button className={styles.btn_edit} onClick={() => handleEdit(user)}>Edit</button>
-                      <button className={styles.btn_delete} onClick={() => handleDelete(user.id)}>Delete</button>
+                      <div className={styles.actionButtons}>
+                        <button className={styles.btn_edit} onClick={() => handleEdit(user)}>Edit</button>
+                        <button className={styles.btn_delete} onClick={() => handleDelete(user.id)}>Delete</button>
+                      </div>
                     </td>
                   </tr>
                 ))}

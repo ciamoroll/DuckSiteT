@@ -6,6 +6,16 @@ function toOptionsArray(value) {
   return value.map((item) => String(item || "").trim()).filter(Boolean);
 }
 
+function isChallengeAttemptsMissing(error) {
+  if (!error) return false;
+  const message = String(error.message || "").toLowerCase();
+  return message.includes("challenge_attempts") && (
+    message.includes("does not exist") ||
+    message.includes("undefined table") ||
+    message.includes("relation")
+  );
+}
+
 async function listChallenges(_req, res) {
   try {
     const { data, error } = await supabase
@@ -13,7 +23,42 @@ async function listChallenges(_req, res) {
       .select("*")
       .order("id", { ascending: false });
     if (error) return errorResponse(res, 400, error.message);
-    return res.status(200).json({ ok: true, challenges: data || [] });
+
+    const challenges = data || [];
+    const challengeIds = challenges
+      .map((row) => Number(row.id))
+      .filter((id) => Number.isInteger(id));
+
+    if (challengeIds.length === 0) {
+      return res.status(200).json({ ok: true, challenges });
+    }
+
+    const { data: attempts, error: attemptsError } = await supabase
+      .from("challenge_attempts")
+      .select("challenge_id")
+      .eq("is_correct", true)
+      .in("challenge_id", challengeIds);
+
+    if (attemptsError) {
+      if (isChallengeAttemptsMissing(attemptsError)) {
+        return res.status(200).json({ ok: true, challenges });
+      }
+      return errorResponse(res, 400, attemptsError.message);
+    }
+
+    const counts = new Map();
+    for (const row of attempts || []) {
+      const challengeId = Number(row.challenge_id);
+      if (!Number.isInteger(challengeId)) continue;
+      counts.set(challengeId, Number(counts.get(challengeId) || 0) + 1);
+    }
+
+    const hydrated = challenges.map((challenge) => ({
+      ...challenge,
+      completed: Number(counts.get(Number(challenge.id)) || 0),
+    }));
+
+    return res.status(200).json({ ok: true, challenges: hydrated });
   } catch (err) {
     return errorResponse(res, 500, "Unexpected listChallenges error", { error: err.message });
   }
@@ -33,7 +78,6 @@ async function createChallenge(req, res) {
       lesson_order: Math.max(1, Number(raw.lesson_order || 1)),
       required_xp: Math.max(0, Number(raw.required_xp || 0)),
       points: raw.points,
-      completed: raw.completed,
       status: raw.status || "Active",
     };
     if (!payload.title) return errorResponse(res, 400, "title is required");
@@ -76,7 +120,6 @@ async function updateChallenge(req, res) {
     if (raw.lesson_order !== undefined) payload.lesson_order = Math.max(1, Number(raw.lesson_order || 1));
     if (raw.required_xp !== undefined) payload.required_xp = Math.max(0, Number(raw.required_xp || 0));
     if (raw.points !== undefined) payload.points = raw.points;
-    if (raw.completed !== undefined) payload.completed = raw.completed;
     if (raw.status !== undefined) payload.status = raw.status;
 
     if (Object.keys(payload).length === 0) {

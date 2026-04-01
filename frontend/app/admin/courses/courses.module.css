@@ -1,21 +1,250 @@
-.container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-4); }
-.btn_primary { background: var(--primary); color: white; border: none; padding: var(--spacing-2) var(--spacing-4); border-radius: 4px; cursor: pointer; font-weight: 500; margin-bottom: var(--spacing-4); }
-.btn_primary:hover { opacity: 0.9; }
-.btn_secondary { background: var(--muted); color: var(--text); border: none; padding: var(--spacing-2) var(--spacing-4); border-radius: 4px; cursor: pointer; }
-.btn_secondary:hover { opacity: 0.8; }
-.btn_edit { background: var(--primary); color: white; border: none; padding: var(--spacing-1) var(--spacing-2); border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: var(--spacing-1); }
-.btn_edit:hover { opacity: 0.8; }
-.btn_delete { background: var(--danger); color: white; border: none; padding: var(--spacing-1) var(--spacing-2); border-radius: 4px; cursor: pointer; font-size: 12px; }
-.btn_delete:hover { opacity: 0.8; }
-.form { background: var(--surface); padding: var(--spacing-4); border-radius: 8px; margin-bottom: var(--spacing-4); border: 1px solid var(--muted); }
-.form h3 { margin-top: 0; }
-.form input, .form textarea, .form select { display: block; width: 100%; padding: var(--spacing-2); margin-bottom: var(--spacing-2); border: 1px solid var(--muted); border-radius: 4px; font-size: 14px; }
-.form input:focus, .form textarea:focus, .form select:focus { outline: none; border-color: var(--primary); }
-.form_buttons { display: flex; gap: var(--spacing-2); margin-top: var(--spacing-4); }
-.form_buttons button { flex: 1; }
-.table { width: 100%; border-collapse: collapse; background: var(--surface); }
-.table thead { background: var(--bg); border-bottom: 2px solid var(--muted); }
-.table th { padding: var(--spacing-3); text-align: left; font-weight: 600; }
-.table td { padding: var(--spacing-3); border-bottom: 1px solid var(--muted); }
-.table tbody tr:hover { background: rgba(0, 0, 0, 0.02); }
-.actions { display: flex; gap: var(--spacing-2); }
+.container {
+  display: grid;
+  gap: 14px;
+}
+
+.btn_primary,
+.btn_secondary,
+.btn_ghost,
+.btn_edit,
+.btn_delete,
+.btn_small_primary,
+.btn_small_danger {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn_primary {
+  background: linear-gradient(180deg, #5e82d5, #476bbf);
+  color: #f4f8ff;
+  border-color: #3f62aa;
+  padding: 10px 14px;
+  width: fit-content;
+}
+
+.btn_primary:hover {
+  background: linear-gradient(180deg, #6d91de, #5276c8);
+}
+
+.btn_secondary {
+  background: #edf2ff;
+  color: #3f5f99;
+  border-color: #ccd8f2;
+  padding: 10px 14px;
+}
+
+.btn_ghost {
+  background: #f8fbff;
+  color: #5f6f95;
+  border-color: #d9e3f8;
+  padding: 10px 14px;
+}
+
+.form {
+  border: 1px solid #d0dbf2;
+  border-radius: 12px;
+  background: #fbfdff;
+  padding: 14px;
+  display: grid;
+  gap: 14px;
+}
+
+.formTitleRow h3 {
+  margin: 0;
+  color: #2a467f;
+  font-size: 34px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.formSection {
+  border: 1px solid #dbe3f6;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.formSection h4,
+.lessonSection h4 {
+  margin: 0 0 10px;
+  color: #3f588a;
+  font-size: 24px;
+}
+
+.subHeading {
+  margin-top: 12px;
+}
+
+.fieldLabel {
+  display: block;
+  margin-bottom: 5px;
+  color: #3e547d;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.form input,
+.form textarea,
+.form select {
+  width: 100%;
+  border: 1px solid #d6dff3;
+  border-radius: 7px;
+  background: #fdfefe;
+  color: #263d6e;
+  padding: 10px 11px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.form input:focus,
+.form textarea:focus,
+.form select:focus {
+  outline: none;
+  border-color: #5f84d3;
+  box-shadow: 0 0 0 3px rgba(96, 133, 211, 0.14);
+}
+
+.form textarea {
+  min-height: 86px;
+  resize: vertical;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid #dbe4f8;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.compactTable,
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.compactTable thead,
+.table thead {
+  background: #eef2ff;
+}
+
+.compactTable th,
+.compactTable td,
+.table th,
+.table td {
+  border-bottom: 1px solid #e4ebfa;
+  color: #39507e;
+  padding: 9px 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.compactTable th,
+.table th {
+  font-size: 13px;
+  color: #5770a4;
+}
+
+.emptyCell {
+  text-align: center;
+  color: #7a89ac;
+}
+
+.btn_small_primary,
+.btn_small_danger {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 7px;
+}
+
+.btn_small_primary {
+  background: linear-gradient(180deg, #6287d9, #4f72c2);
+  color: #f4f8ff;
+  border-color: #4264ae;
+}
+
+.btn_small_danger {
+  background: #fff4f4;
+  color: #b45157;
+  border-color: #f0c2c5;
+}
+
+.lessonSection {
+  border: 1px solid #dbe3f6;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.form_buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form_buttons .btn_primary,
+.form_buttons .btn_secondary,
+.form_buttons .btn_ghost {
+  flex: 1;
+  min-height: 42px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading {
+  color: #5a6f99;
+  padding: 8px 2px;
+}
+
+.table {
+  background: #fff;
+}
+
+.table tbody tr:hover {
+  background: #f5f8ff;
+}
+
+.actions {
+  white-space: nowrap;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn_edit,
+.btn_delete {
+  padding: 7px 11px;
+  font-size: 12px;
+}
+
+.btn_edit {
+  background: linear-gradient(180deg, #5f83d6, #4a6fbe);
+  color: #f4f8ff;
+  border-color: #3e60a8;
+}
+
+.btn_delete {
+  background: #fff4f4;
+  color: #b45157;
+  border-color: #f0c2c5;
+}
+
+@media (max-width: 980px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formTitleRow h3 {
+    font-size: 28px;
+  }
+}
