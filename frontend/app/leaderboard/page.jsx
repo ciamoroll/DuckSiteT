@@ -64,7 +64,7 @@ export default function LeaderboardPage() {
             <nav className={styles.topNav}>
               <button type="button" onClick={() => router.push("/dashboard")}>Dashboard</button>
               <button type="button" onClick={() => router.push("/courses")}>Courses</button>
-              <button type="button" onClick={() => router.push("/leaderboard")}>Leaderboard</button>
+              <button type="button" className={styles.active} onClick={() => router.push("/leaderboard")}>Leaderboard</button>
               <button type="button" onClick={() => router.push("/profile")}>Profile</button>
               <button type="button" onClick={logout}>Logout</button>
             </nav>

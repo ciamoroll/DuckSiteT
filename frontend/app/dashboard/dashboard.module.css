@@ -56,6 +56,19 @@
   border-radius: 999px;
   padding: 7px 12px;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.topNav button:hover {
+  background: rgba(100, 113, 49, 0.8);
+  border-color: rgba(255, 230, 145, 0.6);
+}
+
+.topNav .active {
+  background: rgba(135, 171, 48, 0.8);
+  color: #fff8d8;
 }
 
 .playerMeta {

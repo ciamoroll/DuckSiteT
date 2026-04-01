@@ -10,14 +10,11 @@ import styles from "./dashboard.module.css";
 export default function StudentDashboardPage() {
   const router = useRouter();
   const [courses, setCourses] = useState([]);
-  const [allCourses, setAllCourses] = useState([]);
   const [classes, setClasses] = useState([]);
   const [challenges, setChallenges] = useState([]);
-  const [leaders, setLeaders] = useState([]);
+  const [attempts, setAttempts] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [enrollingCourseId, setEnrollingCourseId] = useState(null);
-  const [savingClass, setSavingClass] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -33,27 +30,24 @@ export default function StudentDashboardPage() {
           return;
         }
 
-        const [courseData, allCourseData, classesData, leaderboardData, challengeData] = await Promise.all([
+        const [courseData, classesData, challengeData, attemptsData] = await Promise.all([
           apiRequest("/api/public/my-courses", { student: true }),
-          apiRequest("/api/public/courses"),
           apiRequest("/api/public/classes"),
-          apiRequest("/api/public/leaderboard"),
           apiRequest("/api/public/my-challenges", { student: true }),
+          apiRequest("/api/public/my-attempts", { student: true }),
         ]);
 
         if (!isMounted) return;
         setCourses(courseData?.courses || []);
-        setAllCourses(allCourseData?.courses || []);
         setClasses(classesData?.classes || []);
-        setLeaders((leaderboardData?.leaderboard || []).slice(0, 5));
         setChallenges(challengeData?.challenges || []);
+        setAttempts(attemptsData?.attempts || []);
       } catch (_error) {
         if (!isMounted) return;
         setCourses([]);
-        setAllCourses([]);
         setClasses([]);
-        setLeaders([]);
         setChallenges([]);
+        setAttempts([]);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -79,65 +73,11 @@ export default function StudentDashboardPage() {
   const xp = Number(profile?.xp || 0);
   const level = Math.floor(xp / 500) + 1;
   const levelProgress = Math.min(100, Math.max(0, (xp % 500) / 5));
-  const enrolledIds = new Set(courses.map((course) => Number(course.id)));
-  const availableToEnroll = allCourses.filter((course) => {
-    if (enrolledIds.has(Number(course.id))) return false;
-    const allowedClassIds = Array.isArray(course.class_ids)
-      ? course.class_ids.map((value) => Number(value)).filter((id) => Number.isInteger(id) && id > 0)
-      : [];
-    if (allowedClassIds.length === 0) return true;
-    return Number.isInteger(classId) && classId > 0 && allowedClassIds.includes(classId);
-  });
 
-  async function saveClassId(nextClassId) {
-    setSavingClass(true);
-    try {
-      await apiRequest("/api/auth/me", {
-        method: "PUT",
-        body: { class_id: nextClassId || null },
-        student: true,
-      });
-
-      const [me, myCoursesData, myChallengesData] = await Promise.all([
-        apiRequest("/api/auth/me", { student: true }),
-        apiRequest("/api/public/my-courses", { student: true }),
-        apiRequest("/api/public/my-challenges", { student: true }),
-      ]);
-
-      setProfile(me?.profile || null);
-      setCourses(myCoursesData?.courses || []);
-      setChallenges(myChallengesData?.challenges || []);
-      alert("Class updated");
-    } catch (error) {
-      alert(error.message || "Failed to update class");
-    } finally {
-      setSavingClass(false);
-    }
-  }
-
-  async function enrollCourse(courseId) {
-    setEnrollingCourseId(courseId);
-    try {
-      await apiRequest("/api/public/my-courses/enroll", {
-        method: "POST",
-        body: { courseId },
-        student: true,
-      });
-
-      const [myCoursesData, myChallengesData] = await Promise.all([
-        apiRequest("/api/public/my-courses", { student: true }),
-        apiRequest("/api/public/my-challenges", { student: true }),
-      ]);
-
-      setCourses(myCoursesData?.courses || []);
-      setChallenges(myChallengesData?.challenges || []);
-      alert("Enrolled successfully");
-    } catch (error) {
-      alert(error.message || "Failed to enroll");
-    } finally {
-      setEnrollingCourseId(null);
-    }
-  }
+  const completedChallenges = new Set(
+    attempts.filter((a) => a?.is_correct).map((a) => Number(a.challenge_id))
+  ).size;
+  const totalBadges = Math.floor(completedChallenges / 5);
 
 
 
@@ -149,7 +89,7 @@ export default function StudentDashboardPage() {
           <header className={styles.topBar}>
             <div className={styles.brand}>DuckSiteT</div>
             <nav className={styles.topNav}>
-              <button type="button" onClick={() => router.push("/dashboard")}>Dashboard</button>
+              <button type="button" className={styles.active} onClick={() => router.push("/dashboard")}>Dashboard</button>
               <button type="button" onClick={() => router.push("/courses")}>Courses</button>
               <button type="button" onClick={() => router.push("/leaderboard")}>Leaderboard</button>
               <button type="button" onClick={() => router.push("/profile")}>Profile</button>
@@ -181,56 +121,21 @@ export default function StudentDashboardPage() {
 
               <section className={styles.statsGrid}>
                 <article>
-                  <h3>{courses.length}</h3>
-                  <p>Enrolled Courses</p>
+                  <h3>⭐ {totalBadges}</h3>
+                  <p>Total Badges</p>
                 </article>
                 <article>
-                  <h3>{challenges.length}</h3>
-                  <p>Active Challenges</p>
+                  <h3>🎖️ {level}</h3>
+                  <p>Current Level</p>
                 </article>
                 <article>
-                  <h3>{leaders.length}</h3>
-                  <p>Leaderboard Loaded</p>
+                  <h3>✓ {completedChallenges}</h3>
+                  <p>Completed Challenges</p>
                 </article>
                 <article>
-                  <h3>{classCode || "N/A"}</h3>
-                  <p>Current Class</p>
+                  <h3>💎 {xp}</h3>
+                  <p>Total Points</p>
                 </article>
-              </section>
-
-              <section className={styles.mainGrid}>
-                <div className={styles.panel}>
-                  <h2>Profile Settings</h2>
-                  <label className={styles.inputLabel}>Select Class</label>
-                  <select
-                    value={classId || ""}
-                    onChange={(e) => saveClassId(e.target.value ? Number(e.target.value) : null)}
-                    disabled={savingClass}
-                    className={styles.select}
-                  >
-                    <option value="">Select your class</option>
-                    {classes.map((cls) => (
-                      <option key={cls.id} value={cls.id}>{cls.name} ({cls.code})</option>
-                    ))}
-                  </select>
-                  <button type="button" className={styles.editBtn} onClick={() => router.push("/profile")}>Edit Full Profile</button>
-                </div>
-
-                <div className={styles.panel}>
-                  <h2>Leaderboard</h2>
-                  {leaders.length === 0 ? (
-                    <p className={styles.muted}>No leaderboard data yet.</p>
-                  ) : (
-                    <div className={styles.leaderList}>
-                      {leaders.map((row, index) => (
-                        <div key={row.id || index} className={styles.leaderRow}>
-                          <span>#{index + 1} {row.name || "Student"}</span>
-                          <strong>{Number(row.xp || 0)} XP</strong>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </section>
 
               <section className={styles.panelWide}>
@@ -249,31 +154,6 @@ export default function StudentDashboardPage() {
                   )}
                 </div>
               </section>
-
-              <section className={styles.panelWide}>
-                <h2>Course Catalog</h2>
-                <div className={styles.catalogGrid}>
-                  {availableToEnroll.length === 0 ? (
-                    <p className={styles.muted}>No additional courses available for enrollment.</p>
-                  ) : (
-                    availableToEnroll.slice(0, 12).map((course) => (
-                      <article key={course.id || course.code || course.name} className={styles.catalogCard}>
-                        <h4>{course.name || "Untitled Course"}</h4>
-                        <p>{course.code || "No code"}</p>
-                        <button
-                          type="button"
-                          onClick={() => enrollCourse(course.id)}
-                          disabled={enrollingCourseId === course.id}
-                        >
-                          {enrollingCourseId === course.id ? "Enrolling..." : "Enroll"}
-                        </button>
-                      </article>
-                    ))
-                  )}
-                </div>
-              </section>
-
-
             </>
           )}
         </div>

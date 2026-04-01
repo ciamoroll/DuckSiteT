@@ -66,6 +66,11 @@
   border-color: rgba(255, 230, 145, 0.6);
 }
 
+.topNav .active {
+  background: rgba(135, 171, 48, 0.8);
+  color: #fff8d8;
+}
+
 .playerMeta {
   display: flex;
   gap: 8px;

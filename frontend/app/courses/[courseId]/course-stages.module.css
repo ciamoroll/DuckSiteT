@@ -26,19 +26,21 @@
 .topBar {
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(246, 227, 143, 0.25);
-  background: linear-gradient(180deg, rgba(53, 60, 28, 0.9), rgba(32, 37, 15, 0.9));
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 233, 170, 0.25);
+  background: linear-gradient(180deg, rgba(62, 56, 25, 0.85), rgba(36, 32, 14, 0.85));
+  backdrop-filter: blur(6px);
 }
 
 .brand {
-  color: #f4d56e;
+  color: #f8d96f;
   font-family: "Trebuchet MS", sans-serif;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
+  letter-spacing: 0.4px;
 }
 
 .topNav {
@@ -47,13 +49,20 @@
 }
 
 .topNav button {
-  border: 1px solid rgba(250, 232, 154, 0.35);
-  background: rgba(96, 116, 48, 0.72);
-  color: #fff2c8;
+  border: 1px solid rgba(255, 230, 145, 0.35);
+  background: rgba(84, 95, 41, 0.6);
+  color: #fff0b6;
   border-radius: 999px;
   padding: 7px 12px;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.topNav button:hover {
+  background: rgba(100, 113, 49, 0.8);
+  border-color: rgba(255, 230, 145, 0.6);
 }
 
 .topNav .active {
@@ -63,16 +72,17 @@
 .meta {
   display: flex;
   gap: 8px;
+  color: #f4e9ba;
+  font-weight: 700;
+  font-size: 13px;
 }
 
 .meta span {
-  background: rgba(78, 95, 37, 0.84);
-  border: 1px solid rgba(255, 231, 150, 0.35);
+  background: rgba(74, 84, 35, 0.78);
+  border: 1px solid rgba(245, 221, 139, 0.35);
   padding: 6px 10px;
   border-radius: 999px;
-  color: #fff4c8;
-  font-weight: 700;
-  font-size: 13px;
+  color: #f4e9ba;
 }
 
 .heading,
