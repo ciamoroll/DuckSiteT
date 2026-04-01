@@ -121,6 +121,10 @@ export default function ProfileSetupPage() {
         alert("Please select your year level");
         return;
       }
+      if (!formData.classId) {
+        alert("Please select your class");
+        return;
+      }
     }
 
     try {
@@ -144,6 +148,11 @@ export default function ProfileSetupPage() {
   }
 
   async function handleComplete() {
+    if (!formData.classId) {
+      alert("Please select your class before completing your profile");
+      return;
+    }
+
     try {
       await apiRequest("/api/auth/me", {
         method: "PUT",
@@ -189,6 +198,7 @@ export default function ProfileSetupPage() {
   }
 
   const currentClassId = Number(formData.classId || profile?.class_id || 0);
+  const hasClassSelected = Number.isInteger(currentClassId) && currentClassId > 0;
   const enrolledIds = new Set(myCourses.map((course) => Number(course.id)));
   const availableToEnroll = allCourses.filter((course) => {
     if (enrolledIds.has(Number(course.id))) return false;
@@ -285,14 +295,23 @@ export default function ProfileSetupPage() {
                     <option key={cls.id} value={cls.id}>{cls.name} ({cls.code})</option>
                   ))}
                 </select>
+                {!hasClassSelected ? (
+                  <p className={styles.settingsSubtitle}>Select and save your class to receive class-based courses automatically.</p>
+                ) : null}
                 <button 
                   onClick={async () => {
+                    if (!formData.classId) {
+                      alert("Please select your class first.");
+                      return;
+                    }
                     try {
                       await apiRequest("/api/auth/me", {
                         method: "PUT",
                         body: { class_id: formData.classId || null },
                         student: true,
                       });
+                      const myCoursesData = await apiRequest("/api/public/my-courses", { student: true });
+                      setMyCourses(myCoursesData?.courses || []);
                       alert("Class updated successfully!");
                     } catch (err) {
                       alert("Failed to update class: " + err.message);
@@ -315,7 +334,11 @@ export default function ProfileSetupPage() {
             <p className={styles.settingsSubtitle}>Enroll in more courses from your profile page</p>
             <div className={styles.catalogGrid}>
               {availableToEnroll.length === 0 ? (
-                <p className={styles.catalogMuted}>No additional courses available for enrollment.</p>
+                <p className={styles.catalogMuted}>
+                  {hasClassSelected
+                    ? "No additional courses available for enrollment."
+                    : "Select and save your class first to see class-based courses."}
+                </p>
               ) : (
                 availableToEnroll.slice(0, 12).map((course) => (
                   <article key={course.id || course.code || course.name} className={styles.catalogCard}>

@@ -91,6 +91,43 @@ async function autoEnrollStudentsForClasses(courseId, classIds) {
   }
 }
 
+async function autoUnenrollStudentsOutsideClasses(courseId, classIds) {
+  const uniqueClassIds = toUniqueIds(classIds);
+  if (!Number.isInteger(Number(courseId)) || uniqueClassIds.length === 0) return;
+
+  const { data: enrollments, error: enrollmentsError } = await supabase
+    .from("course_enrollments")
+    .select("user_id")
+    .eq("course_id", Number(courseId));
+  if (enrollmentsError) {
+    if (isCourseEnrollmentsMissing(enrollmentsError)) return;
+    throw new Error(enrollmentsError.message);
+  }
+
+  const enrolledUserIds = (enrollments || []).map((row) => row.user_id).filter(Boolean);
+  if (enrolledUserIds.length === 0) return;
+
+  const { data: students, error: studentsError } = await supabase
+    .from("users")
+    .select("id, class_id")
+    .eq("role", "student")
+    .in("id", enrolledUserIds);
+  if (studentsError) throw new Error(studentsError.message);
+
+  const toRemoveUserIds = (students || [])
+    .filter((student) => !uniqueClassIds.includes(Number(student.class_id)))
+    .map((student) => student.id)
+    .filter(Boolean);
+  if (toRemoveUserIds.length === 0) return;
+
+  const { error: removeError } = await supabase
+    .from("course_enrollments")
+    .delete()
+    .eq("course_id", Number(courseId))
+    .in("user_id", toRemoveUserIds);
+  if (removeError) throw new Error(removeError.message);
+}
+
 async function listCourses(_req, res) {
   try {
     const { data, error } = await supabase.from("courses").select("*").order("id", { ascending: false });
@@ -183,6 +220,7 @@ async function updateCourse(req, res) {
         if (linkError) return errorResponse(res, 400, linkError.message);
 
         await autoEnrollStudentsForClasses(id, classIds);
+        await autoUnenrollStudentsOutsideClasses(id, classIds);
       }
     }
 

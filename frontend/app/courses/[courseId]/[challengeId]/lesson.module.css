@@ -18,9 +18,9 @@
   z-index: 1;
   width: min(1180px, 96vw);
   margin: 0 auto;
-  padding: 14px 0 28px;
+  padding: 20px 0 32px;
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
 .topBar {
@@ -107,7 +107,12 @@
   border-radius: 14px;
   background: linear-gradient(180deg, rgba(56, 49, 24, 0.78), rgba(31, 29, 16, 0.78));
   color: #fff4ca;
-  padding: 18px;
+  padding: 24px 18px 18px;
+}
+
+.lessonWrap {
+  display: grid;
+  gap: 12px;
 }
 
 .lessonWrap h1,
@@ -116,13 +121,22 @@
   color: #ffdf86;
 }
 
+.lessonWrap h1 {
+  margin-bottom: 2px;
+}
+
+.lessonWrap h2 {
+  margin-bottom: 4px;
+}
+
 .question {
-  margin-top: 8px;
+  margin: 0;
   font-size: 18px;
   font-weight: 700;
 }
 
 .reward {
+  margin: 0;
   color: #9fe17c;
   font-weight: 800;
 }
@@ -131,6 +145,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 10px;
+  margin-top: 2px;
 }
 
 .optionBtn,
@@ -140,7 +155,7 @@
   background: rgba(95, 114, 47, 0.72);
   color: #fff3c4;
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 11px 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -150,9 +165,14 @@
 }
 
 .actions {
-  display: flex;
+  display: grid;
   gap: 10px;
-  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.actions button {
+  width: 100%;
+  padding: 12px 14px;
 }
 
 .resultBox {
@@ -162,7 +182,16 @@
   padding: 10px;
 }
 
+.resultBox p {
+  margin: 0;
+}
+
+.resultBox p + p {
+  margin-top: 4px;
+}
+
 .success {
+  margin: 0;
   color: #9fe17c;
   font-weight: 700;
 }
