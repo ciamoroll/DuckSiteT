@@ -23,6 +23,26 @@ async function createMaterial(req, res) {
   }
 }
 
+async function updateMaterial(req, res) {
+  try {
+    const { id } = req.params;
+    const payload = req.body || {};
+    if (payload.title !== undefined && !String(payload.title).trim()) {
+      return errorResponse(res, 400, "title cannot be empty");
+    }
+    const { data, error } = await supabase
+      .from("materials")
+      .update(payload)
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) return errorResponse(res, 400, error.message);
+    return res.status(200).json({ ok: true, material: data });
+  } catch (err) {
+    return errorResponse(res, 500, "Unexpected updateMaterial error", { error: err.message });
+  }
+}
+
 async function deleteMaterial(req, res) {
   try {
     const { id } = req.params;
@@ -51,4 +71,4 @@ async function uploadMaterialFile(req, res) {
   }
 }
 
-module.exports = { listMaterials, createMaterial, deleteMaterial, uploadMaterialFile };
+module.exports = { listMaterials, createMaterial, updateMaterial, deleteMaterial, uploadMaterialFile };

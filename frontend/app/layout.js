@@ -2,7 +2,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "Ducksite",
-  description: "Ducksite migrated to Next.js",
+  description: "Learning platform frontend",
 };
 
 export default function RootLayout({ children }) {

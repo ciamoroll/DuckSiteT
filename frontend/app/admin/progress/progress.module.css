@@ -1,0 +1,17 @@
+.container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-4); }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-4); margin-bottom: var(--spacing-4); }
+.summary_card { background: var(--surface); padding: var(--spacing-4); border-radius: 8px; border: 1px solid var(--muted); text-align: center; }
+.summary_card h4 { margin: 0 0 var(--spacing-2) 0; color: var(--muted); font-size: 12px; text-transform: uppercase; }
+.summary_number { font-size: 28px; font-weight: 700; color: var(--primary); margin: 0; }
+.filters { margin-bottom: var(--spacing-4); display: flex; gap: var(--spacing-2); align-items: center; }
+.filters select { padding: var(--spacing-2); border: 1px solid var(--muted); border-radius: 4px; font-size: 14px; }
+.table_container { overflow-x: auto; border: 1px solid var(--muted); border-radius: 8px; }
+.table { width: 100%; border-collapse: collapse; background: var(--surface); }
+.table thead { background: var(--bg); border-bottom: 2px solid var(--muted); }
+.table th { padding: var(--spacing-3); text-align: left; font-weight: 600; }
+.table td { padding: var(--spacing-3); border-bottom: 1px solid var(--muted); }
+.table tbody tr:hover { background: rgba(0, 0, 0, 0.02); }
+.badge { display: inline-block; padding: var(--spacing-1) var(--spacing-2); border-radius: 4px; font-size: 12px; font-weight: 600; }
+.badge_started { background: rgba(255, 159, 64, 0.1); color: #ff9f40; }
+.badge_in_progress { background: rgba(31, 111, 235, 0.1); color: var(--primary); }
+.badge_completed { background: rgba(0, 128, 96, 0.1); color: #008060; }

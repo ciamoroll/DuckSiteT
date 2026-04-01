@@ -1,0 +1,195 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-4);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: var(--spacing-6);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-6);
+}
+
+.step {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--muted);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: var(--primary);
+  color: white;
+}
+
+.line {
+  flex: 1;
+  height: 2px;
+  background: var(--muted);
+  margin: 0 var(--spacing-2);
+  max-width: 100px;
+  transition: all 0.3s ease;
+}
+
+.line.active {
+  background: var(--primary);
+}
+
+.step_content {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step_content h2 {
+  margin: 0 0 var(--spacing-2) 0;
+  color: var(--text);
+  font-size: 24px;
+}
+
+.step_desc {
+  color: var(--muted);
+  margin: 0 0 var(--spacing-4) 0;
+}
+
+.form_group {
+  margin-bottom: var(--spacing-4);
+}
+
+.form_group label {
+  display: block;
+  margin-bottom: var(--spacing-1);
+  color: var(--text);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.form_group input,
+.form_group select,
+.form_group textarea {
+  width: 100%;
+  padding: var(--spacing-2);
+  border: 1px solid var(--muted);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.form_group input:focus,
+.form_group select:focus,
+.form_group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.1);
+}
+
+.review_section {
+  background: var(--bg);
+  padding: var(--spacing-4);
+  border-radius: 8px;
+  margin-bottom: var(--spacing-4);
+}
+
+.review_item {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-2) 0;
+  border-bottom: 1px solid var(--muted);
+}
+
+.review_item:last-child {
+  border-bottom: none;
+}
+
+.review_item .label {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.review_item .value {
+  color: var(--text);
+  text-align: right;
+  flex: 1;
+  margin-left: var(--spacing-2);
+}
+
+.btn_primary {
+  width: 100%;
+  padding: var(--spacing-3);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.btn_primary:hover {
+  opacity: 0.9;
+}
+
+.btn_secondary {
+  flex: 1;
+  padding: var(--spacing-3);
+  background: var(--muted);
+  color: var(--text);
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.btn_secondary:hover {
+  opacity: 0.8;
+}
+
+.button_group {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.button_group .btn_primary {
+  width: auto;
+}
+
+/* CSS variable defaults */
+:root {
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+}

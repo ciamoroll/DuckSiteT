@@ -1,0 +1,23 @@
+.container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-4); }
+.btn_primary { background: var(--primary); color: white; border: none; padding: var(--spacing-2) var(--spacing-4); border-radius: 4px; cursor: pointer; font-weight: 500; margin-bottom: var(--spacing-4); }
+.btn_primary:hover { opacity: 0.9; }
+.btn_secondary { background: var(--muted); color: var(--text); border: none; padding: var(--spacing-2) var(--spacing-4); border-radius: 4px; cursor: pointer; }
+.btn_secondary:hover { opacity: 0.8; }
+.btn_edit { background: var(--primary); color: white; border: none; padding: var(--spacing-1) var(--spacing-2); border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: var(--spacing-1); }
+.btn_edit:hover { opacity: 0.8; }
+.btn_delete { background: var(--danger); color: white; border: none; padding: var(--spacing-1) var(--spacing-2); border-radius: 4px; cursor: pointer; font-size: 12px; }
+.btn_delete:hover { opacity: 0.8; }
+.form { background: var(--surface); padding: var(--spacing-4); border-radius: 8px; margin-bottom: var(--spacing-4); border: 1px solid var(--muted); }
+.form h3 { margin-top: 0; }
+.form input, .form textarea, .form select { display: block; width: 100%; padding: var(--spacing-2); margin-bottom: var(--spacing-2); border: 1px solid var(--muted); border-radius: 4px; font-size: 14px; }
+.form input:focus, .form textarea:focus, .form select:focus { outline: none; border-color: var(--primary); }
+.form_buttons { display: flex; gap: var(--spacing-2); margin-top: var(--spacing-4); }
+.form_buttons button { flex: 1; }
+.table { width: 100%; border-collapse: collapse; background: var(--surface); }
+.table thead { background: var(--bg); border-bottom: 2px solid var(--muted); }
+.table th { padding: var(--spacing-3); text-align: left; font-weight: 600; }
+.table td { padding: var(--spacing-3); border-bottom: 1px solid var(--muted); }
+.table tbody tr:hover { background: rgba(0, 0, 0, 0.02); }
+.actions { display: flex; gap: var(--spacing-2); }
+.table a { color: var(--primary); text-decoration: none; }
+.table a:hover { text-decoration: underline; }

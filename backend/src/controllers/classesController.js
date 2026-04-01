@@ -13,7 +13,12 @@ async function listClasses(_req, res) {
 
 async function createClass(req, res) {
   try {
-    const payload = req.body || {};
+    const raw = req.body || {};
+    const payload = {
+      name: raw.name,
+      code: raw.code,
+      instructor: raw.instructor,
+    };
     if (!payload.name || !payload.code || !payload.instructor) {
       return errorResponse(res, 400, "name, code, and instructor are required");
     }
@@ -28,9 +33,19 @@ async function createClass(req, res) {
 async function updateClass(req, res) {
   try {
     const { id } = req.params;
+    const raw = req.body || {};
+    const payload = {};
+    if (raw.name !== undefined) payload.name = raw.name;
+    if (raw.code !== undefined) payload.code = raw.code;
+    if (raw.instructor !== undefined) payload.instructor = raw.instructor;
+
+    if (Object.keys(payload).length === 0) {
+      return errorResponse(res, 400, "No valid fields to update");
+    }
+
     const { data, error } = await supabase
       .from("classes")
-      .update(req.body || {})
+      .update(payload)
       .eq("id", id)
       .select()
       .single();

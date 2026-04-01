@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node src/server.js",
     "start": "node src/server.js",
-    "test": "echo \"No backend tests yet\""
+    "test": "node --test",
+    "create-admin": "node scripts/create-admin.js"
   },
   "keywords": [],
   "author": "",
@@ -19,5 +20,8 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.1"
   }
 }

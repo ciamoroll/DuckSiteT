@@ -51,6 +51,10 @@ app.use((err, req, res, _next) => {
 });
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => {
-  console.log(`Backend running on port ${port}`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Backend running on port ${port}`);
+  });
+}
+
+module.exports = { app };

@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiRequest } from "@/lib/api";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000";
+function isStrongPassword(value) {
+  return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
+}
 
 export default function SignupPage() {
   const router = useRouter();
@@ -11,128 +14,59 @@ export default function SignupPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function validatePassword(value) {
-    return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(value || "");
-  }
-
-  async function signup() {
+  async function onSignup() {
     const normalizedEmail = email.trim().toLowerCase();
     if (!firstName.trim() || !lastName.trim() || !normalizedEmail || !password) {
-      alert("Please fill all fields");
+      alert("Please fill all fields.");
       return;
     }
-    if (!validatePassword(password)) {
-      alert(
-        "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
-      );
+    if (!isStrongPassword(password)) {
+      alert("Password must be at least 8 chars with uppercase, number, and symbol.");
       return;
     }
+
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+      setLoading(true);
+      await apiRequest("/api/auth/signup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: {
           firstName: firstName.trim(),
           lastName: lastName.trim(),
           email: normalizedEmail,
           password,
-        }),
+        },
       });
-      const payload = await response.json();
-      if (!response.ok || !payload?.ok) {
-        throw new Error(payload?.message || "Signup failed");
-      }
-      localStorage.setItem("userId", payload?.user?.id || "");
-      localStorage.setItem("email", normalizedEmail);
-      alert("Account Created! Please log in.");
+      alert("Account created. Please login.");
       router.push("/login");
     } catch (error) {
-      alert(error.message);
+      alert(error.message || "Signup failed");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <>
-      <style jsx>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          font-family: Arial, sans-serif;
-        }
-        .page {
-          height: 100vh;
-          background: url("/images/backgrounds/background.jpg") no-repeat center/cover;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .container {
-          background: rgba(255, 255, 200, 0.85);
-          padding: 30px;
-          border-radius: 20px;
-          width: 350px;
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-          border: 3px solid #2f6b2f;
-        }
-        h2 {
-          margin-bottom: 20px;
-          text-align: center;
-          color: #2f6b2f;
-          font-weight: bold;
-          font-size: 22px;
-        }
-        input {
-          width: 100%;
-          padding: 12px;
-          margin-bottom: 15px;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          background: #2f6b2f;
-          color: white;
-        }
-        input::placeholder {
-          color: #ddd;
-        }
-        button {
-          width: 100%;
-          padding: 12px;
-          border: none;
-          border-radius: 10px;
-          cursor: pointer;
-          margin-bottom: 10px;
-          font-weight: bold;
-        }
-        .signup-btn {
-          background: #f4e7a1;
-          color: #2f6b2f;
-        }
-        .back-btn {
-          background: #ccc;
-          color: #333;
-        }
-      `}</style>
-      <div className="page">
-        <div className="container">
-          <h2>🦆 DuckSiteT</h2>
-          <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" />
-          <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last Name" />
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email" />
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            placeholder="Password"
-          />
-          <button className="signup-btn" onClick={signup}>
-            Create Account
-          </button>
-          <button className="back-btn" onClick={() => router.push("/login")}>
-            Back to Login
-          </button>
-        </div>
+    <main className="page-wrap">
+      <div className="panel stack" style={{ maxWidth: 480, margin: "0 auto" }}>
+        <h1>Create Student Account</h1>
+        <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First name" />
+        <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last name" />
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+        />
+        <button onClick={onSignup} disabled={loading}>
+          {loading ? "Please wait..." : "Create Account"}
+        </button>
+        <button className="secondary" onClick={() => router.push("/login")}>
+          Back to Login
+        </button>
       </div>
-    </>
+    </main>
   );
 }

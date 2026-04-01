@@ -31,10 +31,7 @@ async function login(req, res) {
     }
 
     const { data, error } = await withTimeout(
-      supabase.auth.signInWithPassword({
-        email,
-        password,
-      }),
+      supabase.auth.signInWithPassword({ email, password }),
       10000,
       "Timed out while signing in",
     );
@@ -67,6 +64,7 @@ async function signup(req, res) {
     const normalizedEmail = String(email).trim().toLowerCase();
     let data;
     let error;
+
     try {
       const adminResult = await withTimeout(
         supabase.auth.admin.createUser({
@@ -114,6 +112,7 @@ async function signup(req, res) {
         "Signup request was accepted but no user id was returned. Check Supabase email confirmation settings.",
       );
     }
+
     const { error: profileError } = await withTimeout(
       supabase.from("users").upsert({
         id: user.id,
@@ -154,16 +153,17 @@ async function adminLogin(req, res) {
       return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
     }
 
-    const adminUser = process.env.ADMIN_USER || "admin";
-    const adminPass = process.env.ADMIN_PASS || "Admin@123";
+    const adminUser = process.env.ADMIN_USER;
+    const adminPass = process.env.ADMIN_PASS;
+    const adminJwtSecret = process.env.ADMIN_JWT_SECRET;
+    if (!adminJwtSecret) {
+      return errorResponse(res, 500, "Server misconfiguration: ADMIN_JWT_SECRET is required");
+    }
 
-    // Legacy static admin credential path.
-    if (username === adminUser && password === adminPass) {
-      const token = jwt.sign(
-        { role: "admin", username },
-        process.env.ADMIN_JWT_SECRET || "ducksite-admin-secret",
-        { expiresIn: "8h" },
-      );
+    if (adminUser && adminPass && username === adminUser && password === adminPass) {
+      const token = jwt.sign({ role: "admin", username }, adminJwtSecret, {
+        expiresIn: "8h",
+      });
 
       return res.status(200).json({
         ok: true,
@@ -175,13 +175,13 @@ async function adminLogin(req, res) {
       });
     }
 
-    // Admin account path (email + password) backed by Supabase users table.
     const normalized = String(username).trim().toLowerCase();
     const loginResult = await withTimeout(
       supabase.auth.signInWithPassword({ email: normalized, password }),
       10000,
       "Timed out while signing in admin",
     );
+
     if (loginResult.error || !loginResult.data?.user?.id) {
       return errorResponse(res, 401, loginResult.error?.message || "Invalid admin credentials");
     }
@@ -192,15 +192,14 @@ async function adminLogin(req, res) {
       10000,
       "Timed out while checking admin profile",
     );
+
     if (profileError || !profile || profile.role !== "admin") {
       return errorResponse(res, 403, "Account is not authorized as admin");
     }
 
-    const token = jwt.sign(
-      { role: "admin", username: normalized, userId },
-      process.env.ADMIN_JWT_SECRET || "ducksite-admin-secret",
-      { expiresIn: "8h" },
-    );
+    const token = jwt.sign({ role: "admin", username: normalized, userId }, adminJwtSecret, {
+      expiresIn: "8h",
+    });
 
     return res.status(200).json({
       ok: true,
@@ -216,71 +215,138 @@ async function adminLogin(req, res) {
 }
 
 async function adminSignup(req, res) {
+  return errorResponse(
+    res,
+    403,
+    "Admin account creation is disabled. Admins must be created manually in the database.",
+  );
+}
+
+async function getMe(req, res) {
   try {
-    const { firstName, lastName, email, password, setupKey } = req.body || {};
-    if (!firstName || !lastName || !email || !password || !setupKey) {
-      return errorResponse(
-        res,
-        400,
-        "firstName, lastName, email, password, and setupKey are required",
-      );
-    }
-    if (!isStrongPassword(password)) {
-      return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
+    const user = req.user;
+    const userId = user?.id;
+    if (!userId) {
+      return errorResponse(res, 401, "Authenticated user is required");
     }
 
-    const expectedKey = process.env.ADMIN_SETUP_KEY || "ducksite-admin-setup";
-    if (setupKey !== expectedKey) {
-      return errorResponse(res, 403, "Invalid admin setup key");
-    }
+    let { data: profile, error } = await withTimeout(
+      supabase
+        .from("users")
+        .select("id, uid, email, first_name, last_name, role, year_level, class_id, class_code, student_id, profile_completed, profile_step, xp, status")
+        .eq("id", userId)
+        .single(),
+      10000,
+      "Timed out while fetching profile",
+    );
 
-    const normalizedEmail = String(email).trim().toLowerCase();
-    const { data, error } = await withTimeout(
-      supabase.auth.admin.createUser({
-        email: normalizedEmail,
-        password,
-        email_confirm: true,
-        user_metadata: {
+    // If the auth user exists but profile row is missing, create a default profile.
+    if (error || !profile) {
+      const firstName = user?.user_metadata?.first_name || "";
+      const lastName = user?.user_metadata?.last_name || "";
+      const email = String(user?.email || "").trim().toLowerCase();
+      const role = user?.user_metadata?.role === "admin" ? "admin" : "student";
+
+      const { error: upsertError } = await withTimeout(
+        supabase.from("users").upsert({
+          id: userId,
+          uid: userId,
+          email,
           first_name: firstName,
           last_name: lastName,
-          role: "admin",
-        },
-      }),
-      10000,
-      "Timed out while creating admin account",
-    );
-    if (error || !data?.user?.id) {
-      return errorResponse(res, 400, error?.message || "Failed to create admin account");
+          role,
+          profile_completed: role === "admin",
+          profile_step: role === "admin" ? 3 : 1,
+          xp: 0,
+          status: "Active",
+        }),
+        10000,
+        "Timed out while creating missing profile",
+      );
+
+      if (upsertError) {
+        return errorResponse(res, 400, upsertError.message);
+      }
+
+      const refetch = await withTimeout(
+        supabase
+          .from("users")
+          .select("id, uid, email, first_name, last_name, role, year_level, class_id, class_code, student_id, profile_completed, profile_step, xp, status")
+          .eq("id", userId)
+          .single(),
+        10000,
+        "Timed out while refetching created profile",
+      );
+
+      profile = refetch.data;
+      error = refetch.error;
     }
 
-    const user = data.user;
-    const { error: profileError } = await withTimeout(
-      supabase.from("users").upsert({
-        id: user.id,
-        uid: user.id,
-        first_name: firstName,
-        last_name: lastName,
-        email: normalizedEmail,
-        role: "admin",
-        profile_completed: true,
-        profile_step: 3,
-        status: "Active",
-      }),
-      10000,
-      "Timed out while writing admin profile",
-    );
-    if (profileError) {
-      return errorResponse(res, 400, profileError.message);
+    if (error || !profile) {
+      return errorResponse(res, 404, "Profile not found");
     }
 
-    return res.status(201).json({
+    return res.status(200).json({
       ok: true,
-      message: "Admin account created successfully",
-      user: { id: user.id, email: normalizedEmail, role: "admin" },
+      message: "Profile retrieved successfully",
+      profile,
     });
   } catch (err) {
-    return errorResponse(res, 500, "Unexpected admin signup error", { error: err.message });
+    return errorResponse(res, 500, "Unexpected error fetching profile", { error: err.message });
   }
 }
 
-module.exports = { login, signup, adminLogin, adminSignup };
+async function updateMe(req, res) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return errorResponse(res, 401, "Authenticated user is required");
+    }
+
+    const { first_name, last_name, student_id, year_level, class_id, class_code, profile_step, profile_completed } = req.body || {};
+
+    const { data: profile, error: fetchError } = await withTimeout(
+      supabase
+        .from("users")
+        .select("role")
+        .eq("id", userId)
+        .single(),
+      10000,
+      "Timed out while checking role",
+    );
+
+    if (fetchError || !profile || profile.role !== "student") {
+      return errorResponse(res, 403, "Only students can update their profile");
+    }
+
+    const updatePayload = {};
+    if (first_name !== undefined) updatePayload.first_name = first_name;
+    if (last_name !== undefined) updatePayload.last_name = last_name;
+    if (student_id !== undefined) updatePayload.student_id = student_id;
+    if (year_level !== undefined) updatePayload.year_level = year_level;
+    if (class_id !== undefined) updatePayload.class_id = class_id ? Number(class_id) : null;
+    if (class_code !== undefined) updatePayload.class_code = class_code;
+    if (profile_step !== undefined) updatePayload.profile_step = profile_step;
+    if (profile_completed !== undefined) updatePayload.profile_completed = profile_completed;
+    updatePayload.updated_at = new Date().toISOString();
+
+    const { error: updateError } = await withTimeout(
+      supabase.from("users").update(updatePayload).eq("id", userId),
+      10000,
+      "Timed out while updating profile",
+    );
+
+    if (updateError) {
+      return errorResponse(res, 400, updateError.message);
+    }
+
+    return res.status(200).json({
+      ok: true,
+      message: "Profile updated successfully",
+    });
+  } catch (err) {
+    return errorResponse(res, 500, "Unexpected error updating profile", { error: err.message });
+  }
+}
+
+module.exports = { login, signup, adminLogin, adminSignup, getMe, updateMe };
