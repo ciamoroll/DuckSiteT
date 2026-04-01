@@ -55,6 +55,42 @@ async function attachCourseClasses(courses) {
   });
 }
 
+function isCourseEnrollmentsMissing(error) {
+  if (!error) return false;
+  const message = String(error.message || "").toLowerCase();
+  return message.includes("course_enrollments") && (
+    message.includes("does not exist") ||
+    message.includes("undefined table") ||
+    message.includes("relation")
+  );
+}
+
+async function autoEnrollStudentsForClasses(courseId, classIds) {
+  const uniqueClassIds = toUniqueIds(classIds);
+  if (!Number.isInteger(Number(courseId)) || uniqueClassIds.length === 0) return;
+
+  const { data: students, error: studentsError } = await supabase
+    .from("users")
+    .select("id")
+    .eq("role", "student")
+    .in("class_id", uniqueClassIds);
+  if (studentsError) throw new Error(studentsError.message);
+
+  const rows = (students || []).map((student) => ({
+    user_id: student.id,
+    course_id: Number(courseId),
+  }));
+  if (rows.length === 0) return;
+
+  const { error: enrollError } = await supabase
+    .from("course_enrollments")
+    .upsert(rows, { onConflict: "user_id,course_id" });
+  if (enrollError) {
+    if (isCourseEnrollmentsMissing(enrollError)) return;
+    throw new Error(enrollError.message);
+  }
+}
+
 async function listCourses(_req, res) {
   try {
     const { data, error } = await supabase.from("courses").select("*").order("id", { ascending: false });
@@ -90,6 +126,8 @@ async function createCourse(req, res) {
         .from("course_classes")
         .upsert(rows, { onConflict: "course_id,class_id" });
       if (linkError) return errorResponse(res, 400, linkError.message);
+
+      await autoEnrollStudentsForClasses(data.id, classIds);
     }
 
     const [course] = await attachCourseClasses([data]);
@@ -143,6 +181,8 @@ async function updateCourse(req, res) {
           .from("course_classes")
           .upsert(rows, { onConflict: "course_id,class_id" });
         if (linkError) return errorResponse(res, 400, linkError.message);
+
+        await autoEnrollStudentsForClasses(id, classIds);
       }
     }
 
