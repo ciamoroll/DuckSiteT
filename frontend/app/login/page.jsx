@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/api";
 import { saveAdminSession, saveStudentSession, getRole } from "@/lib/auth";
+import styles from "./login.module.css";
 
 function isStrongPassword(value) {
   return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
@@ -11,11 +13,8 @@ function isStrongPassword(value) {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [studentEmail, setStudentEmail] = useState("");
-  const [studentPassword, setStudentPassword] = useState("");
-  const [adminUser, setAdminUser] = useState("");
-  const [adminPassword, setAdminPassword] = useState("");
-  const [showAdmin, setShowAdmin] = useState(false);
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -24,122 +23,139 @@ export default function LoginPage() {
     if (role === "admin") router.replace("/admin/dashboard");
   }, [router]);
 
-  async function onStudentLogin() {
-    if (!studentEmail || !studentPassword) {
-      alert("Email and password are required.");
+  async function onLogin() {
+    const normalizedIdentifier = String(identifier || "").trim();
+    const looksLikeEmail = normalizedIdentifier.includes("@");
+    if (!normalizedIdentifier || !password) {
+      alert("Email/username and password are required.");
       return;
     }
-    if (!isStrongPassword(studentPassword)) {
+    if (!isStrongPassword(password)) {
       alert("Password must be at least 8 chars with uppercase, number, and symbol.");
       return;
     }
 
     try {
       setLoading(true);
-      const payload = await apiRequest("/api/auth/login", {
+      // For usernames, go directly to admin login to avoid noisy /auth/login 401.
+      if (!looksLikeEmail) {
+        const adminPayload = await apiRequest("/api/auth/admin-login", {
+          method: "POST",
+          body: { username: normalizedIdentifier, password },
+        });
+
+        saveAdminSession({
+          email: normalizedIdentifier,
+          firstName: adminPayload?.firstName || "Prof.",
+          lastName: adminPayload?.lastName || "",
+          token: adminPayload?.token || "",
+        });
+
+        router.push("/admin/dashboard");
+        return;
+      }
+
+      // Email: try standard auth login first (students and Supabase-based admins).
+      try {
+        const payload = await apiRequest("/api/auth/login", {
+          method: "POST",
+          body: { email: normalizedIdentifier.toLowerCase(), password },
+        });
+
+        saveStudentSession({
+          email: normalizedIdentifier.toLowerCase(),
+          firstName: payload?.user?.user_metadata?.first_name || "Student",
+          lastName: payload?.user?.user_metadata?.last_name || "",
+          userId: payload?.user?.id || "",
+          accessToken: payload?.session?.access_token || "",
+        });
+
+        const me = await apiRequest("/api/auth/me", { student: true });
+        if (me?.profile?.role === "admin") {
+          const adminPayload = await apiRequest("/api/auth/admin-login", {
+            method: "POST",
+            body: { username: normalizedIdentifier, password },
+          });
+
+          saveAdminSession({
+            email: normalizedIdentifier,
+            firstName: adminPayload?.firstName || me?.profile?.first_name || "Prof.",
+            lastName: adminPayload?.lastName || me?.profile?.last_name || "",
+            token: adminPayload?.token || "",
+          });
+
+          router.push("/admin/dashboard");
+          return;
+        }
+
+        router.push("/dashboard");
+        return;
+      } catch (_studentErr) {
+        // If email auth fails, fallback to admin credentials login.
+      }
+
+      const adminPayload = await apiRequest("/api/auth/admin-login", {
         method: "POST",
-        body: { email: studentEmail.trim().toLowerCase(), password: studentPassword },
-      });
-
-      saveStudentSession({
-        email: studentEmail.trim().toLowerCase(),
-        firstName: payload?.user?.user_metadata?.first_name || "Student",
-        lastName: payload?.user?.user_metadata?.last_name || "",
-        userId: payload?.user?.id || "",
-        accessToken: payload?.session?.access_token || "",
-      });
-
-      router.push("/dashboard");
-    } catch (error) {
-      alert(error.message || "Student login failed");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onAdminLogin() {
-    if (!adminUser || !adminPassword) {
-      alert("Admin credentials are required.");
-      return;
-    }
-    if (!isStrongPassword(adminPassword)) {
-      alert("Password must be at least 8 chars with uppercase, number, and symbol.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const payload = await apiRequest("/api/auth/admin-login", {
-        method: "POST",
-        body: { username: adminUser.trim(), password: adminPassword },
+        body: { username: normalizedIdentifier, password },
       });
 
       saveAdminSession({
-        email: adminUser.trim(),
-        firstName: payload?.firstName || "Prof.",
-        lastName: payload?.lastName || "",
-        token: payload?.token || "",
+        email: normalizedIdentifier,
+        firstName: adminPayload?.firstName || "Prof.",
+        lastName: adminPayload?.lastName || "",
+        token: adminPayload?.token || "",
       });
 
       router.push("/admin/dashboard");
     } catch (error) {
-      alert(error.message || "Admin login failed");
+      alert(error.message || "Login failed");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="page-wrap">
-      <div className="panel stack" style={{ maxWidth: 480, margin: "0 auto" }}>
-        <h1>Ducksite Login</h1>
-        <p>Sign in as student or admin.</p>
+    <main className={styles.page}>
+      <div className={styles.bgLayer} />
+      <div className={styles.topBrand}>
+        <Image src="/images/DucksiteT-logo.png" alt="DuckSiteT" width={210} height={54} priority />
+      </div>
 
-        <div className="stack">
-          <input
-            type="email"
-            placeholder="Student email"
-            value={studentEmail}
-            onChange={(e) => setStudentEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Student password"
-            value={studentPassword}
-            onChange={(e) => setStudentPassword(e.target.value)}
-          />
-          <button onClick={onStudentLogin} disabled={loading}>
-            {loading ? "Please wait..." : "Login as Student"}
-          </button>
-          <button className="secondary" onClick={() => router.push("/signup")}>
-            Create Student Account
-          </button>
+
+      <section className={styles.authCard}>
+        <h1 className={styles.title}>Welcome to DuckSiteT</h1>
+
+        <div className={styles.tabRow}>
+          <button type="button" className={`${styles.tab} ${styles.activeTab}`}>Login</button>
+          <button type="button" className={styles.tab} onClick={() => router.push("/signup")}>Sign up</button>
         </div>
 
-        <button className="secondary" onClick={() => setShowAdmin((v) => !v)}>
-          {showAdmin ? "Hide Admin Login" : "Show Admin Login"}
-        </button>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Email / Username</label>
+          <input
+            className={styles.input}
+            type="text"
+            placeholder="Enter email or username"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+          />
+        </div>
 
-        {showAdmin && (
-          <div className="stack panel">
-            <h3>Admin Login</h3>
-            <input
-              placeholder="Admin username or email"
-              value={adminUser}
-              onChange={(e) => setAdminUser(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Admin password"
-              value={adminPassword}
-              onChange={(e) => setAdminPassword(e.target.value)}
-            />
-            <button onClick={onAdminLogin} disabled={loading}>
-              {loading ? "Please wait..." : "Login as Admin"}
-            </button>
-          </div>
-        )}
-      </div>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Password</label>
+          <input
+            className={styles.input}
+            type="password"
+            placeholder="Enter password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <button className={styles.loginBtn} onClick={onLogin} disabled={loading}>
+          {loading ? "Please wait..." : "Login"}
+        </button>
+      </section>
     </main>
   );
 }

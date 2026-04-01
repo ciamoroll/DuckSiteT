@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/api";
+import styles from "./signup.module.css";
 
 function isStrongPassword(value) {
   return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
@@ -48,25 +50,72 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="page-wrap">
-      <div className="panel stack" style={{ maxWidth: 480, margin: "0 auto" }}>
-        <h1>Create Student Account</h1>
-        <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First name" />
-        <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last name" />
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-        />
-        <button onClick={onSignup} disabled={loading}>
+    <main className={styles.page}>
+      <div className={styles.bgLayer} />
+      <div className={styles.topBrand}>
+        <Image src="/images/DucksiteT-logo.png" alt="DuckSiteT" width={210} height={54} priority />
+      </div>
+
+      <section className={styles.authCard}>
+        <h1 className={styles.title}>Create Student Account</h1>
+
+        <div className={styles.tabRow}>
+          <button type="button" className={styles.tab} onClick={() => router.push("/login")}>Login</button>
+          <button type="button" className={`${styles.tab} ${styles.activeTab}`}>Sign up</button>
+        </div>
+
+        <div className={styles.nameGrid}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>First Name</label>
+            <input
+              className={styles.input}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Enter first name"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Last Name</label>
+            <input
+              className={styles.input}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Enter last name"
+            />
+          </div>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Email</label>
+          <input
+            className={styles.input}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter email"
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Password</label>
+          <input
+            className={styles.input}
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Create password"
+          />
+        </div>
+
+        <button className={styles.actionBtn} onClick={onSignup} disabled={loading}>
           {loading ? "Please wait..." : "Create Account"}
         </button>
-        <button className="secondary" onClick={() => router.push("/login")}>
+
+        <button className={styles.backBtn} type="button" onClick={() => router.push("/login")}>
           Back to Login
         </button>
-      </div>
+      </section>
     </main>
   );
 }
