@@ -17,7 +17,6 @@ async function createClass(req, res) {
     const payload = {
       name: raw.name,
       code: raw.code,
-      instructor: raw.instructor,
     };
     if (!payload.name || !payload.code) {
       return errorResponse(res, 400, "name and code are required");
@@ -37,7 +36,6 @@ async function updateClass(req, res) {
     const payload = {};
     if (raw.name !== undefined) payload.name = raw.name;
     if (raw.code !== undefined) payload.code = raw.code;
-    if (raw.instructor !== undefined) payload.instructor = raw.instructor;
 
     if (Object.keys(payload).length === 0) {
       return errorResponse(res, 400, "No valid fields to update");

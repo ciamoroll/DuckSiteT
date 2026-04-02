@@ -15,7 +15,7 @@ export default function EditCoursePage() {
   const [classSearch, setClassSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({ name: "", code: "", description: "", classIds: [] });
+  const [formData, setFormData] = useState({ name: "", code: "", description: "", instructor: "", classIds: [] });
 
   useEffect(() => {
     let alive = true;
@@ -49,6 +49,7 @@ export default function EditCoursePage() {
           name: course.name || "",
           code: course.code || "",
           description: course.description || "",
+          instructor: course.instructor || "",
           classIds: Array.isArray(course.class_ids) ? course.class_ids.map((id) => Number(id)) : [],
         });
       } catch (err) {
@@ -106,6 +107,7 @@ export default function EditCoursePage() {
           name: formData.name,
           code: formData.code,
           description: formData.description,
+          instructor: formData.instructor,
           class_ids: formData.classIds,
         },
         admin: true,
@@ -163,6 +165,14 @@ export default function EditCoursePage() {
                 placeholder="Enter a brief description of the course."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+
+              <label className={styles.fieldLabel}>Instructor</label>
+              <input
+                type="text"
+                placeholder="Instructor Name"
+                value={formData.instructor}
+                onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
               />
             </section>
 

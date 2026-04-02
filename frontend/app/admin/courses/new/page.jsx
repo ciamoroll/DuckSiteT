@@ -11,10 +11,17 @@ export default function NewCoursePage() {
   const [classes, setClasses] = useState([]);
   const [classSearch, setClassSearch] = useState("");
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({ name: "", code: "", description: "", classIds: [] });
+  const [formData, setFormData] = useState({ name: "", code: "", description: "", instructor: "", classIds: [] });
 
   useEffect(() => {
     fetchClasses();
+    // Auto-fill instructor from localStorage
+    const firstName = localStorage.getItem("firstName") || "";
+    const lastName = localStorage.getItem("lastName") || "";
+    const instructorName = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || "";
+    if (instructorName) {
+      setFormData((prev) => ({ ...prev, instructor: instructorName }));
+    }
   }, []);
 
   async function fetchClasses() {
@@ -65,6 +72,7 @@ export default function NewCoursePage() {
           name: formData.name,
           code: formData.code,
           description: formData.description,
+          instructor: formData.instructor,
           class_ids: formData.classIds,
         },
         admin: true,
@@ -112,6 +120,14 @@ export default function NewCoursePage() {
                 placeholder="Enter a brief description of the course."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+
+              <label className={styles.fieldLabel}>Instructor</label>
+              <input
+                type="text"
+                placeholder="Instructor Name"
+                value={formData.instructor}
+                onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
               />
             </section>
 

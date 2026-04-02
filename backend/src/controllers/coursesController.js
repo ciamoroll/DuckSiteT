@@ -147,6 +147,7 @@ async function createCourse(req, res) {
       name: raw.name,
       code: raw.code,
       description: raw.description,
+      instructor: raw.instructor || "",
       classes: [],
       lessons: raw.lessons,
       materials: raw.materials,
@@ -185,6 +186,7 @@ async function updateCourse(req, res) {
     if (raw.name !== undefined) payload.name = raw.name;
     if (raw.code !== undefined) payload.code = raw.code;
     if (raw.description !== undefined) payload.description = raw.description;
+    if (raw.instructor !== undefined) payload.instructor = raw.instructor;
     if (raw.lessons !== undefined) payload.lessons = raw.lessons;
     if (raw.materials !== undefined) payload.materials = raw.materials;
 

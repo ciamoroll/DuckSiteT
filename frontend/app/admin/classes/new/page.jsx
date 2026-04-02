@@ -12,23 +12,11 @@ export default function NewClassPage() {
   const [formData, setFormData] = useState({
     name: "",
     code: "",
-    instructor: "",
   });
 
     useEffect(() => {
     // Use localStorage keys that are set during admin login
-    if (typeof window !== "undefined") {
-        const firstName = localStorage.getItem("firstName") || "";
-        const lastName = localStorage.getItem("lastName") || "";
-      const fullName = [firstName, lastName].filter(Boolean).join(" ") || "";
 
-      if (fullName) {
-        setFormData((prev) => ({
-          ...prev,
-          instructor: fullName,
-        }));
-      }
-    }
   }, []);
 
   async function handleSubmit(e) {
@@ -68,13 +56,7 @@ export default function NewClassPage() {
             onChange={(e) => setFormData({ ...formData, code: e.target.value })}
             required
           />
-          <input
-            type="text"
-            placeholder="Instructor Name"
-            value={formData.instructor}
-            onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
-          />
-          <small style={{ color: "#666", marginTop: "4px", display: "block" }}>Auto-filled with your name. Leave blank or edit as needed.</small>
+
           <div className={styles.form_buttons}>
             <button type="submit" className={styles.btn_primary} disabled={saving}>{saving ? "Creating..." : "Create"}</button>
             <button type="button" className={styles.btn_secondary} onClick={() => router.push("/admin/classes")}>Back to Classes</button>

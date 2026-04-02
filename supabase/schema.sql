@@ -33,21 +33,27 @@ create table if not exists public.classes (
   id bigint generated always as identity primary key,
   name text not null,
   code text not null,
-  instructor text not null,
+  instructor text default '',
   students int default 0,
   created_at timestamptz default now()
 );
+
+alter table public.classes alter column instructor set default '';
+alter table public.classes alter column instructor drop not null;
 
 create table if not exists public.courses (
   id bigint generated always as identity primary key,
   name text not null,
   code text not null,
   description text,
+  instructor text default '',
   classes jsonb default '[]'::jsonb,
   lessons jsonb default '[]'::jsonb,
   materials jsonb default '[]'::jsonb,
   created_at timestamptz default now()
 );
+
+alter table public.courses add column if not exists instructor text default '';
 
 create table if not exists public.course_enrollments (
   id bigint generated always as identity primary key,
@@ -99,11 +105,14 @@ create table if not exists public.materials (
   id bigint generated always as identity primary key,
   title text not null,
   description text,
-  course text,
+  course_id bigint,
   lesson text,
   file_url text,
-  uploaded_at timestamptz default now()
+  uploaded_at timestamptz default now(),
+  foreign key (course_id) references public.courses(id) on delete cascade
 );
+
+alter table public.materials add column if not exists course_id bigint;
 
 create table if not exists public.user_progress (
   id bigint generated always as identity primary key,

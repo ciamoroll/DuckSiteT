@@ -16,6 +16,7 @@ export default function CourseStagesPage() {
   const [profile, setProfile] = useState(null);
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
+  const [materials, setMaterials] = useState([]);
   const [solvedSet, setSolvedSet] = useState(new Set());
   const [attemptedSet, setAttemptedSet] = useState(new Set());
   const [loading, setLoading] = useState(true);
@@ -26,10 +27,11 @@ export default function CourseStagesPage() {
     async function load() {
       try {
         const me = await apiRequest("/api/auth/me", { student: true });
-        const [myCourses, myChallenges, myAttempts] = await Promise.all([
+        const [myCourses, myChallenges, myAttempts, courseMaterials] = await Promise.all([
           apiRequest("/api/public/my-courses", { student: true }),
           apiRequest("/api/public/my-challenges", { student: true }),
           apiRequest(`/api/public/my-attempts?courseId=${courseId}`, { student: true }),
+          apiRequest(`/api/public/materials?courseId=${courseId}`, { student: true }),
         ]);
 
         if (!alive) return;
@@ -60,6 +62,7 @@ export default function CourseStagesPage() {
         setProfile(me?.profile || null);
         setCourse(selectedCourse);
         setLessons(challengeRows);
+        setMaterials(courseMaterials?.materials || []);
         setSolvedSet(solved);
         setAttemptedSet(attempted);
       } catch (_error) {
@@ -188,6 +191,27 @@ export default function CourseStagesPage() {
                   </button>
                 </article>
               ))}
+            </section>
+          )}
+
+          {materials.length > 0 && (
+            <section className={styles.materialsSection}>
+              <h2>Course Materials</h2>
+              <div className={styles.materialsList}>
+                {materials.map((material) => (
+                  <div key={material.id} className={styles.materialItem}>
+                    <div className={styles.materialInfo}>
+                      <h3>{material.title}</h3>
+                      {material.description && <p>{material.description}</p>}
+                    </div>
+                    {material.file_url && (
+                      <a href={material.file_url} target="_blank" rel="noopener noreferrer" className={styles.downloadBtn}>
+                        Download
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
             </section>
           )}
         </div>

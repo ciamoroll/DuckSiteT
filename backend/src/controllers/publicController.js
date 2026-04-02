@@ -130,9 +130,16 @@ async function listPublicCourses(_req, res) {
   }
 }
 
-async function listPublicMaterials(_req, res) {
+async function listPublicMaterials(req, res) {
   try {
-    const { data, error } = await supabase.from("materials").select("*").order("id", { ascending: false });
+    const courseId = req.query.courseId;
+    let query = supabase.from("materials").select("*");
+    
+    if (courseId) {
+      query = query.eq("course_id", Number(courseId));
+    }
+    
+    const { data, error } = await query.order("id", { ascending: false });
     if (error) return errorResponse(res, 400, error.message);
     return res.status(200).json({ ok: true, materials: data || [] });
   } catch (err) {

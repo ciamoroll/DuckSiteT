@@ -123,6 +123,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 34px;
+  margin-bottom: 8px;
 }
 
 .pad {
@@ -278,6 +279,82 @@
   box-shadow: none;
 }
 
+.materialsSection {
+  margin-top: 30px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 224, 128, 0.28);
+  background: linear-gradient(180deg, rgba(36, 50, 24, 0.92), rgba(27, 38, 19, 0.92));
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.22);
+}
+
+.materialsSection h2 {
+  margin: 0 0 12px;
+  color: #ffe085;
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.materialsList {
+  display: grid;
+  gap: 10px;
+}
+
+.materialItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 224, 128, 0.24);
+  background: linear-gradient(180deg, rgba(255, 235, 170, 0.08), rgba(255, 235, 170, 0.03));
+}
+
+.materialInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.materialInfo h3 {
+  margin: 0 0 4px;
+  color: #fff8d7;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.materialInfo p {
+  margin: 0;
+  color: rgba(245, 236, 201, 0.9);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 108px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(138, 83, 26, 0.45);
+  background: linear-gradient(180deg, #ffbf56, #e59033);
+  color: #4e2a08;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 232, 182, 0.55);
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.downloadBtn:hover {
+  background: linear-gradient(180deg, #ffc96c, #ec9c45);
+  transform: translateY(-1px);
+}
+
 @media (max-width: 920px) {
   .topBar {
     grid-template-columns: 1fr;
@@ -285,5 +362,15 @@
 
   .brandLogo {
     height: 28px;
+  }
+
+  .materialItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .downloadBtn {
+    margin-left: 0;
   }
 }

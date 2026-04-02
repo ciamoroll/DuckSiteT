@@ -46,20 +46,7 @@ export default function EditClassPage() {
           instructor: found.instructor || "",
         });
 
-        // Fallback: if instructor is empty, use admin name from localStorage
-        if (!found.instructor) {
-          if (typeof window !== "undefined") {
-            const firstName = localStorage.getItem("firstName") || "";
-            const lastName = localStorage.getItem("lastName") || "";
-            const fullName = [firstName, lastName].filter(Boolean).join(" ") || "";
-            if (fullName) {
-              setFormData((prev) => ({
-                ...prev,
-                instructor: fullName,
-              }));
-            }
-          }
-        }
+
       } catch (err) {
         if (alive) alert("Failed to load class: " + err.message);
       } finally {
@@ -116,13 +103,7 @@ export default function EditClassPage() {
               onChange={(e) => setFormData({ ...formData, code: e.target.value })}
               required
             />
-            <input
-              type="text"
-              placeholder="Instructor Name"
-              value={formData.instructor}
-              onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
-            />
-            <small style={{ color: "#666", marginTop: "4px", display: "block" }}>Instructor is optional.</small>
+
             <div className={styles.form_buttons}>
               <button type="submit" className={styles.btn_primary} disabled={saving}>{saving ? "Updating..." : "Update"}</button>
               <button type="button" className={styles.btn_secondary} onClick={() => router.push("/admin/classes")}>Back to Classes</button>

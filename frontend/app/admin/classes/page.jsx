@@ -55,7 +55,6 @@ export default function ClassesPage() {
                 <tr>
                   <th>Name</th>
                   <th>Code</th>
-                  <th>Instructor</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -64,7 +63,6 @@ export default function ClassesPage() {
                   <tr key={cls.id}>
                     <td>{cls.name}</td>
                     <td>{cls.code || "-"}</td>
-                    <td>{cls.instructor || "-"}</td>
                     <td className={styles.actions}>
                       <div className={styles.actionButtons}>
                         <Link href={`/admin/classes/${cls.id}/edit`} className={styles.btn_edit_link}>Edit</Link>
