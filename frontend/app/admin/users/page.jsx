@@ -14,7 +14,6 @@ export default function UsersPage() {
     firstName: "",
     lastName: "",
     email: "",
-    role: "student",
     yearLevel: "",
   });
 
@@ -26,7 +25,8 @@ export default function UsersPage() {
     try {
       setLoading(true);
       const data = await apiRequest("/api/users", { admin: true });
-      setUsers(data?.users || []);
+      const visibleUsers = (data?.users || []).filter((user) => String(user?.role || "").toLowerCase() !== "admin");
+      setUsers(visibleUsers);
     } catch (err) {
       alert("Failed to fetch users: " + err.message);
     } finally {
@@ -41,7 +41,7 @@ export default function UsersPage() {
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email.toLowerCase().trim(),
-        role: formData.role,
+        role: "student",
         year_level: formData.yearLevel || null,
       };
 
@@ -61,7 +61,7 @@ export default function UsersPage() {
         alert("User created successfully");
       }
 
-      setFormData({ firstName: "", lastName: "", email: "", role: "student", yearLevel: "" });
+      setFormData({ firstName: "", lastName: "", email: "", yearLevel: "" });
       setEditingId(null);
       setShowForm(false);
       await fetchUsers();
@@ -75,7 +75,6 @@ export default function UsersPage() {
       firstName: user.first_name,
       lastName: user.last_name,
       email: user.email,
-      role: user.role,
       yearLevel: user.year_level || "",
     });
     setEditingId(user.id);
@@ -96,7 +95,7 @@ export default function UsersPage() {
   function handleCancel() {
     setShowForm(false);
     setEditingId(null);
-    setFormData({ firstName: "", lastName: "", email: "", role: "student", yearLevel: "" });
+    setFormData({ firstName: "", lastName: "", email: "", yearLevel: "" });
   }
 
   return (
@@ -130,18 +129,12 @@ export default function UsersPage() {
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
             />
-            <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })}>
-              <option value="student">Student</option>
-              <option value="admin">Admin</option>
-            </select>
-            {formData.role === "student" && (
-              <input
-                type="text"
-                placeholder="Year Level (e.g., 1st, 2nd, 3rd, 4th)"
-                value={formData.yearLevel}
-                onChange={(e) => setFormData({ ...formData, yearLevel: e.target.value })}
-              />
-            )}
+            <input
+              type="text"
+              placeholder="Year Level (e.g., 1st, 2nd, 3rd, 4th)"
+              value={formData.yearLevel}
+              onChange={(e) => setFormData({ ...formData, yearLevel: e.target.value })}
+            />
             <div className={styles.form_buttons}>
               <button type="submit" className={styles.btn_primary}>
                 {editingId ? "Update" : "Create"}

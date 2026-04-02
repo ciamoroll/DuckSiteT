@@ -128,7 +128,7 @@
   color: #f7f0d2;
   padding: 24px;
   max-width: 700px;
-  margin: 0 auto;
+  margin: 16px auto 0;
 }
 
 .playerCardLabel {
@@ -472,8 +472,10 @@
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s ease;
-  margin-top: 15px;
-  
+  min-height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btnPrimary:hover {
@@ -492,6 +494,14 @@
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s ease;
+  min-height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepContent > .btnPrimary {
+  margin-top: 15px;
 }
 
 .btnSecondary:hover {
