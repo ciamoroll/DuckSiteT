@@ -10,10 +10,12 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
+    password: "",
     yearLevel: "",
   });
 
@@ -40,7 +42,6 @@ export default function UsersPage() {
       const payload = {
         first_name: formData.firstName,
         last_name: formData.lastName,
-        email: formData.email.toLowerCase().trim(),
         role: "student",
         year_level: formData.yearLevel || null,
       };
@@ -53,16 +54,23 @@ export default function UsersPage() {
         });
         alert("User updated successfully");
       } else {
+        const password = String(formData.password || "").trim();
+        if (!password) {
+          alert("Password is required for new users.");
+          return;
+        }
+
         await apiRequest("/api/users", {
           method: "POST",
-          body: { ...payload, password: "TempPass@123" },
+          body: { ...payload, email: formData.email.toLowerCase().trim(), password },
           admin: true,
         });
         alert("User created successfully");
       }
 
-      setFormData({ firstName: "", lastName: "", email: "", yearLevel: "" });
+      setFormData({ firstName: "", lastName: "", email: "", password: "", yearLevel: "" });
       setEditingId(null);
+      setShowPassword(false);
       setShowForm(false);
       await fetchUsers();
     } catch (err) {
@@ -75,6 +83,7 @@ export default function UsersPage() {
       firstName: user.first_name,
       lastName: user.last_name,
       email: user.email,
+      password: "",
       yearLevel: user.year_level || "",
     });
     setEditingId(user.id);
@@ -95,7 +104,8 @@ export default function UsersPage() {
   function handleCancel() {
     setShowForm(false);
     setEditingId(null);
-    setFormData({ firstName: "", lastName: "", email: "", yearLevel: "" });
+    setShowPassword(false);
+    setFormData({ firstName: "", lastName: "", email: "", password: "", yearLevel: "" });
   }
 
   return (
@@ -127,8 +137,29 @@ export default function UsersPage() {
               placeholder="Email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              disabled={Boolean(editingId)}
               required
             />
+            {editingId ? <small className={styles.loading}>Email is locked for security. Create a new user to change email.</small> : null}
+            {!editingId ? (
+              <>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password (8+ chars, uppercase, number, symbol)"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                />
+                <button
+                  type="button"
+                  className={styles.btn_secondary}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? "Hide Password" : "Show Password"}
+                </button>
+                <small className={styles.loading}>Set the student's login password. Share this securely with the student.</small>
+              </>
+            ) : null}
             <input
               type="text"
               placeholder="Year Level (e.g., 1st, 2nd, 3rd, 4th)"
