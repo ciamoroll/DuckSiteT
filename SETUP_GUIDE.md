@@ -100,21 +100,21 @@ Open SQL Editor and run this (replace values)
 update public.users
 set
 role = 'admin',
-first_name = 'NewFirstName',
-last_name = 'NewLastName',
+first_name = 'Mike',
+last_name = 'Tolentino',
 profile_completed = true,
 profile_step = 3,
 updated_at = now()
-where lower(email) = 'new.admin@ducksite.com';
+where lower(email) = 'miketolentino@paterostechnologicalcollege.edu.ph';
 ```
 
 If the row does not exist yet, insert it from auth.users first
 
 ```sql
 insert into public.users (id, uid, email, first_name, last_name, role, profile_completed, profile_step, xp, created_at, updated_at)
-select id, id, email, 'NewFirstName', 'NewLastName', 'admin', true, 3, 0, now(), now()
+select id, id, email, 'Mike', 'Tolentino', 'admin', true, 3, 0, now(), now()
 from auth.users
-where lower(email) = 'new.admin@ducksite.com'
+where lower(email) = 'miketolentino@paterostechnologicalcollege.edu.ph'
 on conflict (id) do update
 set
 role = 'admin',
@@ -130,7 +130,7 @@ Verify
 ```sql
 select id, email, role, profile_completed, profile_step
 from public.users
-where lower(email) = 'new.admin@ducksite.com';
+where lower(email) = 'miketolentino@paterostechnologicalcollege.edu.ph';
 ```
 
 ## 8. Optional Ownership Backfill (Existing Courses)

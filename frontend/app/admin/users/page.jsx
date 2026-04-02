@@ -5,6 +5,12 @@ import AdminShell from "@/components/AdminShell";
 import { apiRequest } from "@/lib/api";
 import styles from "./users.module.css";
 
+const ALLOWED_EMAIL_DOMAIN = "paterostechnologicalcollege.edu.ph";
+
+function isAllowedInstitutionalEmail(value) {
+  return String(value || "").trim().toLowerCase().endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +63,10 @@ export default function UsersPage() {
         const password = String(formData.password || "").trim();
         if (!password) {
           alert("Password is required for new users.");
+          return;
+        }
+        if (!isAllowedInstitutionalEmail(formData.email)) {
+          alert(`Only institutional email addresses ending with @${ALLOWED_EMAIL_DOMAIN} are allowed.`);
           return;
         }
 

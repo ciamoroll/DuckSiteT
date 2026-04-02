@@ -1,5 +1,6 @@
 const { supabase } = require("../services/supabaseService");
 const { errorResponse } = require("../utils/response");
+const ALLOWED_EMAIL_DOMAIN = "paterostechnologicalcollege.edu.ph";
 
 function normalizeEmail(value) {
   return String(value || "").trim().toLowerCase();
@@ -7,6 +8,10 @@ function normalizeEmail(value) {
 
 function isStrongPassword(value) {
   return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
+}
+
+function isAllowedInstitutionalEmail(value) {
+  return normalizeEmail(value).endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
 }
 
 async function listUsers(_req, res) {
@@ -52,6 +57,9 @@ async function createUser(req, res) {
     }
     if (!password) {
       return errorResponse(res, 400, "password is required");
+    }
+    if (!isAllowedInstitutionalEmail(email)) {
+      return errorResponse(res, 403, `Only institutional email addresses ending with @${ALLOWED_EMAIL_DOMAIN} are allowed.`);
     }
     if (!isStrongPassword(password)) {
       return errorResponse(res, 400, "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.");

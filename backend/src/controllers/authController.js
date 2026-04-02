@@ -1,11 +1,25 @@
 const { supabase } = require("../services/supabaseService");
 const { errorResponse } = require("../utils/response");
 const jwt = require("jsonwebtoken");
+const ALLOWED_EMAIL_DOMAIN = "paterostechnologicalcollege.edu.ph";
 const PASSWORD_POLICY_MESSAGE =
   "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.";
 
 function isStrongPassword(value) {
   return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
+}
+
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isAllowedInstitutionalEmail(value) {
+  const email = normalizeEmail(value);
+  return email.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
+}
+
+function domainRestrictionMessage() {
+  return `Only institutional email addresses ending with @${ALLOWED_EMAIL_DOMAIN} are allowed.`;
 }
 
 async function withTimeout(promise, ms, message) {
@@ -26,12 +40,17 @@ async function login(req, res) {
     if (!email || !password) {
       return errorResponse(res, 400, "email and password are required");
     }
+    if (!isAllowedInstitutionalEmail(email)) {
+      return errorResponse(res, 403, domainRestrictionMessage());
+    }
     if (!isStrongPassword(password)) {
       return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
     }
 
+    const normalizedEmail = normalizeEmail(email);
+
     const { data, error } = await withTimeout(
-      supabase.auth.signInWithPassword({ email, password }),
+      supabase.auth.signInWithPassword({ email: normalizedEmail, password }),
       10000,
       "Timed out while signing in",
     );
@@ -57,11 +76,14 @@ async function signup(req, res) {
     if (!firstName || !lastName || !email || !password) {
       return errorResponse(res, 400, "firstName, lastName, email, and password are required");
     }
+    if (!isAllowedInstitutionalEmail(email)) {
+      return errorResponse(res, 403, domainRestrictionMessage());
+    }
     if (!isStrongPassword(password)) {
       return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
     }
 
-    const normalizedEmail = String(email).trim().toLowerCase();
+    const normalizedEmail = normalizeEmail(email);
     let data;
     let error;
 
@@ -159,6 +181,9 @@ async function adminLogin(req, res) {
     const { username, password } = req.body || {};
     if (!username || !password) {
       return errorResponse(res, 400, "username and password are required");
+    }
+    if (String(username || "").includes("@") && !isAllowedInstitutionalEmail(username)) {
+      return errorResponse(res, 403, domainRestrictionMessage());
     }
     if (!isStrongPassword(password)) {
       return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);

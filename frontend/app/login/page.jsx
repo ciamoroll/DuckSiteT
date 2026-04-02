@@ -7,8 +7,14 @@ import { apiRequest } from "@/lib/api";
 import { saveAdminSession, saveStudentSession, getRole } from "@/lib/auth";
 import styles from "./login.module.css";
 
+const ALLOWED_EMAIL_DOMAIN = "paterostechnologicalcollege.edu.ph";
+
 function isStrongPassword(value) {
   return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
+}
+
+function isAllowedInstitutionalEmail(value) {
+  return String(value || "").trim().toLowerCase().endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
 }
 
 export default function LoginPage() {
@@ -32,6 +38,10 @@ export default function LoginPage() {
     }
     if (!isStrongPassword(password)) {
       alert("Password must be at least 8 chars with uppercase, number, and symbol.");
+      return;
+    }
+    if (looksLikeEmail && !isAllowedInstitutionalEmail(normalizedIdentifier)) {
+      alert(`Only institutional email addresses ending with @${ALLOWED_EMAIL_DOMAIN} are allowed.`);
       return;
     }
 
