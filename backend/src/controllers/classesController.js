@@ -59,6 +59,16 @@ async function updateClass(req, res) {
 async function deleteClass(req, res) {
   try {
     const { id } = req.params;
+
+    const { error: linksError } = await supabase.from("course_classes").delete().eq("class_id", id);
+    if (linksError) return errorResponse(res, 400, linksError.message);
+
+    const { error: usersError } = await supabase
+      .from("users")
+      .update({ class_id: null, class_code: null, updated_at: new Date().toISOString() })
+      .eq("class_id", id);
+    if (usersError) return errorResponse(res, 400, usersError.message);
+
     const { error } = await supabase.from("classes").delete().eq("id", id);
     if (error) return errorResponse(res, 400, error.message);
     return res.status(200).json({ ok: true, message: "Class deleted" });

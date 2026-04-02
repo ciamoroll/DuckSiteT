@@ -97,6 +97,28 @@ async function attachCourseClassMappings(courses) {
   });
 }
 
+async function getValidatedStudentClassId(profile) {
+  const classId = Number(profile?.class_id);
+  if (!Number.isInteger(classId) || classId <= 0) return null;
+
+  const { data: classRow, error: classError } = await supabase
+    .from("classes")
+    .select("id")
+    .eq("id", classId)
+    .maybeSingle();
+  if (classError) throw new Error(classError.message);
+
+  if (classRow) return classId;
+
+  // Class was deleted; clear stale student class assignment.
+  await supabase
+    .from("users")
+    .update({ class_id: null, class_code: null, updated_at: new Date().toISOString() })
+    .eq("id", profile.id);
+
+  return null;
+}
+
 async function listPublicCourses(_req, res) {
   try {
     const { data, error } = await supabase.from("courses").select("*").order("id", { ascending: false });
@@ -206,6 +228,11 @@ async function listMyCourses(req, res) {
     if (profileError || !profile) return errorResponse(res, 404, "Student profile not found");
     if (profile.role !== "student") return errorResponse(res, 403, "Only students can access enrolled courses");
 
+    const validClassId = await getValidatedStudentClassId(profile);
+    if (!validClassId) {
+      return res.status(200).json({ ok: true, courses: [] });
+    }
+
     const { data: enrollments, error: enrollError } = await supabase
       .from("course_enrollments")
       .select("course_id")
@@ -222,7 +249,7 @@ async function listMyCourses(req, res) {
 
         let filteredCourses = mappedCourses;
         try {
-          const allowedIds = await getAllowedCourseIds(mappedCourses.map((course) => course.id), profile.class_id);
+          const allowedIds = await getAllowedCourseIds(mappedCourses.map((course) => course.id), validClassId);
           const allowedSet = new Set(allowedIds.map((id) => Number(id)));
           filteredCourses = mappedCourses.filter((course) => allowedSet.has(Number(course.id)));
         } catch (_err) {
@@ -254,7 +281,7 @@ async function listMyCourses(req, res) {
 
     let filteredCourses = mappedCourses;
     try {
-      const allowedIds = await getAllowedCourseIds(courseIds, profile.class_id);
+      const allowedIds = await getAllowedCourseIds(courseIds, validClassId);
       const allowedSet = new Set(allowedIds.map((id) => Number(id)));
       filteredCourses = mappedCourses.filter((course) => allowedSet.has(Number(course.id)));
     } catch (_err) {
@@ -284,6 +311,11 @@ async function listMyChallenges(req, res) {
     if (profileError || !profile) return errorResponse(res, 404, "Student profile not found");
     if (profile.role !== "student") return errorResponse(res, 403, "Only students can access enrolled challenges");
 
+    const validClassId = await getValidatedStudentClassId(profile);
+    if (!validClassId) {
+      return res.status(200).json({ ok: true, challenges: [] });
+    }
+
     const { data: enrollments, error: enrollError } = await supabase
       .from("course_enrollments")
       .select("course_id")
@@ -297,7 +329,7 @@ async function listMyChallenges(req, res) {
 
         let allowedCourseIds = [];
         try {
-          allowedCourseIds = await getAllowedCourseIds((courseRows || []).map((course) => course.id), profile.class_id);
+          allowedCourseIds = await getAllowedCourseIds((courseRows || []).map((course) => course.id), validClassId);
         } catch (_err) {
           const studentClassCode = String(profile.class_code || "").trim();
           const { data: legacyCourseRows } = await supabase.from("courses").select("id, classes");
@@ -329,7 +361,7 @@ async function listMyChallenges(req, res) {
 
     let allowedCourseIds = [];
     try {
-      allowedCourseIds = await getAllowedCourseIds(courseIds, profile.class_id);
+      allowedCourseIds = await getAllowedCourseIds(courseIds, validClassId);
     } catch (_err) {
       const { data: courses, error: coursesError } = await supabase
         .from("courses")
