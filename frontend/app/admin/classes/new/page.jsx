@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminShell from "@/components/AdminShell";
 import { apiRequest } from "@/lib/api";
@@ -14,6 +14,22 @@ export default function NewClassPage() {
     code: "",
     instructor: "",
   });
+
+    useEffect(() => {
+    // Use localStorage keys that are set during admin login
+    if (typeof window !== "undefined") {
+        const firstName = localStorage.getItem("firstName") || "";
+        const lastName = localStorage.getItem("lastName") || "";
+      const fullName = [firstName, lastName].filter(Boolean).join(" ") || "";
+
+      if (fullName) {
+        setFormData((prev) => ({
+          ...prev,
+          instructor: fullName,
+        }));
+      }
+    }
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -57,8 +73,8 @@ export default function NewClassPage() {
             placeholder="Instructor Name"
             value={formData.instructor}
             onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
-            required
           />
+          <small style={{ color: "#666", marginTop: "4px", display: "block" }}>Auto-filled with your name. Leave blank or edit as needed.</small>
           <div className={styles.form_buttons}>
             <button type="submit" className={styles.btn_primary} disabled={saving}>{saving ? "Creating..." : "Create"}</button>
             <button type="button" className={styles.btn_secondary} onClick={() => router.push("/admin/classes")}>Back to Classes</button>

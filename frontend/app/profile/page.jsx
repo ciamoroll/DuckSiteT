@@ -287,7 +287,22 @@ export default function ProfileSetupPage() {
                 <label className={styles.formLabel}>Select Class</label>
                 <select
                   value={formData.classId || ""}
-                  onChange={(e) => setFormData({ ...formData, classId: e.target.value ? Number(e.target.value) : null })}
+                  onChange={async (e) => {
+                    const newClassId = e.target.value ? Number(e.target.value) : null;
+                    setFormData({ ...formData, classId: newClassId });
+                    if (!newClassId) return;
+                    try {
+                      await apiRequest("/api/auth/me", {
+                        method: "PUT",
+                        body: { class_id: newClassId },
+                        student: true,
+                      });
+                      const myCoursesData = await apiRequest("/api/public/my-courses", { student: true });
+                      setMyCourses(myCoursesData?.courses || []);
+                    } catch (err) {
+                      alert("Failed to update class: " + err.message);
+                    }
+                  }}
                   className={styles.formInput}
                 >
                   <option value="">Select your class</option>
@@ -296,31 +311,8 @@ export default function ProfileSetupPage() {
                   ))}
                 </select>
                 {!hasClassSelected ? (
-                  <p className={styles.settingsSubtitle}>Select and save your class to receive class-based courses automatically.</p>
+                  <p className={styles.settingsSubtitle}>Select your class to see class-based courses (auto-saved).</p>
                 ) : null}
-                <button 
-                  onClick={async () => {
-                    if (!formData.classId) {
-                      alert("Please select your class first.");
-                      return;
-                    }
-                    try {
-                      await apiRequest("/api/auth/me", {
-                        method: "PUT",
-                        body: { class_id: formData.classId || null },
-                        student: true,
-                      });
-                      const myCoursesData = await apiRequest("/api/public/my-courses", { student: true });
-                      setMyCourses(myCoursesData?.courses || []);
-                      alert("Class updated successfully!");
-                    } catch (err) {
-                      alert("Failed to update class: " + err.message);
-                    }
-                  }}
-                  className={styles.btnPrimary}
-                >
-                  Save Class
-                </button>
               </div>
 
               <button onClick={() => router.push("/dashboard")} className={styles.btnSecondary}>
@@ -471,6 +463,7 @@ export default function ProfileSetupPage() {
                     <option key={cls.id} value={cls.id}>{cls.name} ({cls.code})</option>
                   ))}
                 </select>
+                <small style={{ marginTop: "4px", display: "block", color: "#666" }}>Pro tip: Class selection will auto-save and populate your course list after profile completion.</small>
               </div>
               <div className={styles.buttonGroup}>
                 <button onClick={() => setCurrentStep(1)} className={styles.btnSecondary}>

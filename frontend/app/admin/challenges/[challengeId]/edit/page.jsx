@@ -76,6 +76,29 @@ export default function EditChallengePage() {
     };
   }, [challengeId, router]);
 
+  async function handleCourseChange(courseId) {
+    setFormData({ ...formData, course_id: courseId });
+    if (!courseId) return;
+
+    try {
+      const data = await apiRequest("/api/challenges", { admin: true });
+      const courseChallenges = (data?.challenges || []).filter(
+        (ch) => Number(ch.course_id) === Number(courseId)
+      );
+      const maxLessonOrder = Math.max(
+        0,
+        ...courseChallenges.map((ch) => Number(ch.lesson_order || 0))
+      );
+      setFormData((prev) => ({
+        ...prev,
+        course_id: courseId,
+        lesson_order: maxLessonOrder + 1,
+      }));
+    } catch (_err) {
+      // Fallback: just set course_id without auto-suggestion
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     const options = formData.optionsText
@@ -137,7 +160,7 @@ export default function EditChallengePage() {
               <input type="text" placeholder="Challenge Title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
 
               <label className={styles.fieldLabel}>Course</label>
-              <select value={formData.course_id} onChange={(e) => setFormData({ ...formData, course_id: e.target.value })} required>
+              <select value={formData.course_id} onChange={(e) => handleCourseChange(e.target.value)} required>
                 <option value="">Select Course</option>
                 {courses.map((course) => (
                   <option key={course.id} value={course.id}>{course.name}</option>

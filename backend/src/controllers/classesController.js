@@ -19,8 +19,8 @@ async function createClass(req, res) {
       code: raw.code,
       instructor: raw.instructor,
     };
-    if (!payload.name || !payload.code || !payload.instructor) {
-      return errorResponse(res, 400, "name, code, and instructor are required");
+    if (!payload.name || !payload.code) {
+      return errorResponse(res, 400, "name and code are required");
     }
     const { data, error } = await supabase.from("classes").insert(payload).select().single();
     if (error) return errorResponse(res, 400, error.message);
