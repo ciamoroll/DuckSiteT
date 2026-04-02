@@ -1,6 +1,13 @@
 const { supabase } = require("../services/supabaseService");
 const { errorResponse } = require("../utils/response");
 
+function applyCourseOwnershipScope(query, req) {
+  if (req?.isScopedAdmin && req?.adminProfile?.id) {
+    return query.eq("owner_id", req.adminProfile.id);
+  }
+  return query;
+}
+
 function toUniqueIds(value) {
   if (!Array.isArray(value)) return [];
   const set = new Set();
@@ -128,9 +135,10 @@ async function autoUnenrollStudentsOutsideClasses(courseId, classIds) {
   if (removeError) throw new Error(removeError.message);
 }
 
-async function listCourses(_req, res) {
+async function listCourses(req, res) {
   try {
-    const { data, error } = await supabase.from("courses").select("*").order("id", { ascending: false });
+    const scopedQuery = applyCourseOwnershipScope(supabase.from("courses").select("*"), req);
+    const { data, error } = await scopedQuery.order("id", { ascending: false });
     if (error) return errorResponse(res, 400, error.message);
     const courses = await attachCourseClasses(data || []);
     return res.status(200).json({ ok: true, courses });
@@ -148,6 +156,7 @@ async function createCourse(req, res) {
       code: raw.code,
       description: raw.description,
       instructor: raw.instructor || "",
+      owner_id: req?.isScopedAdmin ? req?.adminProfile?.id : null,
       classes: [],
       lessons: raw.lessons,
       materials: raw.materials,
@@ -196,16 +205,19 @@ async function updateCourse(req, res) {
 
     let data = null;
     if (Object.keys(payload).length > 0) {
-      const result = await supabase
+      let updateQuery = supabase
         .from("courses")
         .update(payload)
-        .eq("id", id)
-        .select()
-        .single();
+        .eq("id", id);
+      updateQuery = applyCourseOwnershipScope(updateQuery, req);
+
+      const result = await updateQuery.select().single();
       data = result.data;
       if (result.error) return errorResponse(res, 400, result.error.message);
     } else {
-      const result = await supabase.from("courses").select("*").eq("id", id).single();
+      let selectQuery = supabase.from("courses").select("*").eq("id", id);
+      selectQuery = applyCourseOwnershipScope(selectQuery, req);
+      const result = await selectQuery.single();
       data = result.data;
       if (result.error) return errorResponse(res, 400, result.error.message);
     }
@@ -236,7 +248,9 @@ async function updateCourse(req, res) {
 async function deleteCourse(req, res) {
   try {
     const { id } = req.params;
-    const { error } = await supabase.from("courses").delete().eq("id", id);
+    let deleteQuery = supabase.from("courses").delete().eq("id", id);
+    deleteQuery = applyCourseOwnershipScope(deleteQuery, req);
+    const { error } = await deleteQuery;
     if (error) return errorResponse(res, 400, error.message);
     return res.status(200).json({ ok: true, message: "Course deleted" });
   } catch (err) {

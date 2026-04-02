@@ -113,6 +113,17 @@ async function signup(req, res) {
       );
     }
 
+    const { data: existingProfile } = await withTimeout(
+      supabase
+        .from("users")
+        .select("role, profile_completed, profile_step, xp")
+        .eq("id", user.id)
+        .maybeSingle(),
+      10000,
+      "Timed out while reading existing profile row",
+    );
+
+    const preservedRole = existingProfile?.role || "student";
     const { error: profileError } = await withTimeout(
       supabase.from("users").upsert({
         id: user.id,
@@ -120,10 +131,10 @@ async function signup(req, res) {
         first_name: firstName,
         last_name: lastName,
         email: normalizedEmail,
-        role: "student",
-        profile_completed: false,
-        profile_step: 1,
-        xp: 0,
+        role: preservedRole,
+        profile_completed: existingProfile?.profile_completed ?? false,
+        profile_step: existingProfile?.profile_step ?? 1,
+        xp: existingProfile?.xp ?? 0,
       }),
       10000,
       "Timed out while creating profile row",

@@ -1,6 +1,28 @@
 const { supabase } = require("../services/supabaseService");
 const { errorResponse } = require("../utils/response");
 
+async function listOwnedCourseIds(req) {
+  if (!req?.isScopedAdmin || !req?.adminProfile?.id) return null;
+  const { data, error } = await supabase
+    .from("courses")
+    .select("id")
+    .eq("owner_id", req.adminProfile.id);
+  if (error) throw new Error(error.message);
+  return (data || []).map((row) => Number(row.id)).filter((id) => Number.isInteger(id));
+}
+
+async function ensureCourseOwnedByAdmin(courseId, req) {
+  if (!req?.isScopedAdmin || !req?.adminProfile?.id) return true;
+  const { data, error } = await supabase
+    .from("courses")
+    .select("id")
+    .eq("id", Number(courseId))
+    .eq("owner_id", req.adminProfile.id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return Boolean(data?.id);
+}
+
 function toOptionsArray(value) {
   if (!Array.isArray(value)) return [];
   return value.map((item) => String(item || "").trim()).filter(Boolean);
@@ -16,12 +38,19 @@ function isChallengeAttemptsMissing(error) {
   );
 }
 
-async function listChallenges(_req, res) {
+async function listChallenges(req, res) {
   try {
-    const { data, error } = await supabase
-      .from("challenges")
-      .select("*")
-      .order("id", { ascending: false });
+    let challengesQuery = supabase.from("challenges").select("*");
+
+    const ownedCourseIds = await listOwnedCourseIds(req);
+    if (Array.isArray(ownedCourseIds)) {
+      if (ownedCourseIds.length === 0) {
+        return res.status(200).json({ ok: true, challenges: [] });
+      }
+      challengesQuery = challengesQuery.in("course_id", ownedCourseIds);
+    }
+
+    const { data, error } = await challengesQuery.order("id", { ascending: false });
     if (error) return errorResponse(res, 400, error.message);
 
     const challenges = data || [];
@@ -88,6 +117,10 @@ async function createChallenge(req, res) {
     if (!options.includes(String(payload.correct_answer).trim())) {
       return errorResponse(res, 400, "correct_answer must match one of the options");
     }
+
+    const owned = await ensureCourseOwnedByAdmin(payload.course_id, req);
+    if (!owned) return errorResponse(res, 403, "You can only create challenges for your own courses");
+
     const { data, error } = await supabase.from("challenges").insert(payload).select().single();
     if (error) return errorResponse(res, 400, error.message);
     return res.status(201).json({ ok: true, challenge: data });
@@ -103,12 +136,15 @@ async function updateChallenge(req, res) {
 
     const { data: existingChallenge, error: existingError } = await supabase
       .from("challenges")
-      .select("id, options, correct_answer")
+      .select("id, options, correct_answer, course_id")
       .eq("id", id)
       .single();
     if (existingError || !existingChallenge) {
       return errorResponse(res, 404, "Challenge not found");
     }
+
+    const existingOwned = await ensureCourseOwnedByAdmin(existingChallenge.course_id, req);
+    if (!existingOwned) return errorResponse(res, 403, "You can only update your own challenges");
 
     const payload = {};
     if (raw.title !== undefined) payload.title = raw.title;
@@ -139,6 +175,11 @@ async function updateChallenge(req, res) {
       return errorResponse(res, 400, "correct_answer must match one of the options");
     }
 
+    if (payload.course_id) {
+      const nextCourseOwned = await ensureCourseOwnedByAdmin(payload.course_id, req);
+      if (!nextCourseOwned) return errorResponse(res, 403, "You can only move challenges to your own courses");
+    }
+
     const { data, error } = await supabase
       .from("challenges")
       .update(payload)
@@ -155,6 +196,18 @@ async function updateChallenge(req, res) {
 async function deleteChallenge(req, res) {
   try {
     const { id } = req.params;
+
+    const { data: existing, error: existingError } = await supabase
+      .from("challenges")
+      .select("id, course_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (existingError) return errorResponse(res, 400, existingError.message);
+    if (!existing) return errorResponse(res, 404, "Challenge not found");
+
+    const owned = await ensureCourseOwnedByAdmin(existing.course_id, req);
+    if (!owned) return errorResponse(res, 403, "You can only delete your own challenges");
+
     const { error } = await supabase.from("challenges").delete().eq("id", id);
     if (error) return errorResponse(res, 400, error.message);
     return res.status(200).json({ ok: true, message: "Challenge deleted" });

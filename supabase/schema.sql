@@ -47,6 +47,7 @@ create table if not exists public.courses (
   code text not null,
   description text,
   instructor text default '',
+  owner_id uuid references public.users(id) on delete set null,
   classes jsonb default '[]'::jsonb,
   lessons jsonb default '[]'::jsonb,
   materials jsonb default '[]'::jsonb,
@@ -54,6 +55,55 @@ create table if not exists public.courses (
 );
 
 alter table public.courses add column if not exists instructor text default '';
+alter table public.courses add column if not exists owner_id uuid;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'courses_owner_id_fkey'
+  ) then
+    alter table public.courses
+      add constraint courses_owner_id_fkey
+      foreign key (owner_id) references public.users(id) on delete set null;
+  end if;
+end $$;
+
+-- One-time legacy backfill for per-professor ownership.
+-- 1) Try to map course.instructor to admin full name.
+-- 2) Remaining unowned courses fall back to the first admin account.
+with admin_names as (
+  select
+    id,
+    lower(trim(concat_ws(' ', first_name, last_name))) as full_name
+  from public.users
+  where role = 'admin'
+),
+matched as (
+  select c.id as course_id, a.id as admin_id
+  from public.courses c
+  join admin_names a
+    on lower(trim(coalesce(c.instructor, ''))) = a.full_name
+  where c.owner_id is null
+)
+update public.courses c
+set owner_id = m.admin_id
+from matched m
+where c.id = m.course_id
+  and c.owner_id is null;
+
+with fallback_admin as (
+  select id
+  from public.users
+  where role = 'admin'
+  order by created_at asc nulls last, id asc
+  limit 1
+)
+update public.courses c
+set owner_id = fa.id
+from fallback_admin fa
+where c.owner_id is null;
 
 create table if not exists public.course_enrollments (
   id bigint generated always as identity primary key,
