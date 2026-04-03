@@ -35,7 +35,7 @@ export default function SignupPage() {
       return;
     }
     if (!isAllowedInstitutionalEmail(normalizedEmail)) {
-      alert(`Only institutional email addresses ending with @${ALLOWED_EMAIL_DOMAIN} are allowed.`);
+      alert(`Registration Restricted: Please use your official institutional email address to create an account.`);
       return;
     }
 

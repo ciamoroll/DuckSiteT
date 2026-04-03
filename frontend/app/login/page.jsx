@@ -39,9 +39,9 @@ export default function LoginPage() {
     if (!isStrongPassword(password)) {
       alert("Password must be at least 8 chars with uppercase, number, and symbol.");
       return;
-    }
+    } 
     if (looksLikeEmail && !isAllowedInstitutionalEmail(normalizedIdentifier)) {
-      alert(`Only institutional email addresses ending with @${ALLOWED_EMAIL_DOMAIN} are allowed.`);
+      alert(`Unauthorized Domain: Please sign in with your institutional email address.`);
       return;
     }
 

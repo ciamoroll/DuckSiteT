@@ -520,7 +520,7 @@ async function submitChallengeAttempt(req, res) {
 
     const { data: challenge, error: challengeError } = await supabase
       .from("challenges")
-      .select("id, title, course_id, points, status, correct_answer")
+      .select("id, title, course_id, points, status, correct_answer, required_xp, lesson_order")
       .eq("id", challengeId)
       .single();
     if (challengeError || !challenge) return errorResponse(res, 404, "Challenge not found");
@@ -592,7 +592,11 @@ async function submitChallengeAttempt(req, res) {
         .filter((id) => Number.isInteger(id) && id > 0)
     );
 
-    const requiredXp = Number(challenge.required_xp ?? lessonIndex * 100);
+    const lessonConfig = sortedChallenges[lessonIndex] || {};
+    const requiredXpValue = lessonConfig.required_xp ?? challenge.required_xp;
+    const requiredXp = Number.isFinite(Number(requiredXpValue))
+      ? Number(requiredXpValue)
+      : lessonIndex * 100;
     const meetsXp = Number(profile.xp || 0) >= requiredXp;
     const previousChallengeId = lessonIndex > 0 ? Number(sortedChallenges[lessonIndex - 1]?.id) : null;
     const meetsPrerequisite = previousChallengeId == null ? true : solvedSet.has(previousChallengeId);
