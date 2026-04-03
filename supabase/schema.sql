@@ -22,13 +22,6 @@ create table if not exists public.users (
 alter table public.users add column if not exists class_code text;
 alter table public.users add column if not exists class_id bigint;
 
-alter table public.users
-  drop constraint if exists users_class_id_fkey;
-
-alter table public.users
-  add constraint users_class_id_fkey
-  foreign key (class_id) references public.classes(id) on delete set null;
-
 create or replace function public.has_users_auth_fk_cascade()
 returns boolean
 language sql
@@ -61,6 +54,13 @@ create table if not exists public.classes (
 
 alter table public.classes alter column instructor set default '';
 alter table public.classes alter column instructor drop not null;
+
+alter table public.users
+  drop constraint if exists users_class_id_fkey;
+
+alter table public.users
+  add constraint users_class_id_fkey
+  foreign key (class_id) references public.classes(id) on delete set null;
 
 create table if not exists public.courses (
   id bigint generated always as identity primary key,
