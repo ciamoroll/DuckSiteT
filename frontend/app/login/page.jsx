@@ -9,10 +9,6 @@ import styles from "./login.module.css";
 
 const ALLOWED_EMAIL_DOMAIN = "paterostechnologicalcollege.edu.ph";
 
-function isStrongPassword(value) {
-  return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
-}
-
 function isAllowedInstitutionalEmail(value) {
   return String(value || "").trim().toLowerCase().endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
 }
@@ -36,10 +32,6 @@ export default function LoginPage() {
       alert("Email/username and password are required.");
       return;
     }
-    if (!isStrongPassword(password)) {
-      alert("Password must be at least 8 chars with uppercase, number, and symbol.");
-      return;
-    } 
     if (looksLikeEmail && !isAllowedInstitutionalEmail(normalizedIdentifier)) {
       alert(`Unauthorized Domain: Please sign in with your institutional email address.`);
       return;

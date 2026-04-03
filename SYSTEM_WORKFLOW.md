@@ -26,6 +26,7 @@ Core domains:
 - Frontend calls `POST /api/auth/login`
 - Stores student session token (`studentToken`) and role `student`
 - Loads profile via `GET /api/auth/me`
+- Login does not enforce strong-password format regex; credential validity is checked by Supabase Auth
 
 2. Admin login:
 - Frontend calls `POST /api/auth/admin-login`
@@ -76,6 +77,19 @@ Behavior:
 ## Frontend Admin Safety Rules (Current)
 - User management table hides admin accounts
 - Add/Edit user form only creates/updates `student` role
+- Create-user form requires explicit password input with show/hide toggle
+- Edit-user form locks email field for security
+
+## Backend Hardening Rules (Current)
+- `/api/users` create path creates `auth.users` first, then profile row in `public.users`
+- User role escalation to admin is blocked in update endpoint
+- Email update is blocked in users update endpoint to avoid auth/profile mismatch
+- Delete user removes auth user first; if profile row remains, backend cleans it up and returns a warning
+
+## Health and Integrity Checks
+- `GET /health` returns `warnings` array
+- Health tries to verify `public.users(id) -> auth.users(id) ON DELETE CASCADE`
+- Verification uses SQL function: `public.has_users_auth_fk_cascade()`
 
 ## Known Operational Notes
 - Admin account creation is disabled via API route and must be done manually in Supabase

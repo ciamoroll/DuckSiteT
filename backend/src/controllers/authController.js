@@ -43,9 +43,6 @@ async function login(req, res) {
     if (!isAllowedInstitutionalEmail(email)) {
       return errorResponse(res, 403, domainRestrictionMessage());
     }
-    if (!isStrongPassword(password)) {
-      return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
-    }
 
     const normalizedEmail = normalizeEmail(email);
 
@@ -185,9 +182,6 @@ async function adminLogin(req, res) {
     if (String(username || "").includes("@") && !isAllowedInstitutionalEmail(username)) {
       return errorResponse(res, 403, domainRestrictionMessage());
     }
-    if (!isStrongPassword(password)) {
-      return errorResponse(res, 400, PASSWORD_POLICY_MESSAGE);
-    }
 
     const adminUser = process.env.ADMIN_USER;
     const adminPass = process.env.ADMIN_PASS;
@@ -315,7 +309,7 @@ async function getMe(req, res) {
     if (error || !profile) {
       const firstName = user?.user_metadata?.first_name || "";
       const lastName = user?.user_metadata?.last_name || "";
-      const email = String(user?.email || "").trim().toLowerCase();
+      const email = normalizeEmail(user?.email || "");
       const role = user?.user_metadata?.role === "admin" ? "admin" : "student";
 
       const { error: upsertError } = await withTimeout(

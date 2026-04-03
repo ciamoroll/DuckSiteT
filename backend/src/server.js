@@ -10,6 +10,7 @@ const challengesRoutes = require("./routes/challengesRoutes");
 const classesRoutes = require("./routes/classesRoutes");
 const materialsRoutes = require("./routes/materialsRoutes");
 const publicRoutes = require("./routes/publicRoutes");
+const { supabase } = require("./services/supabaseService");
 const { requestLogger } = require("./middleware/requestLogger");
 const { makeErrorId } = require("./utils/response");
 
@@ -19,8 +20,25 @@ app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
 
-app.get("/health", (_req, res) => {
-  res.json({ ok: true, service: "ducksite-backend" });
+app.get("/health", async (_req, res) => {
+  const warnings = [];
+
+  try {
+    const { data, error } = await supabase.rpc("has_users_auth_fk_cascade");
+    if (error) {
+      warnings.push("Unable to verify users->auth.users FK cascade (RPC missing or inaccessible)");
+    } else if (!data) {
+      warnings.push("users->auth.users FK cascade appears missing");
+    }
+  } catch (_err) {
+    warnings.push("Unable to verify users->auth.users FK cascade (health check exception)");
+  }
+
+  res.json({
+    ok: true,
+    service: "ducksite-backend",
+    warnings,
+  });
 });
 
 app.use("/api/auth", authRoutes);

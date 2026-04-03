@@ -163,7 +163,30 @@ async function deleteUser(req, res) {
       return errorResponse(res, 400, authError.message);
     }
 
-    return res.status(200).json({ ok: true, message: "User deleted" });
+    // Safety cleanup: if FK cascade is missing/misconfigured, delete leftover profile row.
+    const { data: remainingProfile, error: remainingError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("id", id)
+      .maybeSingle();
+    if (remainingError) {
+      return errorResponse(res, 400, remainingError.message);
+    }
+
+    let warning = null;
+    if (remainingProfile?.id) {
+      const { error: cleanupError } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", id);
+      if (cleanupError) {
+        return errorResponse(res, 400, cleanupError.message);
+      }
+      warning = "users row did not cascade-delete from auth.users; cleaned up manually";
+      console.warn(`[users.deleteUser] ${warning} (userId=${id})`);
+    }
+
+    return res.status(200).json({ ok: true, message: "User deleted", warning });
   } catch (err) {
     return errorResponse(res, 500, "Unexpected deleteUser error", { error: err.message });
   }

@@ -29,6 +29,27 @@ alter table public.users
   add constraint users_class_id_fkey
   foreign key (class_id) references public.classes(id) on delete set null;
 
+create or replace function public.has_users_auth_fk_cascade()
+returns boolean
+language sql
+security definer
+set search_path = public, auth, pg_catalog
+as $$
+  select exists (
+    select 1
+    from pg_constraint c
+    join pg_class t on t.oid = c.conrelid
+    join pg_namespace n on n.oid = t.relnamespace
+    where n.nspname = 'public'
+      and t.relname = 'users'
+      and c.contype = 'f'
+      and pg_get_constraintdef(c.oid) ilike '%references auth.users(id)%'
+      and pg_get_constraintdef(c.oid) ilike '%on delete cascade%'
+  );
+$$;
+
+grant execute on function public.has_users_auth_fk_cascade() to anon, authenticated, service_role;
+
 create table if not exists public.classes (
   id bigint generated always as identity primary key,
   name text not null,

@@ -20,7 +20,7 @@ Ducksite is a monorepo app with:
 
 It supports:
 - **Student flow**: register, login, view dashboard, take courses/lessons
-- **Admin flow**: login/create admin account, manage users/classes/courses/materials/challenges, monitor progress
+- **Admin flow**: login and manage users/classes/courses/materials/challenges, monitor progress
 
 ## 2) Tech Stack
 
@@ -94,7 +94,6 @@ ENABLE_AUTH_MIDDLEWARE=false
 ADMIN_USER=admin
 ADMIN_PASS=12345
 ADMIN_JWT_SECRET=CHANGE_ME_TO_STRONG_RANDOM_SECRET
-ADMIN_SETUP_KEY=CHANGE_ME_TO_STRONG_SETUP_KEY
 ```
 
 What each key does:
@@ -103,7 +102,6 @@ What each key does:
 - `ENABLE_AUTH_MIDDLEWARE`: toggles token middleware behavior
 - `ADMIN_USER` / `ADMIN_PASS`: legacy admin credential path
 - `ADMIN_JWT_SECRET`: signs admin API JWT tokens
-- `ADMIN_SETUP_KEY`: required for creating admin accounts via API
 
 Security notes:
 - `NEXT_PUBLIC_*` keys are intentionally exposed to browser bundles
@@ -175,13 +173,16 @@ Expected:
 3. Redirects to `/dashboard`.
 
 ### Admin flow
-Two options:
 1. **Legacy admin credentials**
-   - Login from admin section in `/login` using `ADMIN_USER`/`ADMIN_PASS`.
-2. **Create admin account**
-   - Go to `/admin-signup`.
-   - Provide `ADMIN_SETUP_KEY`.
-   - Then login from `/login` admin section using admin email/password.
+  - Login from admin section in `/login` using `ADMIN_USER`/`ADMIN_PASS`.
+2. **Supabase admin profile account**
+  - Create auth user in Supabase Authentication.
+  - Set `public.users.role = 'admin'` for that account.
+  - Login from `/login` using admin email/password.
+
+Notes:
+- Institutional email domain restriction is enforced for email login.
+- Password format policy is enforced on signup/create flows, not on login.
 
 Expected redirects:
 - Student login → `/dashboard`
@@ -193,6 +194,7 @@ Expected redirects:
 ### Health
 - `GET /health`  
   Service status check.
+  Returns a `warnings` array when FK cascade verification cannot be confirmed.
 
 ### Auth
 - `POST /api/auth/login`  
@@ -201,14 +203,18 @@ Expected redirects:
   Student signup + profile creation.
 - `POST /api/auth/admin-login`  
   Admin login (legacy or admin account path).
-- `POST /api/auth/admin-signup`  
-  Create admin account (requires setup key).
 
 ### Users
 - `GET /api/users/*`  
   Admin user listing/details.
 - `POST/PUT/DELETE /api/users/*`  
   User management operations.
+
+Current hardening behavior:
+- User Management creates student auth+profile accounts.
+- Role escalation to admin is blocked in user update endpoints.
+- Email update is blocked in user update endpoint.
+- Delete removes auth user first, then cleans leftover profile row if cascade is missing.
 
 ### Courses
 - `GET /api/courses/*`
@@ -255,6 +261,19 @@ Additional admin/public groups used in current app:
   - Ensure `users` table exists (run `supabase/schema.sql`)
   - Check backend logs for upsert errors
   - Check RLS policy for `users` writes
+
+### Student created from User Management cannot log in
+- Symptoms: account exists in users table but login fails.
+- Fix:
+  - Ensure create request includes a password and email.
+  - Confirm auth user exists in Supabase Authentication.
+  - Reset password from Supabase Authentication if needed.
+
+### `/health` shows FK cascade warning
+- Symptoms: health endpoint contains warning about users-auth FK cascade check.
+- Fix:
+  - Re-run `supabase/schema.sql` to create `public.has_users_auth_fk_cascade()`.
+  - Confirm `public.users.id` references `auth.users(id)` with `on delete cascade`.
 
 ## 12) Scripts
 

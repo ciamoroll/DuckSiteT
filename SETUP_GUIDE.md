@@ -59,6 +59,31 @@ ALTER TABLE public.classes ALTER COLUMN instructor SET DEFAULT '';
 ALTER TABLE public.classes ALTER COLUMN instructor DROP NOT NULL;
 ```
 
+Health-check helper function (needed for `/health` FK warning verification):
+
+```sql
+create or replace function public.has_users_auth_fk_cascade()
+returns boolean
+language sql
+security definer
+set search_path = public, auth, pg_catalog
+as $$
+  select exists (
+    select 1
+    from pg_constraint c
+    join pg_class t on t.oid = c.conrelid
+    join pg_namespace n on n.oid = t.relnamespace
+    where n.nspname = 'public'
+      and t.relname = 'users'
+      and c.contype = 'f'
+      and pg_get_constraintdef(c.oid) ilike '%references auth.users(id)%'
+      and pg_get_constraintdef(c.oid) ilike '%on delete cascade%'
+  );
+$$;
+
+grant execute on function public.has_users_auth_fk_cascade() to anon, authenticated, service_role;
+```
+
 ## 5. Storage Setup
 In Supabase Storage, create bucket:
 - `materials`
@@ -146,6 +171,7 @@ If scoped professors cannot see old courses, backfill `owner_id`:
 - Admin can create course with instructor and class assignment
 - Student sees assigned course and lesson unlock behavior
 - Materials appear on student course page
+- `/health` responds with `warnings: []` or meaningful warning text if FK check cannot be verified
 
 ## 10. Common Issues
 - Student redirected to profile setup instead of admin dashboard:
@@ -154,3 +180,11 @@ If scoped professors cannot see old courses, backfill `owner_id`:
   - run `materials.course_id` migration
 - Class create fails with instructor null error:
   - run classes instructor default/not-null migration
+
+- Student created from User Management cannot log in:
+  - ensure email + password were entered during creation
+  - confirm auth user exists under Supabase Authentication -> Users
+  - reset password in Supabase if needed
+
+- Login rejects valid old password format:
+  - ensure backend/frontend are updated; current login should not enforce strong password regex
