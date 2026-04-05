@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const ALLOWED_EMAIL_DOMAIN = "paterostechnologicalcollege.edu.ph";
 const PASSWORD_POLICY_MESSAGE =
   "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.";
+const INITIAL_STUDENT_XP = 20;
 
 function isStrongPassword(value) {
   return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
@@ -153,7 +154,7 @@ async function signup(req, res) {
         role: preservedRole,
         profile_completed: existingProfile?.profile_completed ?? false,
         profile_step: existingProfile?.profile_step ?? 1,
-        xp: existingProfile?.xp ?? 0,
+        xp: existingProfile?.xp ?? INITIAL_STUDENT_XP,
       }),
       10000,
       "Timed out while creating profile row",
@@ -322,7 +323,7 @@ async function getMe(req, res) {
           role,
           profile_completed: role === "admin",
           profile_step: role === "admin" ? 3 : 1,
-          xp: 0,
+          xp: role === "admin" ? 0 : INITIAL_STUDENT_XP,
           status: "Active",
         }),
         10000,

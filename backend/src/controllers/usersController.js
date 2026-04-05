@@ -1,6 +1,7 @@
 const { supabase } = require("../services/supabaseService");
 const { errorResponse } = require("../utils/response");
 const ALLOWED_EMAIL_DOMAIN = "paterostechnologicalcollege.edu.ph";
+const INITIAL_STUDENT_XP = 20;
 
 function normalizeEmail(value) {
   return String(value || "").trim().toLowerCase();
@@ -93,7 +94,7 @@ async function createUser(req, res) {
       year_level: payload.year_level || null,
       profile_completed: false,
       profile_step: 1,
-      xp: 0,
+      xp: INITIAL_STUDENT_XP,
     };
 
     const { data, error } = await supabase
