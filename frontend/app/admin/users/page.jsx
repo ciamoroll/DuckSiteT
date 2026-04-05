@@ -17,6 +17,7 @@ export default function UsersPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -118,12 +119,48 @@ export default function UsersPage() {
     setFormData({ firstName: "", lastName: "", email: "", password: "", yearLevel: "" });
   }
 
+  function handleClearSearch() {
+    setSearchTerm("");
+  }
+
+  const filteredUsers = users.filter((user) => {
+    const query = String(searchTerm || "").trim().toLowerCase();
+    if (!query) return true;
+
+    const fullName = `${user.first_name || ""} ${user.last_name || ""}`.toLowerCase();
+    const email = String(user.email || "").toLowerCase();
+    const yearLevel = String(user.year_level || "").toLowerCase();
+
+    return fullName.includes(query) || email.includes(query) || yearLevel.includes(query);
+  });
+
   return (
     <AdminShell title="User Management">
       <div className={styles.container}>
         <button className={styles.btn_primary} onClick={() => setShowForm(!showForm)}>
           {showForm ? "Cancel" : "Add New User"}
         </button>
+
+        <div className={styles.searchBar}>
+          <label htmlFor="student-search">Search Students</label>
+          <div className={styles.searchControls}>
+            <input
+              id="student-search"
+              type="text"
+              placeholder="Search by name, email, or year level"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button
+              type="button"
+              className={styles.btn_clear}
+              onClick={handleClearSearch}
+              disabled={!searchTerm}
+            >
+              Clear Search
+            </button>
+          </div>
+        </div>
 
         {showForm && (
           <form className={styles.form} onSubmit={handleSubmit}>
@@ -167,7 +204,7 @@ export default function UsersPage() {
                 >
                   {showPassword ? "Hide Password" : "Show Password"}
                 </button>
-                <small className={styles.loading}>Set the student's login password. Share this securely with the student.</small>
+                <small className={styles.loading}>Set the student&apos;s login password. Share this securely with the student.</small>
               </>
             ) : null}
             <input
@@ -189,7 +226,7 @@ export default function UsersPage() {
 
         {loading ? (
           <p className={styles.loading}>Loading users...</p>
-        ) : users.length === 0 ? (
+        ) : filteredUsers.length === 0 ? (
           <p className={styles.empty}>No users found</p>
         ) : (
           <div className={styles.table_container}>
@@ -204,7 +241,7 @@ export default function UsersPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                   <tr key={user.id}>
                     <td>{user.first_name} {user.last_name}</td>
                     <td>{user.email}</td>

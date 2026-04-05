@@ -1,5 +1,75 @@
 .container { display: grid; gap: 14px; }
 
+.searchBar {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid #d6dff3;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fbfdff, #f4f8ff);
+}
+
+.searchBar label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #34538f;
+}
+
+.searchControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.searchBar input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #d6dff3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #263d6e;
+  padding: 10px 11px;
+  font-size: 14px;
+}
+
+.searchBar input:focus {
+  outline: none;
+  border-color: #5f84d3;
+  box-shadow: 0 0 0 3px rgba(96, 133, 211, 0.14);
+}
+
+.btn_clear {
+  border-radius: 8px;
+  border: 1px solid #ccd8f2;
+  background: #edf2ff;
+  color: #3f5f99;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 10px 14px;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.btn_clear:hover:not(:disabled) {
+  background: #e3ebff;
+}
+
+.btn_clear:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .searchControls {
+    grid-template-columns: 1fr;
+  }
+
+  .btn_clear {
+    width: 100%;
+  }
+}
+
 .btn_primary, .btn_secondary, .btn_edit, .btn_delete { border-radius: 8px; border: 1px solid transparent; font-weight: 700; cursor: pointer; }
 
 .btn_primary {
