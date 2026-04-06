@@ -87,10 +87,11 @@ button {
   color: #fff;
   border: none;
   font-weight: 600;
+  transition: filter 0.15s ease;
 }
 
 button:hover {
-  background: var(--primary-strong);
+  filter: brightness(0.94);
 }
 
 button.secondary {

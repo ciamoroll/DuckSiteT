@@ -192,6 +192,10 @@
   cursor: pointer;
 }
 
+.startBtn:hover {
+  background: #5a7f3f;
+}
+
 @media (max-width: 900px) {
   .topBar {
     grid-template-columns: 1fr;

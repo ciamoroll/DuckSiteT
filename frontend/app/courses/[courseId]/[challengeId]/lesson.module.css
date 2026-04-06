@@ -164,6 +164,14 @@
   background: rgba(128, 164, 45, 0.9);
 }
 
+.optionBtn:hover {
+  background: rgba(112, 130, 58, 0.82);
+}
+
+.optionActive:hover {
+  background: rgba(128, 164, 45, 0.9);
+}
+
 .actions {
   display: grid;
   gap: 10px;
@@ -173,6 +181,15 @@
 .actions button {
   width: 100%;
   padding: 12px 14px;
+}
+
+.actions button:hover:not(:disabled) {
+  background: rgba(112, 130, 58, 0.82);
+}
+
+.actions button:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
 }
 
 .resultBox {

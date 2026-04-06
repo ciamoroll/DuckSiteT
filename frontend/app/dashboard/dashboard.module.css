@@ -231,6 +231,17 @@
   font-weight: 700;
 }
 
+.editBtn:hover,
+.catalogCard button:hover:not(:disabled),
+.submitBtn:hover,
+.optionBtn:hover {
+  background: rgba(114, 128, 59, 0.85);
+}
+
+.optionActive:hover {
+  background: rgba(100, 113, 49, 0.75);
+}
+
 .leaderList {
   display: grid;
   gap: 8px;

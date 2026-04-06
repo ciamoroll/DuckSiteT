@@ -63,9 +63,17 @@
   background: rgba(243, 234, 186, 0.95);
 }
 
+.tab:hover {
+  background: rgba(236, 226, 171, 0.98);
+}
+
 .activeTab {
   background: linear-gradient(180deg, #2a7b27, #246822);
   color: #ffe879;
+}
+
+.activeTab:hover {
+  background: linear-gradient(180deg, #2a7b27, #246822);
 }
 
 .nameGrid {
@@ -123,6 +131,7 @@
 }
 
 .actionBtn:hover {
+  background: #e9e894;
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(24, 33, 13, 0.24);
 }
@@ -141,6 +150,11 @@
   text-decoration: underline;
   font-weight: 700;
   cursor: pointer;
+}
+
+.backBtn:hover {
+  color: #27471f;
+  background: transparent;
 }
 
 @media (max-width: 640px) {
