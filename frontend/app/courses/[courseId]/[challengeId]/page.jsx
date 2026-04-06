@@ -201,6 +201,9 @@ export default function LessonChallengePage() {
               {result ? (
                 <div className={styles.resultBox}>
                   <p>{result.isCorrect ? "Correct answer!" : "Incorrect answer. Try again."}</p>
+                  {result.isCorrect && String(result.explanation || challenge?.explanation || "").trim() ? (
+                    <p className={styles.explanation}>Explanation: {String(result.explanation || challenge?.explanation || "").trim()}</p>
+                  ) : null}
                   <p>Awarded XP: {Number(result.awardedXp || 0)}</p>
                   <p>Total XP: {Number(result.totalXp || 0)}</p>
                 </div>

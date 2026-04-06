@@ -351,7 +351,7 @@ async function listMyChallenges(req, res) {
 
         const { data: challenges, error: challengesError } = await supabase
           .from("challenges")
-          .select("id, title, course_id, question_text, options, points, required_xp, lesson_order, status, created_at")
+          .select("id, title, course_id, question_text, options, explanation, points, required_xp, lesson_order, status, created_at")
           .eq("status", "Active")
           .in("course_id", allowedCourseIds)
           .order("id", { ascending: false });
@@ -388,7 +388,7 @@ async function listMyChallenges(req, res) {
 
     const { data: challenges, error: challengesError } = await supabase
       .from("challenges")
-      .select("id, title, course_id, question_text, options, points, required_xp, lesson_order, status, created_at")
+      .select("id, title, course_id, question_text, options, explanation, points, required_xp, lesson_order, status, created_at")
       .eq("status", "Active")
       .in("course_id", allowedCourseIds)
       .order("id", { ascending: false });
@@ -520,7 +520,7 @@ async function submitChallengeAttempt(req, res) {
 
     const { data: challenge, error: challengeError } = await supabase
       .from("challenges")
-      .select("id, title, course_id, points, status, correct_answer, required_xp, lesson_order")
+      .select("id, title, course_id, points, status, correct_answer, explanation, required_xp, lesson_order")
       .eq("id", challengeId)
       .single();
     if (challengeError || !challenge) return errorResponse(res, 404, "Challenge not found");
@@ -669,6 +669,7 @@ async function submitChallengeAttempt(req, res) {
       ok: true,
       challengeId,
       isCorrect: Boolean(isCorrect),
+      explanation: challenge.explanation || "",
       awardedXp,
       totalXp: newXp,
       attempts: nextAttempts,

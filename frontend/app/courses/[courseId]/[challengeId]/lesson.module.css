@@ -190,6 +190,11 @@
   margin-top: 4px;
 }
 
+.explanation {
+  color: #d9f8b3;
+  font-weight: 600;
+}
+
 .success {
   margin: 0;
   color: #9fe17c;
