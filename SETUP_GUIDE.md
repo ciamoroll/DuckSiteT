@@ -47,6 +47,7 @@ Important: ensure these newer columns/migrations exist after applying schema:
 - `courses.instructor`
 - `courses.owner_id`
 - `materials.course_id`
+- `users.bio`
 - class instructor nullable/default update
 
 If needed, run explicitly:
@@ -55,6 +56,7 @@ If needed, run explicitly:
 ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS instructor text default '';
 ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS owner_id uuid;
 ALTER TABLE public.materials ADD COLUMN IF NOT EXISTS course_id bigint;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS bio text;
 ALTER TABLE public.classes ALTER COLUMN instructor SET DEFAULT '';
 ALTER TABLE public.classes ALTER COLUMN instructor DROP NOT NULL;
 ```

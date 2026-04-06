@@ -57,21 +57,22 @@ export default function LoginPage() {
         return;
       }
 
-      // Email: try standard auth login first (students and Supabase-based admins).
+      // Email: always use standard auth login. Do not fallback to admin-login,
+      // otherwise student login failures show misleading admin authorization errors.
+      const payload = await apiRequest("/api/auth/login", {
+        method: "POST",
+        body: { email: normalizedIdentifier.toLowerCase(), password },
+      });
+
+      saveStudentSession({
+        email: normalizedIdentifier.toLowerCase(),
+        firstName: payload?.user?.user_metadata?.first_name || "Student",
+        lastName: payload?.user?.user_metadata?.last_name || "",
+        userId: payload?.user?.id || "",
+        accessToken: payload?.session?.access_token || "",
+      });
+
       try {
-        const payload = await apiRequest("/api/auth/login", {
-          method: "POST",
-          body: { email: normalizedIdentifier.toLowerCase(), password },
-        });
-
-        saveStudentSession({
-          email: normalizedIdentifier.toLowerCase(),
-          firstName: payload?.user?.user_metadata?.first_name || "Student",
-          lastName: payload?.user?.user_metadata?.last_name || "",
-          userId: payload?.user?.id || "",
-          accessToken: payload?.session?.access_token || "",
-        });
-
         const me = await apiRequest("/api/auth/me", { student: true });
         if (me?.profile?.role === "admin") {
           const adminPayload = await apiRequest("/api/auth/admin-login", {
@@ -89,26 +90,11 @@ export default function LoginPage() {
           router.push("/admin/dashboard");
           return;
         }
-
-        router.push("/dashboard");
-        return;
-      } catch (_studentErr) {
-        // If email auth fails, fallback to admin credentials login.
+      } catch (_meErr) {
+        // Keep student session and continue to dashboard if profile probe fails.
       }
 
-      const adminPayload = await apiRequest("/api/auth/admin-login", {
-        method: "POST",
-        body: { username: normalizedIdentifier, password },
-      });
-
-      saveAdminSession({
-        email: normalizedIdentifier,
-        firstName: adminPayload?.firstName || "Prof.",
-        lastName: adminPayload?.lastName || "",
-        token: adminPayload?.token || "",
-      });
-
-      router.push("/admin/dashboard");
+      router.push("/dashboard");
     } catch (error) {
       alert(error.message || "Login failed");
     } finally {

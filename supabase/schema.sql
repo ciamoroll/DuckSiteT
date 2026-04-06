@@ -21,6 +21,7 @@ create table if not exists public.users (
 
 alter table public.users add column if not exists class_code text;
 alter table public.users add column if not exists class_id bigint;
+alter table public.users add column if not exists bio text;
 
 create or replace function public.has_users_auth_fk_cascade()
 returns boolean

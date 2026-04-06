@@ -5,6 +5,8 @@ const ALLOWED_EMAIL_DOMAIN = "paterostechnologicalcollege.edu.ph";
 const PASSWORD_POLICY_MESSAGE =
   "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.";
 const INITIAL_STUDENT_XP = 20;
+const PROFILE_SELECT_WITH_BIO = "id, uid, email, first_name, last_name, role, year_level, bio, class_id, class_code, student_id, profile_completed, profile_step, xp, status";
+const PROFILE_SELECT_LEGACY = "id, uid, email, first_name, last_name, role, year_level, class_id, class_code, student_id, profile_completed, profile_step, xp, status";
 
 function isStrongPassword(value) {
   return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(String(value || ""));
@@ -21,6 +23,16 @@ function isAllowedInstitutionalEmail(value) {
 
 function domainRestrictionMessage() {
   return `Only institutional email addresses ending with @${ALLOWED_EMAIL_DOMAIN} are allowed.`;
+}
+
+function isMissingColumnError(error, columnName) {
+  const message = String(error?.message || "").toLowerCase();
+  const column = String(columnName || "").toLowerCase();
+  return message.includes(column) && (
+    message.includes("does not exist") ||
+    message.includes("schema cache") ||
+    message.includes("column")
+  );
 }
 
 async function withTimeout(promise, ms, message) {
@@ -299,12 +311,26 @@ async function getMe(req, res) {
     let { data: profile, error } = await withTimeout(
       supabase
         .from("users")
-        .select("id, uid, email, first_name, last_name, role, year_level, class_id, class_code, student_id, profile_completed, profile_step, xp, status")
+        .select(PROFILE_SELECT_WITH_BIO)
         .eq("id", userId)
         .single(),
       10000,
       "Timed out while fetching profile",
     );
+
+    if (error && isMissingColumnError(error, "bio")) {
+      const legacy = await withTimeout(
+        supabase
+          .from("users")
+          .select(PROFILE_SELECT_LEGACY)
+          .eq("id", userId)
+          .single(),
+        10000,
+        "Timed out while fetching profile (legacy schema)",
+      );
+      profile = legacy.data ? { ...legacy.data, bio: "" } : legacy.data;
+      error = legacy.error;
+    }
 
     // If the auth user exists but profile row is missing, create a default profile.
     if (error || !profile) {
@@ -334,15 +360,30 @@ async function getMe(req, res) {
         return errorResponse(res, 400, upsertError.message);
       }
 
-      const refetch = await withTimeout(
+      let refetch = await withTimeout(
         supabase
           .from("users")
-          .select("id, uid, email, first_name, last_name, role, year_level, class_id, class_code, student_id, profile_completed, profile_step, xp, status")
+          .select(PROFILE_SELECT_WITH_BIO)
           .eq("id", userId)
           .single(),
         10000,
         "Timed out while refetching created profile",
       );
+
+      if (refetch.error && isMissingColumnError(refetch.error, "bio")) {
+        refetch = await withTimeout(
+          supabase
+            .from("users")
+            .select(PROFILE_SELECT_LEGACY)
+            .eq("id", userId)
+            .single(),
+          10000,
+          "Timed out while refetching created profile (legacy schema)",
+        );
+        if (refetch.data) {
+          refetch.data = { ...refetch.data, bio: "" };
+        }
+      }
 
       profile = refetch.data;
       error = refetch.error;
@@ -369,7 +410,7 @@ async function updateMe(req, res) {
       return errorResponse(res, 401, "Authenticated user is required");
     }
 
-    const { first_name, last_name, student_id, year_level, class_id, class_code, profile_step, profile_completed } = req.body || {};
+    const { first_name, last_name, student_id, year_level, bio, class_id, class_code, profile_step, profile_completed } = req.body || {};
 
     const { data: profile, error: fetchError } = await withTimeout(
       supabase
@@ -390,17 +431,28 @@ async function updateMe(req, res) {
     if (last_name !== undefined) updatePayload.last_name = last_name;
     if (student_id !== undefined) updatePayload.student_id = student_id;
     if (year_level !== undefined) updatePayload.year_level = year_level;
+    if (bio !== undefined) updatePayload.bio = bio;
     if (class_id !== undefined) updatePayload.class_id = class_id ? Number(class_id) : null;
     if (class_code !== undefined) updatePayload.class_code = class_code;
     if (profile_step !== undefined) updatePayload.profile_step = profile_step;
     if (profile_completed !== undefined) updatePayload.profile_completed = profile_completed;
     updatePayload.updated_at = new Date().toISOString();
 
-    const { error: updateError } = await withTimeout(
+    let { error: updateError } = await withTimeout(
       supabase.from("users").update(updatePayload).eq("id", userId),
       10000,
       "Timed out while updating profile",
     );
+
+    if (updateError && bio !== undefined && isMissingColumnError(updateError, "bio")) {
+      delete updatePayload.bio;
+      const retry = await withTimeout(
+        supabase.from("users").update(updatePayload).eq("id", userId),
+        10000,
+        "Timed out while updating profile (legacy schema)",
+      );
+      updateError = retry.error;
+    }
 
     if (updateError) {
       return errorResponse(res, 400, updateError.message);

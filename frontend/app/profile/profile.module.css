@@ -201,7 +201,29 @@
   width: 280px;
   height: 280px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 16px rgba(255, 215, 115, 0.2));
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.2));
+  animation: avatarBounce 0.5s infinite;
+}
+
+@keyframes avatarBounce {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+  }
+  25% {
+    transform: translateY(-30px) scaleY(1.1);
+  }
+  50% {
+    transform: translateY(0) scaleY(0.85);
+  }
+  75% {
+    transform: translateY(-15px) scaleY(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatarImage {
+    animation: none;
+  }
 }
 
 .scrollCue {
