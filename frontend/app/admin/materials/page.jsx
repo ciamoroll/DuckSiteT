@@ -103,7 +103,7 @@ export default function MaterialsPage() {
               <option value="">Select Course</option>
               {courses.map((course) => (<option key={course.id} value={course.id}>{course.name}</option>))}
             </select>
-            <input type="url" placeholder="File URL" value={formData.file_url} onChange={(e) => setFormData({ ...formData, file_url: e.target.value })} />
+            <input type="url" placeholder="Material URL (PDF, video, PPT, etc.)" value={formData.file_url} onChange={(e) => setFormData({ ...formData, file_url: e.target.value })} />
             <div className={styles.form_buttons}>
               <button type="submit" className={styles.btn_primary}>{editingId ? "Update" : "Create"}</button>
               <button type="button" className={styles.btn_secondary} onClick={() => setShowForm(false)}>Cancel</button>

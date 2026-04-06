@@ -8,6 +8,21 @@ import { apiRequest } from "@/lib/api";
 import { clearSession } from "@/lib/auth";
 import styles from "./course-stages.module.css";
 
+function getMaterialActionLabel(url) {
+  const normalized = String(url || "").trim().toLowerCase();
+  if (!normalized) return "Open Material";
+
+  const isYouTube = normalized.includes("youtube.com") || normalized.includes("youtu.be") || normalized.includes("vimeo.com");
+  if (isYouTube) return "Watch Video";
+
+  const isSlides = normalized.endsWith(".ppt") || normalized.endsWith(".pptx") || normalized.includes("docs.google.com/presentation");
+  if (isSlides) return "View Slides";
+
+  if (normalized.endsWith(".pdf")) return "View PDF";
+
+  return "Open Material";
+}
+
 export default function CourseStagesPage() {
   const params = useParams();
   const router = useRouter();
@@ -206,7 +221,7 @@ export default function CourseStagesPage() {
                     </div>
                     {material.file_url && (
                       <a href={material.file_url} target="_blank" rel="noopener noreferrer" className={styles.downloadBtn}>
-                        Download
+                        {getMaterialActionLabel(material.file_url)}
                       </a>
                     )}
                   </div>
