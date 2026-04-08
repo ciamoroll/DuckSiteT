@@ -29,7 +29,7 @@ export default function LoginPage() {
     const normalizedIdentifier = String(identifier || "").trim();
     const looksLikeEmail = normalizedIdentifier.includes("@");
     if (!normalizedIdentifier || !password) {
-      alert("Email/username and password are required.");
+      alert("Email and password are required.");
       return;
     }
     if (looksLikeEmail && !isAllowedInstitutionalEmail(normalizedIdentifier)) {
@@ -119,7 +119,7 @@ export default function LoginPage() {
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.label}>Email / Username</label>
+          <label className={styles.label}>Email</label>
           <input
             className={styles.input}
             type="text"

@@ -120,7 +120,7 @@ export default function StudentCoursesPage() {
           ) : (
             <section className={styles.grid}>
               {courses.length === 0 ? (
-                <article className={styles.empty}>No enrolled courses yet.</article>
+                <article className={styles.empty}>It looks like you aren&apos;t enrolled in any courses yet. To get started, please visit your profile to select your courses and enroll.</article>
               ) : (
                 courses.map((course) => {
                   const row = progressMap.get(Number(course.id)) || { done: 0, total: 0, pct: 0 };
