@@ -113,9 +113,9 @@ export default function CourseStagesPage() {
       const meetsXp = xp >= requiredXp;
       const previousLessonId = index > 0 ? Number(lessons[index - 1]?.id) : null;
       const meetsPrerequisite = previousLessonId == null ? true : solvedSet.has(previousLessonId);
-      const isUnlocked = meetsXp && meetsPrerequisite;
       const solved = solvedSet.has(Number(lesson.id));
       const attempted = attemptedSet.has(Number(lesson.id));
+      const isUnlocked = solved || (meetsXp && meetsPrerequisite);
 
       let actionLabel = "Locked";
       if (isUnlocked && solved) actionLabel = "Review";

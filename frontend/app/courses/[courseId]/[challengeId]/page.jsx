@@ -126,7 +126,7 @@ export default function LessonChallengePage() {
   const previousChallengeId = lessonIndex > 0 ? Number(courseLessons[lessonIndex - 1]?.id) : null;
   const meetsXp = xp >= requiredXp;
   const meetsPrerequisite = previousChallengeId == null ? true : solvedSet.has(previousChallengeId);
-  const isUnlocked = meetsXp && meetsPrerequisite;
+  const isUnlocked = solved || (meetsXp && meetsPrerequisite);
 
   const lockMessage = useMemo(() => {
     if (isUnlocked) return "";

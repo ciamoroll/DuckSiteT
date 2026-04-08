@@ -432,8 +432,38 @@ async function updateMe(req, res) {
     if (student_id !== undefined) updatePayload.student_id = student_id;
     if (year_level !== undefined) updatePayload.year_level = year_level;
     if (bio !== undefined) updatePayload.bio = bio;
-    if (class_id !== undefined) updatePayload.class_id = class_id ? Number(class_id) : null;
-    if (class_code !== undefined) updatePayload.class_code = class_code;
+    const hasClassId = class_id !== undefined;
+    const normalizedClassId = hasClassId
+      ? (class_id ? Number(class_id) : null)
+      : undefined;
+
+    if (hasClassId) {
+      updatePayload.class_id = normalizedClassId;
+    }
+    if (class_code !== undefined) {
+      updatePayload.class_code = class_code;
+    }
+
+    // Keep class_code aligned when class_id changes and class_code is not explicitly provided.
+    if (hasClassId && class_code === undefined) {
+      if (!normalizedClassId) {
+        updatePayload.class_code = null;
+      } else {
+        const { data: classRow, error: classFetchError } = await withTimeout(
+          supabase
+            .from("classes")
+            .select("code")
+            .eq("id", normalizedClassId)
+            .maybeSingle(),
+          10000,
+          "Timed out while resolving class code",
+        );
+        if (classFetchError) {
+          return errorResponse(res, 400, classFetchError.message);
+        }
+        updatePayload.class_code = classRow?.code || null;
+      }
+    }
     if (profile_step !== undefined) updatePayload.profile_step = profile_step;
     if (profile_completed !== undefined) updatePayload.profile_completed = profile_completed;
     updatePayload.updated_at = new Date().toISOString();

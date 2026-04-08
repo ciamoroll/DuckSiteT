@@ -243,7 +243,14 @@ export default function ProfileSetupPage() {
               </div>
               
               <div className={styles.playerAvatar}>
-                 <img src="/images/duck_profile_image.png" alt="Profile" className={styles.avatarImage} />
+                <Image
+                  src="/images/duck_profile_image.png"
+                  alt="Profile"
+                  width={280}
+                  height={280}
+                  className={styles.avatarImage}
+                  priority
+                />
               </div>
             </div>
 
