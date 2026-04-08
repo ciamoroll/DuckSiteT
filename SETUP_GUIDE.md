@@ -5,18 +5,29 @@
 - npm
 - Supabase project (URL, anon key, service role key)
 
+
 ## 2. Clone and Install
 From repo root:
 
 ```bash
 cd frontend
 npm install
+# Installs all dependencies including canvas-confetti for confetti animation
 ```
 
 ```bash
 cd ../backend
 npm install
 ```
+## 11. Animation Effects (Confetti)
+
+The frontend uses [canvas-confetti](https://www.npmjs.com/package/canvas-confetti) to display a confetti animation when a student answers a challenge correctly.
+
+**Troubleshooting:**
+- If you do not see the confetti animation, ensure that your operating system's "Animation effects" (Windows) or "Reduce motion" (macOS) setting is enabled to allow animations. Chrome and other browsers respect this system setting.
+- The confetti effect will not appear if "prefers-reduced-motion" is enabled.
+
+No additional setup is required beyond `npm install` in the frontend directory.
 
 ## 3. Environment Files
 Create:

@@ -202,7 +202,7 @@
   height: 280px;
   object-fit: contain;
   filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.2));
-  animation: avatarBounce 0.5s infinite;
+  animation: avatarBounce 2s ease-in-out infinite;
 }
 
 @keyframes avatarBounce {
@@ -210,13 +210,13 @@
     transform: translateY(0) scaleY(1);
   }
   25% {
-    transform: translateY(-30px) scaleY(1.1);
+    transform: translateY(-25px) scaleY(1.05);
   }
   50% {
-    transform: translateY(0) scaleY(0.85);
+    transform: translateY(0) scaleY(0.9);
   }
   75% {
-    transform: translateY(-15px) scaleY(1.05);
+    transform: translateY(-12px) scaleY(1.02);
   }
 }
 

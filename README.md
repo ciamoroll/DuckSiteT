@@ -22,9 +22,10 @@ It supports:
 - **Student flow**: register, login, view dashboard, take courses/lessons
 - **Admin flow**: login and manage users/classes/courses/materials/challenges, monitor progress
 
+
 ## 2) Tech Stack
 
-- **Frontend**: Next.js, React, Supabase JS
+- **Frontend**: Next.js, React, Supabase JS, [canvas-confetti](https://www.npmjs.com/package/canvas-confetti) (for celebration animation)
 - **Backend**: Node.js, Express, Supabase JS
 - **Database/Auth/Storage**: Supabase (Postgres + Auth + Storage)
 
@@ -126,6 +127,7 @@ Security notes:
    - Ensure required read/write policies exist for your tables and storage.
    - If API calls return `401/403`, review RLS policies first.
 
+
 ## 7) Install Dependencies
 
 From repository root:
@@ -133,12 +135,22 @@ From repository root:
 ```bash
 cd frontend
 npm install
+# Installs all dependencies including canvas-confetti for confetti animation
 ```
 
 ```bash
 cd ../backend
 npm install
 ```
+## 17) Animation Effects (Confetti)
+
+The platform uses [canvas-confetti](https://www.npmjs.com/package/canvas-confetti) to display a confetti animation when a student answers a challenge correctly.
+
+**Troubleshooting:**
+- If you do not see the confetti animation, ensure that your operating system's "Animation effects" (Windows) or "Reduce motion" (macOS) setting is enabled to allow animations. Chrome and other browsers respect this system setting.
+- The confetti effect will not appear if "prefers-reduced-motion" is enabled.
+
+No additional setup is required beyond `npm install` in the frontend directory.
 
 ## 8) Run the App (Development)
 
