@@ -1,0 +1,183 @@
+/* Site-wide YouTube music: collapsed FAB → expanded panel */
+
+.musicRoot {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.musicRoot > * {
+  pointer-events: auto;
+}
+
+.fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 230, 145, 0.45);
+  background: linear-gradient(180deg, rgba(84, 95, 41, 0.95), rgba(50, 56, 28, 0.98));
+  color: #fff0b6;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.fab:hover {
+  transform: scale(1.06);
+  border-color: rgba(255, 230, 145, 0.75);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.fab:focus-visible {
+  outline: 2px solid #f8d96f;
+  outline-offset: 3px;
+}
+
+.panel {
+  width: min(440px, calc(100vw - 28px));
+  max-height: min(85vh, 640px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 233, 170, 0.28);
+  background: linear-gradient(180deg, rgba(62, 56, 25, 0.96), rgba(28, 26, 12, 0.98));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 240, 182, 0.9);
+}
+
+.closeBtn {
+  border: 1px solid rgba(255, 230, 145, 0.35);
+  background: rgba(50, 46, 22, 0.75);
+  color: #fff0b6;
+  border-radius: 10px;
+  width: 36px;
+  height: 34px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeBtn:hover {
+  background: rgba(70, 64, 30, 0.9);
+}
+
+/*
+ * YouTube IFrame API replaces its host element. The shell lives on document.body
+ * (imperative mount) so React never reconciles against the iframe.
+ * Audio-only UX: player stays off-screen and inaudible visually (no video UI).
+ */
+.ytShell {
+  position: fixed;
+  z-index: -1;
+  left: -9999px;
+  top: 0;
+  width: 320px;
+  height: 180px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.playBtn {
+  border: 1px solid rgba(255, 230, 145, 0.4);
+  background: rgba(84, 95, 41, 0.75);
+  color: #fff0b6;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.playBtn:hover {
+  background: rgba(100, 113, 49, 0.9);
+  border-color: rgba(255, 230, 145, 0.65);
+}
+
+.iconBtn {
+  border: 1px solid rgba(255, 230, 145, 0.35);
+  background: rgba(50, 46, 22, 0.7);
+  color: #fff0b6;
+  border-radius: 10px;
+  width: 40px;
+  height: 36px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBtn:hover {
+  background: rgba(70, 64, 30, 0.85);
+}
+
+.volume {
+  flex: 1;
+  min-width: 100px;
+  accent-color: #c4d84a;
+}
+
+.volumeLabel {
+  font-size: 11px;
+  color: rgba(255, 248, 216, 0.65);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hint {
+  font-size: 10px;
+  color: rgba(255, 248, 216, 0.4);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.hint a {
+  color: rgba(255, 224, 140, 0.85);
+  text-decoration: underline;
+}
+
+.hint a:hover {
+  color: #fff0b6;
+}

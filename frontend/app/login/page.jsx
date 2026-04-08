@@ -114,8 +114,22 @@ export default function LoginPage() {
         <h1 className={styles.title}>Welcome to DuckSiteT</h1>
 
         <div className={styles.tabRow}>
-          <button type="button" className={`${styles.tab} ${styles.activeTab}`}>Login</button>
-          <button type="button" className={styles.tab} onClick={() => router.push("/signup")}>Sign up</button>
+          {/* suppressHydrationWarning: browser extensions (e.g. form fillers) inject attrs like fdprocessedid on controls */}
+          <button
+            type="button"
+            className={`${styles.tab} ${styles.activeTab}`}
+            suppressHydrationWarning
+          >
+            Login
+          </button>
+          <button
+            type="button"
+            className={styles.tab}
+            onClick={() => router.push("/signup")}
+            suppressHydrationWarning
+          >
+            Sign up
+          </button>
         </div>
 
         <div className={styles.formGroup}>
@@ -126,6 +140,7 @@ export default function LoginPage() {
             placeholder="Enter email or username"
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
+            suppressHydrationWarning
           />
         </div>
 
@@ -137,10 +152,16 @@ export default function LoginPage() {
             placeholder="Enter password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            suppressHydrationWarning
           />
         </div>
 
-        <button className={styles.loginBtn} onClick={onLogin} disabled={loading}>
+        <button
+          className={styles.loginBtn}
+          onClick={onLogin}
+          disabled={loading}
+          suppressHydrationWarning
+        >
           {loading ? "Please wait..." : "Login"}
         </button>
       </section>

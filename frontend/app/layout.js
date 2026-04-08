@@ -1,4 +1,5 @@
 import "./globals.css";
+import AudioProvider from "@/components/AudioProvider";
 
 export const metadata = {
   title: "Ducksite",
@@ -11,7 +12,9 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="icon" href="/images/favicon.png" />
       </head>
-      <body>{children}</body>
+      <body>
+        <AudioProvider>{children}</AudioProvider>
+      </body>
     </html>
   );
 }

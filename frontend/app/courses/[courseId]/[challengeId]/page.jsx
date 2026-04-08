@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import StudentRouteGuard from "@/components/StudentRouteGuard";
@@ -24,6 +24,13 @@ export default function LessonChallengePage() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const celebratedForChallengeRef = useRef(null);
+
+  useEffect(() => {
+    setResult(null);
+    setSelected("");
+    celebratedForChallengeRef.current = null;
+  }, [courseId, challengeId]);
 
   useEffect(() => {
     let alive = true;
@@ -74,6 +81,24 @@ export default function LessonChallengePage() {
       alive = false;
     };
   }, [courseId, challengeId]);
+
+  useEffect(() => {
+    if (!result?.isCorrect) return;
+    if (celebratedForChallengeRef.current === challengeId) return;
+    celebratedForChallengeRef.current = challengeId;
+
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    import("canvas-confetti").then((mod) => {
+      mod.default({
+        particleCount: 120,
+        spread: 72,
+        origin: { y: 0.62 },
+      });
+    });
+  }, [result, challengeId]);
 
   function logout() {
     clearSession();
