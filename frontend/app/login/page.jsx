@@ -49,6 +49,7 @@ export default function LoginPage() {
         saveAdminSession({
           email: normalizedIdentifier,
           firstName: adminPayload?.firstName || "Prof.",
+          middleName: adminPayload?.middleName || "",
           lastName: adminPayload?.lastName || "",
           token: adminPayload?.token || "",
         });
@@ -67,6 +68,7 @@ export default function LoginPage() {
       saveStudentSession({
         email: normalizedIdentifier.toLowerCase(),
         firstName: payload?.user?.user_metadata?.first_name || "Student",
+        middleName: payload?.user?.user_metadata?.middle_name || "",
         lastName: payload?.user?.user_metadata?.last_name || "",
         userId: payload?.user?.id || "",
         accessToken: payload?.session?.access_token || "",
@@ -83,6 +85,7 @@ export default function LoginPage() {
           saveAdminSession({
             email: normalizedIdentifier,
             firstName: adminPayload?.firstName || me?.profile?.first_name || "Prof.",
+            middleName: adminPayload?.middleName || me?.profile?.middle_name || "",
             lastName: adminPayload?.lastName || me?.profile?.last_name || "",
             token: adminPayload?.token || "",
           });

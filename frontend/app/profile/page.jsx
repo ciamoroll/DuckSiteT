@@ -22,6 +22,7 @@ export default function ProfileSetupPage() {
   const [userXp, setUserXp] = useState(0);
   const [formData, setFormData] = useState({
     firstName: "",
+    middleName: "",
     lastName: "",
     studentId: "",
     yearLevel: "",
@@ -73,6 +74,7 @@ export default function ProfileSetupPage() {
       setCurrentStep(meData.profile.profile_step || 1);
       setFormData({
         firstName: meData.profile.first_name || "",
+        middleName: meData.profile.middle_name || "",
         lastName: meData.profile.last_name || "",
         studentId: meData.profile.student_id || "",
         yearLevel: meData.profile.year_level || "",
@@ -132,6 +134,7 @@ export default function ProfileSetupPage() {
         method: "PUT",
         body: {
           first_name: formData.firstName,
+          middle_name: formData.middleName,
           last_name: formData.lastName,
           student_id: formData.studentId,
           year_level: formData.yearLevel,
@@ -172,6 +175,7 @@ export default function ProfileSetupPage() {
 
     const payload = {
       first_name: formData.firstName.trim(),
+      middle_name: formData.middleName.trim(),
       last_name: formData.lastName.trim(),
       student_id: formData.studentId.trim(),
       year_level: formData.yearLevel,
@@ -219,6 +223,7 @@ export default function ProfileSetupPage() {
 
   const currentClassId = Number(formData.classId || profile?.class_id || 0);
   const hasClassSelected = Number.isInteger(currentClassId) && currentClassId > 0;
+  const fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
   const enrolledIds = new Set(myCourses.map((course) => Number(course.id)));
   const availableToEnroll = allCourses.filter((course) => {
     if (enrolledIds.has(Number(course.id))) return false;
@@ -256,7 +261,7 @@ export default function ProfileSetupPage() {
             
             <div className={styles.playerCard}>
               <div className={styles.playerInfo}>
-                <div className={styles.playerName}>{formData.firstName} {formData.lastName}</div>
+                <div className={styles.playerName}>{fullName}</div>
                 <div className={styles.playerLevel}>LEVEL {userLevel}</div>
                 {userRank && <div className={styles.playerRank}>TOP {userRank}</div>}
                 <div className={styles.playerEmail}>{profile.email}</div>
@@ -434,6 +439,16 @@ export default function ProfileSetupPage() {
                   className={styles.formInput}
                 />
               </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Middle Name (Optional)</label>
+                <input
+                  type="text"
+                  value={formData.middleName}
+                  onChange={(e) => setFormData({ ...formData, middleName: e.target.value })}
+                  placeholder="Middle Name"
+                  className={styles.formInput}
+                />
+              </div>
               <button onClick={() => handleNext(1)} className={styles.btnPrimary}>
                 Next
               </button>
@@ -510,7 +525,7 @@ export default function ProfileSetupPage() {
               <div className={styles.reviewSection}>
                 <div className={styles.reviewItem}>
                   <span className={styles.label}>Name:</span>
-                  <span className={styles.value}>{formData.firstName} {formData.lastName}</span>
+                  <span className={styles.value}>{fullName}</span>
                 </div>
                 <div className={styles.reviewItem}>
                   <span className={styles.label}>Email:</span>

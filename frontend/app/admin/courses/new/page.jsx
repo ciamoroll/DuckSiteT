@@ -17,8 +17,9 @@ export default function NewCoursePage() {
     fetchClasses();
     // Auto-fill instructor from localStorage
     const firstName = localStorage.getItem("firstName") || "";
+    const middleName = localStorage.getItem("middleName") || "";
     const lastName = localStorage.getItem("lastName") || "";
-    const instructorName = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || "";
+    const instructorName = [firstName, middleName, lastName].filter(Boolean).join(" ");
     if (instructorName) {
       setFormData((prev) => ({ ...prev, instructor: instructorName }));
     }

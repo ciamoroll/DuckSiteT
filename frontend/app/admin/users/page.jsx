@@ -20,6 +20,7 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     firstName: "",
+    middleName: "",
     lastName: "",
     email: "",
     password: "",
@@ -48,6 +49,7 @@ export default function UsersPage() {
     try {
       const payload = {
         first_name: formData.firstName,
+        middle_name: formData.middleName,
         last_name: formData.lastName,
         role: "student",
         year_level: formData.yearLevel || null,
@@ -79,7 +81,7 @@ export default function UsersPage() {
         alert("User created successfully");
       }
 
-      setFormData({ firstName: "", lastName: "", email: "", password: "", yearLevel: "" });
+      setFormData({ firstName: "", middleName: "", lastName: "", email: "", password: "", yearLevel: "" });
       setEditingId(null);
       setShowPassword(false);
       setShowForm(false);
@@ -92,6 +94,7 @@ export default function UsersPage() {
   function handleEdit(user) {
     setFormData({
       firstName: user.first_name,
+      middleName: user.middle_name || "",
       lastName: user.last_name,
       email: user.email,
       password: "",
@@ -116,7 +119,7 @@ export default function UsersPage() {
     setShowForm(false);
     setEditingId(null);
     setShowPassword(false);
-    setFormData({ firstName: "", lastName: "", email: "", password: "", yearLevel: "" });
+    setFormData({ firstName: "", middleName: "", lastName: "", email: "", password: "", yearLevel: "" });
   }
 
   function handleClearSearch() {
@@ -127,7 +130,7 @@ export default function UsersPage() {
     const query = String(searchTerm || "").trim().toLowerCase();
     if (!query) return true;
 
-    const fullName = `${user.first_name || ""} ${user.last_name || ""}`.toLowerCase();
+    const fullName = `${user.first_name || ""} ${user.middle_name || ""} ${user.last_name || ""}`.toLowerCase();
     const email = String(user.email || "").toLowerCase();
     const yearLevel = String(user.year_level || "").toLowerCase();
 
@@ -171,6 +174,12 @@ export default function UsersPage() {
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               required
+            />
+            <input
+              type="text"
+              placeholder="Middle Name (Optional)"
+              value={formData.middleName}
+              onChange={(e) => setFormData({ ...formData, middleName: e.target.value })}
             />
             <input
               type="text"
@@ -243,7 +252,7 @@ export default function UsersPage() {
               <tbody>
                 {filteredUsers.map((user) => (
                   <tr key={user.id}>
-                    <td>{user.first_name} {user.last_name}</td>
+                    <td>{[user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" ")}</td>
                     <td>{user.email}</td>
                     <td><span className={`${styles.badge} ${styles[`badge_${user.role}`]}`}>{user.role}</span></td>
                     <td>{user.year_level || "—"}</td>

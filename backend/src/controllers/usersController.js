@@ -51,6 +51,7 @@ async function createUser(req, res) {
     const email = normalizeEmail(payload.email);
     const password = String(payload.password || "");
     const firstName = String(payload.first_name || "").trim();
+    const middleName = String(payload.middle_name || "").trim();
     const lastName = String(payload.last_name || "").trim();
 
     if (!email) {
@@ -72,6 +73,7 @@ async function createUser(req, res) {
       email_confirm: true,
       user_metadata: {
         first_name: firstName,
+        middle_name: middleName,
         last_name: lastName,
       },
     });
@@ -88,6 +90,7 @@ async function createUser(req, res) {
       id: authUserId,
       uid: authUserId,
       first_name: firstName,
+      middle_name: middleName,
       last_name: lastName,
       email,
       role: "student",
@@ -129,6 +132,7 @@ async function updateUser(req, res) {
 
     const payload = {};
     if (raw.first_name !== undefined) payload.first_name = raw.first_name;
+    if (raw.middle_name !== undefined) payload.middle_name = raw.middle_name;
     if (raw.last_name !== undefined) payload.last_name = raw.last_name;
     if (raw.year_level !== undefined) payload.year_level = raw.year_level;
     if (raw.class_id !== undefined) payload.class_id = raw.class_id;

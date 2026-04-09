@@ -8,7 +8,9 @@ import styles from "./AdminShell.module.css";
 export default function AdminShell({ title, children }) {
   const router = useRouter();
   const firstName = storage.get("firstName", "Prof.");
+  const middleName = storage.get("middleName", "");
   const lastName = storage.get("lastName", "Cabantog");
+  const adminFullName = [firstName, middleName, lastName].filter(Boolean).join(" ") || "Prof. Cabantog";
 
   function logout() {
     clearSession();
@@ -22,7 +24,7 @@ export default function AdminShell({ title, children }) {
           <div className={styles.adminIdentity}>
             <div className={styles.avatar}>👩‍🏫</div>
             <div>
-              <h1 className={styles.adminName}>{firstName} {lastName}</h1>
+              <h1 className={styles.adminName}>{adminFullName}</h1>
               <p className={styles.adminRole}>Teacher&apos;s Admin</p>
             </div>
           </div>

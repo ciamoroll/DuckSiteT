@@ -5,7 +5,7 @@ const ALLOWED_EMAIL_DOMAIN = "paterostechnologicalcollege.edu.ph";
 const PASSWORD_POLICY_MESSAGE =
   "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.";
 const INITIAL_STUDENT_XP = 20;
-const PROFILE_SELECT_WITH_BIO = "id, uid, email, first_name, last_name, role, year_level, bio, class_id, class_code, student_id, profile_completed, profile_step, xp, status";
+const PROFILE_SELECT_WITH_BIO = "id, uid, email, first_name, middle_name, last_name, role, year_level, bio, class_id, class_code, student_id, profile_completed, profile_step, xp, status";
 const PROFILE_SELECT_LEGACY = "id, uid, email, first_name, last_name, role, year_level, class_id, class_code, student_id, profile_completed, profile_step, xp, status";
 
 function isStrongPassword(value) {
@@ -82,7 +82,7 @@ async function login(req, res) {
 
 async function signup(req, res) {
   try {
-    const { firstName, lastName, email, password } = req.body || {};
+    const { firstName, middleName, lastName, email, password } = req.body || {};
     if (!firstName || !lastName || !email || !password) {
       return errorResponse(res, 400, "firstName, lastName, email, and password are required");
     }
@@ -94,6 +94,7 @@ async function signup(req, res) {
     }
 
     const normalizedEmail = normalizeEmail(email);
+    const normalizedMiddleName = String(middleName || "").trim();
     let data;
     let error;
 
@@ -105,6 +106,7 @@ async function signup(req, res) {
           email_confirm: true,
           user_metadata: {
             first_name: firstName,
+            middle_name: normalizedMiddleName,
             last_name: lastName,
           },
         }),
@@ -121,6 +123,7 @@ async function signup(req, res) {
           options: {
             data: {
               first_name: firstName,
+              middle_name: normalizedMiddleName,
               last_name: lastName,
             },
           },
@@ -156,21 +159,33 @@ async function signup(req, res) {
     );
 
     const preservedRole = existingProfile?.role || "student";
-    const { error: profileError } = await withTimeout(
-      supabase.from("users").upsert({
-        id: user.id,
-        uid: user.id,
-        first_name: firstName,
-        last_name: lastName,
-        email: normalizedEmail,
-        role: preservedRole,
-        profile_completed: existingProfile?.profile_completed ?? false,
-        profile_step: existingProfile?.profile_step ?? 1,
-        xp: existingProfile?.xp ?? INITIAL_STUDENT_XP,
-      }),
+    const profilePayload = {
+      id: user.id,
+      uid: user.id,
+      first_name: firstName,
+      middle_name: normalizedMiddleName,
+      last_name: lastName,
+      email: normalizedEmail,
+      role: preservedRole,
+      profile_completed: existingProfile?.profile_completed ?? false,
+      profile_step: existingProfile?.profile_step ?? 1,
+      xp: existingProfile?.xp ?? INITIAL_STUDENT_XP,
+    };
+
+    let { error: profileError } = await withTimeout(
+      supabase.from("users").upsert(profilePayload),
       10000,
       "Timed out while creating profile row",
     );
+
+    if (profileError && isMissingColumnError(profileError, "middle_name")) {
+      const { middle_name, ...legacyProfilePayload } = profilePayload;
+      ({ error: profileError } = await withTimeout(
+        supabase.from("users").upsert(legacyProfilePayload),
+        10000,
+        "Timed out while creating legacy profile row",
+      ));
+    }
 
     if (profileError) {
       return errorResponse(res, 400, profileError.message);
@@ -206,13 +221,14 @@ async function adminLogin(req, res) {
     if (adminUser && adminPass && username === adminUser && password === adminPass) {
       const normalized = String(username).trim().toLowerCase();
       let resolvedFirstName = process.env.ADMIN_FIRST_NAME || "Prof.";
+      let resolvedMiddleName = process.env.ADMIN_MIDDLE_NAME || "";
       let resolvedLastName = process.env.ADMIN_LAST_NAME || "Cabantog";
 
       // Prefer profile name from DB when the env admin username matches an admin email.
       const { data: profileByEmail } = await withTimeout(
         supabase
           .from("users")
-          .select("first_name, last_name, role")
+          .select("first_name, middle_name, last_name, role")
           .eq("email", normalized)
           .maybeSingle(),
         10000,
@@ -220,13 +236,14 @@ async function adminLogin(req, res) {
       );
       if (profileByEmail && profileByEmail.role === "admin") {
         resolvedFirstName = profileByEmail.first_name || resolvedFirstName;
+        resolvedMiddleName = profileByEmail.middle_name || resolvedMiddleName;
         resolvedLastName = profileByEmail.last_name || resolvedLastName;
       } else {
         // If ADMIN_USER is a username and not an email, use a DB admin profile as fallback.
         const { data: anyAdminProfile } = await withTimeout(
           supabase
             .from("users")
-            .select("first_name, last_name")
+            .select("first_name, middle_name, last_name")
             .eq("role", "admin")
             .limit(1)
             .maybeSingle(),
@@ -235,6 +252,7 @@ async function adminLogin(req, res) {
         );
         if (anyAdminProfile) {
           resolvedFirstName = anyAdminProfile.first_name || resolvedFirstName;
+          resolvedMiddleName = anyAdminProfile.middle_name || resolvedMiddleName;
           resolvedLastName = anyAdminProfile.last_name || resolvedLastName;
         }
       }
@@ -249,6 +267,7 @@ async function adminLogin(req, res) {
         token,
         role: "admin",
         firstName: resolvedFirstName,
+        middleName: resolvedMiddleName,
         lastName: resolvedLastName,
       });
     }
@@ -285,6 +304,7 @@ async function adminLogin(req, res) {
       token,
       role: "admin",
       firstName: profile.first_name || "Prof.",
+      middleName: profile.middle_name || "",
       lastName: profile.last_name || "Cabantog",
     });
   } catch (err) {
@@ -318,7 +338,7 @@ async function getMe(req, res) {
       "Timed out while fetching profile",
     );
 
-    if (error && isMissingColumnError(error, "bio")) {
+    if (error && (isMissingColumnError(error, "bio") || isMissingColumnError(error, "middle_name"))) {
       const legacy = await withTimeout(
         supabase
           .from("users")
@@ -328,13 +348,14 @@ async function getMe(req, res) {
         10000,
         "Timed out while fetching profile (legacy schema)",
       );
-      profile = legacy.data ? { ...legacy.data, bio: "" } : legacy.data;
+      profile = legacy.data ? { ...legacy.data, middle_name: "", bio: "" } : legacy.data;
       error = legacy.error;
     }
 
     // If the auth user exists but profile row is missing, create a default profile.
     if (error || !profile) {
       const firstName = user?.user_metadata?.first_name || "";
+      const middleName = user?.user_metadata?.middle_name || "";
       const lastName = user?.user_metadata?.last_name || "";
       const email = normalizeEmail(user?.email || "");
       const role = user?.user_metadata?.role === "admin" ? "admin" : "student";
@@ -345,6 +366,7 @@ async function getMe(req, res) {
           uid: userId,
           email,
           first_name: firstName,
+          middle_name: middleName,
           last_name: lastName,
           role,
           profile_completed: role === "admin",
@@ -370,7 +392,7 @@ async function getMe(req, res) {
         "Timed out while refetching created profile",
       );
 
-      if (refetch.error && isMissingColumnError(refetch.error, "bio")) {
+      if (refetch.error && (isMissingColumnError(refetch.error, "bio") || isMissingColumnError(refetch.error, "middle_name"))) {
         refetch = await withTimeout(
           supabase
             .from("users")
@@ -381,7 +403,7 @@ async function getMe(req, res) {
           "Timed out while refetching created profile (legacy schema)",
         );
         if (refetch.data) {
-          refetch.data = { ...refetch.data, bio: "" };
+          refetch.data = { ...refetch.data, middle_name: "", bio: "" };
         }
       }
 
@@ -410,7 +432,7 @@ async function updateMe(req, res) {
       return errorResponse(res, 401, "Authenticated user is required");
     }
 
-    const { first_name, last_name, student_id, year_level, bio, class_id, class_code, profile_step, profile_completed } = req.body || {};
+    const { first_name, middle_name, last_name, student_id, year_level, bio, class_id, class_code, profile_step, profile_completed } = req.body || {};
 
     const { data: profile, error: fetchError } = await withTimeout(
       supabase
@@ -428,6 +450,7 @@ async function updateMe(req, res) {
 
     const updatePayload = {};
     if (first_name !== undefined) updatePayload.first_name = first_name;
+    if (middle_name !== undefined) updatePayload.middle_name = middle_name;
     if (last_name !== undefined) updatePayload.last_name = last_name;
     if (student_id !== undefined) updatePayload.student_id = student_id;
     if (year_level !== undefined) updatePayload.year_level = year_level;
@@ -474,8 +497,12 @@ async function updateMe(req, res) {
       "Timed out while updating profile",
     );
 
-    if (updateError && bio !== undefined && isMissingColumnError(updateError, "bio")) {
-      delete updatePayload.bio;
+    if (updateError && (
+      (bio !== undefined && isMissingColumnError(updateError, "bio")) ||
+      (middle_name !== undefined && isMissingColumnError(updateError, "middle_name"))
+    )) {
+      if (bio !== undefined) delete updatePayload.bio;
+      if (middle_name !== undefined) delete updatePayload.middle_name;
       const retry = await withTimeout(
         supabase.from("users").update(updatePayload).eq("id", userId),
         10000,

@@ -19,6 +19,7 @@ function isAllowedInstitutionalEmail(value) {
 export default function SignupPage() {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +46,7 @@ export default function SignupPage() {
         method: "POST",
         body: {
           firstName: firstName.trim(),
+          middleName: middleName.trim(),
           lastName: lastName.trim(),
           email: normalizedEmail,
           password,
@@ -82,6 +84,16 @@ export default function SignupPage() {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="Enter first name"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Middle Name</label>
+            <input
+              className={styles.input}
+              value={middleName}
+              onChange={(e) => setMiddleName(e.target.value)}
+              placeholder="Enter middle name"
             />
           </div>
 

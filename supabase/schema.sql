@@ -3,6 +3,7 @@ create table if not exists public.users (
   id uuid primary key references auth.users(id) on delete cascade,
   uid uuid unique,
   first_name text,
+  middle_name text,
   last_name text,
   email text unique not null,
   role text default 'student',
@@ -22,6 +23,7 @@ create table if not exists public.users (
 alter table public.users add column if not exists class_code text;
 alter table public.users add column if not exists class_id bigint;
 alter table public.users add column if not exists bio text;
+alter table public.users add column if not exists middle_name text;
 
 create or replace function public.has_users_auth_fk_cascade()
 returns boolean

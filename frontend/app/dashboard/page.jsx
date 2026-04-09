@@ -74,6 +74,9 @@ export default function StudentDashboardPage() {
   }
 
   const firstName = profile?.first_name || "Student";
+  const middleName = profile?.middle_name || "";
+  const lastName = profile?.last_name || "";
+  const fullName = [firstName, middleName, lastName].filter(Boolean).join(" ");
   const studentId = profile?.student_id || "N/A";
   const yearLevel = profile?.year_level || "N/A";
   const classId = Number(profile?.class_id || 0);
@@ -169,7 +172,7 @@ export default function StudentDashboardPage() {
             <>
               <section className={styles.hero}>
                 <div>
-                  <h1>Welcome back, {firstName}!</h1>
+                  <h1>Welcome back, {fullName || firstName}!</h1>
                   <p>Student ID: {studentId} | Year: {yearLevel} | Class: {classCode || "Not set"}</p>
                 </div>
                 <div className={styles.levelBox}>

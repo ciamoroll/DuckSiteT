@@ -51,6 +51,9 @@ export default function LeaderboardPage() {
   }
 
   const firstName = profile?.first_name || "Student";
+  const middleName = profile?.middle_name || "";
+  const lastName = profile?.last_name || "";
+  const currentUserName = [firstName, middleName, lastName].filter(Boolean).join(" ") || firstName;
   const xp = Number(profile?.xp || 0);
   const level = Math.floor(xp / 500) + 1;
   const userRankIndex = leaders.findIndex((row) => profile && profile.id === row.id);
@@ -95,7 +98,7 @@ export default function LeaderboardPage() {
                 ) : (
                   <div className={styles.leaderList}>
                     {leaders.map((row, index) => {
-                      const studentName = row.name || row.first_name || "Student";
+                      const studentName = row.name || [row.first_name, row.middle_name, row.last_name].filter(Boolean).join(" ") || "Student";
                       const studentXp = Number(row.xp || 0);
                       const studentLevel = Math.floor(studentXp / 500) + 1;
                       const isCurrentUser = profile && profile.id === row.id;
@@ -132,7 +135,7 @@ export default function LeaderboardPage() {
                     <div className={styles.rankInfo}>
                       <span className={styles.rankNumber}>#{userRankIndex + 1}</span>
                       <div>
-                        <h4>{firstName}</h4>
+                        <h4>{currentUserName}</h4>
                         <p>Level {level}</p>
                       </div>
                     </div>
