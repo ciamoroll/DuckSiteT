@@ -148,29 +148,49 @@ export default function ProfileSetupPage() {
   }
 
   async function handleComplete() {
-    if (!formData.classId) {
+    const normalizedClassId = Number(formData.classId || profile?.class_id || 0);
+
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      alert("Please fill in first and last name before completing your profile");
+      return;
+    }
+
+    if (!formData.studentId.trim()) {
+      alert("Please enter your student ID before completing your profile");
+      return;
+    }
+
+    if (!formData.yearLevel) {
+      alert("Please select your year level before completing your profile");
+      return;
+    }
+
+    if (!Number.isInteger(normalizedClassId) || normalizedClassId <= 0) {
       alert("Please select your class before completing your profile");
       return;
     }
 
+    const payload = {
+      first_name: formData.firstName.trim(),
+      last_name: formData.lastName.trim(),
+      student_id: formData.studentId.trim(),
+      year_level: formData.yearLevel,
+      bio: formData.bio,
+      class_id: normalizedClassId,
+      profile_completed: true,
+      profile_step: 3,
+    };
+
     try {
       await apiRequest("/api/auth/me", {
         method: "PUT",
-        body: {
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          student_id: formData.studentId,
-          year_level: formData.yearLevel,
-          bio: formData.bio,
-          class_id: formData.classId || null,
-          profile_completed: true,
-          profile_step: 3,
-        },
+        body: payload,
         student: true,
       });
       alert("Profile completed successfully!");
       router.push("/dashboard");
     } catch (err) {
+      console.error("[Profile Complete] Failed to update profile", { payload, error: err });
       alert("Error completing profile: " + err.message);
     }
   }
