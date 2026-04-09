@@ -8,6 +8,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import styles from "./AudioProvider.module.css";
 
@@ -18,6 +19,35 @@ const STORAGE_KEYS = {
   muted: "ducksite:bg-music-muted",
   volume: "ducksite:bg-music-volume",
 };
+
+function getInitialVolume() {
+  if (typeof window === "undefined") return 0.65;
+  try {
+    const rawVol = localStorage.getItem(STORAGE_KEYS.volume);
+    if (rawVol != null) {
+      const n = Number(rawVol);
+      if (!Number.isNaN(n) && n >= 0 && n <= 1) {
+        return n;
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  return 0.65;
+}
+
+function getInitialMuted() {
+  if (typeof window === "undefined") return false;
+  try {
+    const rawMuted = localStorage.getItem(STORAGE_KEYS.muted);
+    if (rawMuted === "true" || rawMuted === "false") {
+      return rawMuted === "true";
+    }
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
 
 const AudioContext = createContext(null);
 
@@ -134,10 +164,15 @@ function MusicControls() {
 
 export default function AudioProvider({ children }) {
   const [playing, setPlaying] = useState(false);
-  const [muted, setMutedState] = useState(false);
-  const [volume, setVolumeState] = useState(0.65);
-  const [hydrated, setHydrated] = useState(false);
+  const [muted, setMutedState] = useState(getInitialMuted);
+  const [volume, setVolumeState] = useState(getInitialVolume);
   const [musicExpanded, setMusicExpanded] = useState(false);
+
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const ytPlayerRef = useRef(null);
   const volumeRef = useRef(volume);
@@ -150,25 +185,6 @@ export default function AudioProvider({ children }) {
   useEffect(() => {
     mutedRef.current = muted;
   }, [muted]);
-
-  useEffect(() => {
-    try {
-      const rawVol = localStorage.getItem(STORAGE_KEYS.volume);
-      const rawMuted = localStorage.getItem(STORAGE_KEYS.muted);
-      if (rawVol != null) {
-        const n = Number(rawVol);
-        if (!Number.isNaN(n) && n >= 0 && n <= 1) {
-          setVolumeState(n);
-        }
-      }
-      if (rawMuted === "true" || rawMuted === "false") {
-        setMutedState(rawMuted === "true");
-      }
-    } catch {
-      /* ignore */
-    }
-    setHydrated(true);
-  }, []);
 
   useEffect(() => {
     if (!hydrated || typeof window === "undefined") return;
