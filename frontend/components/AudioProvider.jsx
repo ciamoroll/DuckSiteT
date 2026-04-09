@@ -205,6 +205,8 @@ export default function AudioProvider({ children }) {
         width: "100%",
         height: "100%",
         playerVars: {
+          origin: window.location.origin,
+          enablejsapi: 1,
           autoplay: 0,
           controls: 0,
           rel: 0,
