@@ -125,11 +125,11 @@ export default function CourseStagesPage() {
       let lockMessage = "Unlocked";
       if (solved) lockMessage = "Completed";
       else if (!isUnlocked && !meetsXp && previousLessonId != null && !meetsPrerequisite) {
-        lockMessage = `Locked: ${requiredXp} XP and Lesson ${index} completion required`;
+        lockMessage = `Locked: ${requiredXp} XP and Task ${index} completion required`;
       } else if (!isUnlocked && !meetsXp) {
         lockMessage = `Locked: ${requiredXp} XP required`;
       } else if (!isUnlocked && previousLessonId != null && !meetsPrerequisite) {
-        lockMessage = `Locked: Finish Lesson ${index} first`;
+        lockMessage = `Locked: Finish Task ${index} first`;
       }
 
       return {
@@ -172,13 +172,13 @@ export default function CourseStagesPage() {
 
           <section className={styles.heading}>
             <h1>{course?.name || "Course Stages"}</h1>
-            <p>Choose a lesson to start. Higher lessons unlock at higher XP.</p>
+            <p>Choose a task to start. Higher tasks unlock at higher XP.</p>
           </section>
 
           {loading ? (
             <section className={styles.loading}>Loading stages...</section>
           ) : lessonsView.length === 0 ? (
-            <section className={styles.loading}>No lessons/challenges configured for this course.</section>
+            <section className={styles.loading}>No tasks/challenges configured for this course.</section>
           ) : (
             <section className={styles.lilyGrid}>
               {lessonsView.map((lesson) => (
@@ -188,12 +188,12 @@ export default function CourseStagesPage() {
                     <span className={styles.eye} />
                   </div>
                   <div className={styles.duckBill} aria-hidden="true" />
-                  <div className={styles.padTop}>Lesson {lesson.lessonNo}</div>
+                  <div className={styles.padTop}>Task {lesson.lessonNo}</div>
                   {!lesson.isUnlocked ? (
                     <div className={styles.unlockMeta}>
                       {!lesson.meetsXp
                         ? `Unlocks at ${lesson.requiredXp} XP`
-                        : `Finish Lesson ${lesson.previousLessonNo} to unlock`}
+                        : `Finish Task ${lesson.previousLessonNo} to unlock`}
                     </div>
                   ) : null}
                   <small>{lesson.lockMessage}</small>

@@ -131,12 +131,12 @@ export default function LessonChallengePage() {
   const lockMessage = useMemo(() => {
     if (isUnlocked) return "";
     if (!meetsXp && previousLessonNo != null && !meetsPrerequisite) {
-      return `This lesson is locked. You need ${requiredXp} XP and must finish Lesson ${previousLessonNo} first.`;
+      return `This task is locked. You need ${requiredXp} XP and must finish Task ${previousLessonNo} first.`;
     }
     if (!meetsXp) {
-      return `This lesson is locked. You need ${requiredXp} XP to unlock it.`;
+      return `This task is locked. You need ${requiredXp} XP to unlock it.`;
     }
-    return `This lesson is locked. Finish Lesson ${previousLessonNo} first.`;
+    return `This task is locked. Finish Task ${previousLessonNo} first.`;
   }, [isUnlocked, meetsXp, meetsPrerequisite, requiredXp, previousLessonNo]);
 
   async function submitAnswer() {
@@ -189,15 +189,15 @@ export default function LessonChallengePage() {
           </header>
 
           {loading ? (
-            <section className={styles.loading}>Loading lesson...</section>
+            <section className={styles.loading}>Loading task...</section>
           ) : !challenge ? (
-            <section className={styles.loading}>Lesson not found or not accessible.</section>
+            <section className={styles.loading}>Task not found or not accessible.</section>
           ) : !isUnlocked ? (
             <section className={styles.loading}>{lockMessage}</section>
           ) : (
             <section className={styles.lessonWrap}>
               <h1>{course?.name || "Course"}</h1>
-              <h2>{challenge.title || "Lesson Challenge"}</h2>
+              <h2>{challenge.title || "Task Challenge"}</h2>
               <p className={styles.question}>{challenge.question_text || "No question provided."}</p>
               <p className={styles.reward}>Reward: {Number(challenge.points || 0)} XP</p>
 

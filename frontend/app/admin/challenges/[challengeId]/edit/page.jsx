@@ -183,8 +183,8 @@ export default function EditChallengePage() {
             <section className={styles.formSection}>
               <h4>Progress & Rewards</h4>
 
-              <label className={styles.fieldLabel}>Lesson Order</label>
-              <input type="number" placeholder="Lesson Order" value={formData.lesson_order} onChange={(e) => setFormData({ ...formData, lesson_order: parseInt(e.target.value, 10) || 1 })} min={1} />
+              <label className={styles.fieldLabel}>Task Order</label>
+              <input type="number" placeholder="Task Order" value={formData.lesson_order} onChange={(e) => setFormData({ ...formData, lesson_order: parseInt(e.target.value, 10) || 1 })} min={1} />
 
               <label className={styles.fieldLabel}>Required XP</label>
               <input type="number" placeholder="Required XP" value={formData.required_xp} onChange={(e) => setFormData({ ...formData, required_xp: parseInt(e.target.value, 10) || 0 })} min={0} />

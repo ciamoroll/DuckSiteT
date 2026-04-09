@@ -59,7 +59,7 @@ export default function ChallengesPage() {
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
-                <tr><th>Title</th><th>Course</th><th>Lesson</th><th>Unlock XP</th><th>Points</th><th>Status</th><th>Completed</th><th>Actions</th></tr>
+                <tr><th>Title</th><th>Course</th><th>Task</th><th>Unlock XP</th><th>Points</th><th>Status</th><th>Completed</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 {challenges.map((challenge) => {
@@ -68,7 +68,7 @@ export default function ChallengesPage() {
                     <tr key={challenge.id}>
                       <td>{challenge.title || "—"}</td>
                       <td>{courseName}</td>
-                      <td>{Number(challenge.lesson_order || 1)}</td>
+                      <td>Task {Number(challenge.lesson_order || 1)}</td>
                       <td>{Number(challenge.required_xp || 0)}</td>
                       <td>{challenge.points || 0}</td>
                       <td>{challenge.status || "Active"}</td>
