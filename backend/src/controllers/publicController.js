@@ -457,6 +457,11 @@ async function enrollMyCourse(req, res) {
     if (profileError || !profile) return errorResponse(res, 404, "Student profile not found");
     if (profile.role !== "student") return errorResponse(res, 403, "Only students can enroll in courses");
 
+    const validClassId = await getValidatedStudentClassId(profile);
+    if (!validClassId) {
+      return errorResponse(res, 403, "Please select your class before enrolling in courses");
+    }
+
     const { data: course, error: courseError } = await supabase
       .from("courses")
       .select("id, classes")
@@ -467,7 +472,7 @@ async function enrollMyCourse(req, res) {
 
     let allowedForClass = true;
     try {
-      const allowedIds = await getAllowedCourseIds([courseId], profile.class_id);
+      const allowedIds = await getAllowedCourseIds([courseId], validClassId);
       allowedForClass = allowedIds.includes(courseId);
     } catch (_err) {
       const courseClasses = Array.isArray(course.classes)

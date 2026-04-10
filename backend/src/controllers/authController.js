@@ -437,7 +437,7 @@ async function updateMe(req, res) {
     const { data: profile, error: fetchError } = await withTimeout(
       supabase
         .from("users")
-        .select("role")
+        .select("role, class_id")
         .eq("id", userId)
         .single(),
       10000,
@@ -459,6 +459,18 @@ async function updateMe(req, res) {
     const normalizedClassId = hasClassId
       ? (class_id ? Number(class_id) : null)
       : undefined;
+
+    if (hasClassId && normalizedClassId !== null && (!Number.isInteger(normalizedClassId) || normalizedClassId <= 0)) {
+      return errorResponse(res, 400, "class_id must be a positive integer");
+    }
+
+    // Students can set class once; changing it later is not allowed.
+    const existingClassId = Number(profile.class_id || 0);
+    if (hasClassId && Number.isInteger(existingClassId) && existingClassId > 0) {
+      if (normalizedClassId !== existingClassId) {
+        return errorResponse(res, 403, "Class section is locked and cannot be changed");
+      }
+    }
 
     if (hasClassId) {
       updatePayload.class_id = normalizedClassId;

@@ -159,6 +159,35 @@ where u.class_id is null
   and u.class_code is not null
   and cls.code = u.class_code;
 
+-- Keep users.class_id and users.class_code aligned for legacy/inconsistent rows.
+update public.users u
+set class_code = cls.code
+from public.classes cls
+where u.class_id = cls.id
+  and (
+    u.class_code is null
+    or btrim(u.class_code) = ''
+    or u.class_code <> cls.code
+  );
+
+update public.users u
+set class_id = cls.id
+from public.classes cls
+where (u.class_id is null)
+  and u.class_code is not null
+  and btrim(u.class_code) <> ''
+  and lower(cls.code) = lower(btrim(u.class_code));
+
+update public.users u
+set class_code = cls.code
+from public.classes cls
+where u.class_id = cls.id
+  and (
+    u.class_code is null
+    or btrim(u.class_code) = ''
+    or u.class_code <> cls.code
+  );
+
 insert into public.course_enrollments (user_id, course_id)
 select u.id, c.id
 from public.users u

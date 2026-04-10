@@ -1,7 +1,7 @@
 const { supabase } = require("../services/supabaseService");
 const { errorResponse } = require("../utils/response");
 
-function toStudentRowsFromXp(users) {
+function toStudentRowsFromXp(users, resolveClassCode = null) {
   return (users || []).map((u) => {
     const xp = Number(u.xp || 0);
     const progress = Math.max(0, Math.min(100, Math.round((xp / 2000) * 100)));
@@ -9,6 +9,9 @@ function toStudentRowsFromXp(users) {
     return {
       id: u.id,
       name: [u.first_name, u.last_name].filter(Boolean).join(" ") || "Student",
+      class_code: typeof resolveClassCode === "function"
+        ? resolveClassCode(u)
+        : String(u.class_code || ""),
       module: u.year_level || "General Track",
       progress,
       status,
@@ -34,12 +37,43 @@ async function buildProgressRows(users, scopedCourseIds = null) {
   const studentRows = users || [];
   if (studentRows.length === 0) return [];
 
+  const classCodeById = new Map();
+  const classIds = Array.from(
+    new Set(
+      studentRows
+        .map((row) => Number(row.class_id))
+        .filter((id) => Number.isInteger(id) && id > 0)
+    )
+  );
+  if (classIds.length > 0) {
+    const { data: classes, error: classesError } = await supabase
+      .from("classes")
+      .select("id, code")
+      .in("id", classIds);
+    if (classesError) {
+      throw new Error(classesError.message);
+    }
+    for (const row of classes || []) {
+      classCodeById.set(Number(row.id), String(row.code || "").trim());
+    }
+  }
+
+  const resolveClassCode = (row) => {
+    const directCode = String(row?.class_code || "").trim();
+    if (directCode) return directCode;
+    const classId = Number(row?.class_id);
+    if (Number.isInteger(classId) && classId > 0) {
+      return String(classCodeById.get(classId) || "").trim();
+    }
+    return "";
+  };
+
   const scopedCourseSet = Array.isArray(scopedCourseIds)
     ? new Set(scopedCourseIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0))
     : null;
 
   const studentIds = studentRows.map((u) => u.id).filter(Boolean);
-  if (studentIds.length === 0) return toStudentRowsFromXp(studentRows);
+  if (studentIds.length === 0) return toStudentRowsFromXp(studentRows, resolveClassCode);
 
   const { data: enrollments, error: enrollmentError } = await supabase
     .from("course_enrollments")
@@ -48,7 +82,7 @@ async function buildProgressRows(users, scopedCourseIds = null) {
 
   if (enrollmentError) {
     if (isTableMissing(enrollmentError, "course_enrollments")) {
-      return toStudentRowsFromXp(studentRows);
+      return toStudentRowsFromXp(studentRows, resolveClassCode);
     }
     throw new Error(enrollmentError.message);
   }
@@ -70,6 +104,7 @@ async function buildProgressRows(users, scopedCourseIds = null) {
     return studentRows.map((u) => ({
       id: u.id,
       name: [u.first_name, u.last_name].filter(Boolean).join(" ") || "Student",
+      class_code: resolveClassCode(u),
       module: u.year_level || "General Track",
       progress: 0,
       status: "Not Started",
@@ -115,7 +150,7 @@ async function buildProgressRows(users, scopedCourseIds = null) {
 
     if (attemptsError) {
       if (isTableMissing(attemptsError, "challenge_attempts")) {
-        return toStudentRowsFromXp(studentRows);
+        return toStudentRowsFromXp(studentRows, resolveClassCode);
       }
       throw new Error(attemptsError.message);
     }
@@ -150,6 +185,7 @@ async function buildProgressRows(users, scopedCourseIds = null) {
     return {
       id: u.id,
       name: [u.first_name, u.last_name].filter(Boolean).join(" ") || "Student",
+      class_code: resolveClassCode(u),
       module: u.year_level || "General Track",
       progress,
       status,
@@ -234,7 +270,7 @@ async function listProgress(req, res) {
 
     let usersQuery = supabase
       .from("users")
-      .select("id, first_name, last_name, xp, year_level, updated_at, profile_completed, role")
+      .select("id, first_name, last_name, class_id, class_code, xp, year_level, updated_at, profile_completed, role")
       .eq("role", "student")
       .order("updated_at", { ascending: false });
 
@@ -273,7 +309,7 @@ async function getProgressSummary(req, res) {
 
     let usersQuery = supabase
       .from("users")
-      .select("id, first_name, last_name, xp, year_level, updated_at, profile_completed, role")
+      .select("id, first_name, last_name, class_id, class_code, xp, year_level, updated_at, profile_completed, role")
       .eq("role", "student");
 
     if (Array.isArray(scopedStudentIds)) {

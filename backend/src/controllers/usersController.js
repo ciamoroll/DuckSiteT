@@ -135,8 +135,54 @@ async function updateUser(req, res) {
     if (raw.middle_name !== undefined) payload.middle_name = raw.middle_name;
     if (raw.last_name !== undefined) payload.last_name = raw.last_name;
     if (raw.year_level !== undefined) payload.year_level = raw.year_level;
-    if (raw.class_id !== undefined) payload.class_id = raw.class_id;
-    if (raw.class_code !== undefined) payload.class_code = raw.class_code;
+
+    // Keep class_id and class_code synchronized to avoid inconsistent student class state.
+    if (raw.class_id !== undefined) {
+      const normalizedClassId = raw.class_id ? Number(raw.class_id) : null;
+      if (normalizedClassId !== null && (!Number.isInteger(normalizedClassId) || normalizedClassId <= 0)) {
+        return errorResponse(res, 400, "class_id must be a positive integer");
+      }
+
+      payload.class_id = normalizedClassId;
+
+      if (normalizedClassId === null) {
+        payload.class_code = null;
+      } else {
+        const { data: classRow, error: classError } = await supabase
+          .from("classes")
+          .select("code")
+          .eq("id", normalizedClassId)
+          .maybeSingle();
+        if (classError) {
+          return errorResponse(res, 400, classError.message);
+        }
+        if (!classRow) {
+          return errorResponse(res, 400, "Invalid class_id");
+        }
+        payload.class_code = classRow.code || null;
+      }
+    } else if (raw.class_code !== undefined) {
+      const normalizedClassCode = String(raw.class_code || "").trim();
+      if (!normalizedClassCode) {
+        payload.class_code = null;
+        payload.class_id = null;
+      } else {
+        const { data: classRow, error: classError } = await supabase
+          .from("classes")
+          .select("id, code")
+          .eq("code", normalizedClassCode)
+          .maybeSingle();
+        if (classError) {
+          return errorResponse(res, 400, classError.message);
+        }
+        if (!classRow) {
+          return errorResponse(res, 400, "Invalid class_code");
+        }
+        payload.class_id = classRow.id;
+        payload.class_code = classRow.code;
+      }
+    }
+
     if (raw.student_id !== undefined) payload.student_id = raw.student_id;
     if (raw.status !== undefined) payload.status = raw.status;
 

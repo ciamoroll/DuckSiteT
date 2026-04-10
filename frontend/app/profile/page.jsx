@@ -89,6 +89,12 @@ export default function ProfileSetupPage() {
   }
 
   async function enrollCourse(courseId) {
+    const selectedClassId = Number(formData.classId || profile?.class_id || 0);
+    if (!Number.isInteger(selectedClassId) || selectedClassId <= 0) {
+      alert("Please select your class before enrolling in courses.");
+      return;
+    }
+
     setEnrollingCourseId(courseId);
     try {
       await apiRequest("/api/public/my-courses/enroll", {
@@ -144,6 +150,9 @@ export default function ProfileSetupPage() {
         },
         student: true,
       });
+      if (step === 2 && Number.isInteger(Number(formData.classId || 0)) && Number(formData.classId || 0) > 0) {
+        setProfile((prev) => (prev ? { ...prev, class_id: Number(formData.classId) } : prev));
+      }
       setCurrentStep(step + 1);
     } catch (err) {
       alert("Error saving profile: " + err.message);
@@ -223,14 +232,18 @@ export default function ProfileSetupPage() {
 
   const currentClassId = Number(formData.classId || profile?.class_id || 0);
   const hasClassSelected = Number.isInteger(currentClassId) && currentClassId > 0;
+  const classLocked = Number.isInteger(Number(profile?.class_id || 0)) && Number(profile?.class_id || 0) > 0;
+  const selectedClass = classes.find((cls) => Number(cls.id) === currentClassId) || null;
+  const selectedClassLabel = selectedClass ? `${selectedClass.name} (${selectedClass.code})` : "";
   const fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
   const enrolledIds = new Set(myCourses.map((course) => Number(course.id)));
   const availableToEnroll = allCourses.filter((course) => {
     if (enrolledIds.has(Number(course.id))) return false;
+    if (!hasClassSelected) return false;
     const allowedClassIds = Array.isArray(course.class_ids)
       ? course.class_ids.map((value) => Number(value)).filter((id) => Number.isInteger(id) && id > 0)
       : [];
-    if (allowedClassIds.length === 0) return true;
+    if (allowedClassIds.length === 0) return hasClassSelected;
     return Number.isInteger(currentClassId) && currentClassId > 0 && allowedClassIds.includes(currentClassId);
   });
 
@@ -313,38 +326,51 @@ export default function ProfileSetupPage() {
 
             <section className={styles.settingsCard}>
               <h3>Class Selection</h3>
-              <p className={styles.settingsSubtitle}>Select and manage your class</p>
+              <p className={styles.settingsSubtitle}>Your section determines which courses are available.</p>
               
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Select Class</label>
-                <select
-                  value={formData.classId || ""}
-                  onChange={async (e) => {
-                    const newClassId = e.target.value ? Number(e.target.value) : null;
-                    setFormData({ ...formData, classId: newClassId });
-                    if (!newClassId) return;
-                    try {
-                      await apiRequest("/api/auth/me", {
-                        method: "PUT",
-                        body: { class_id: newClassId },
-                        student: true,
-                      });
-                      const myCoursesData = await apiRequest("/api/public/my-courses", { student: true });
-                      setMyCourses(myCoursesData?.courses || []);
-                    } catch (err) {
-                      alert("Failed to update class: " + err.message);
-                    }
-                  }}
-                  className={styles.formInput}
-                >
-                  <option value="">Select your class</option>
-                  {classes.map((cls) => (
-                    <option key={cls.id} value={cls.id}>{cls.name} ({cls.code})</option>
-                  ))}
-                </select>
-                {!hasClassSelected ? (
-                  <p className={styles.settingsSubtitle}>Select your class to see class-based courses (auto-saved).</p>
-                ) : null}
+              <div className={styles.classPanel}>
+                <div className={styles.classPanelHeader}>
+                  <span className={styles.classPill}>Class Section</span>
+                  <span className={`${styles.classState} ${classLocked ? styles.classStateLocked : styles.classStateOpen}`}>
+                    {classLocked ? "Locked" : "Not Set"}
+                  </span>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Section</label>
+                  <select
+                    value={formData.classId || ""}
+                    disabled={classLocked}
+                    onChange={async (e) => {
+                      const newClassId = e.target.value ? Number(e.target.value) : null;
+                      setFormData({ ...formData, classId: newClassId });
+                      if (!newClassId) return;
+                      try {
+                        await apiRequest("/api/auth/me", {
+                          method: "PUT",
+                          body: { class_id: newClassId },
+                          student: true,
+                        });
+                        const myCoursesData = await apiRequest("/api/public/my-courses", { student: true });
+                        setMyCourses(myCoursesData?.courses || []);
+                      } catch (err) {
+                        alert("Failed to update class: " + err.message);
+                      }
+                    }}
+                    className={styles.formInput}
+                  >
+                    <option value="">Select your section</option>
+                    {classes.map((cls) => (
+                      <option key={cls.id} value={cls.id}>{cls.name} ({cls.code})</option>
+                    ))}
+                  </select>
+                </div>
+
+                <p className={styles.classPanelHint}>
+                  {classLocked
+                    ? `Assigned section: ${selectedClassLabel || "Assigned section"}. You cannot change this.`
+                    : "Select your section once. After it is saved, it will be locked."}
+                </p>
               </div>
 
               <button onClick={() => router.push("/dashboard")} className={styles.btnSecondary}>
@@ -494,18 +520,25 @@ export default function ProfileSetupPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Select Class</label>
-                <select
-                  value={formData.classId || ""}
-                  onChange={(e) => setFormData({ ...formData, classId: e.target.value ? Number(e.target.value) : null })}
-                  className={styles.formInput}
-                >
-                  <option value="">Select your class</option>
-                  {classes.map((cls) => (
-                    <option key={cls.id} value={cls.id}>{cls.name} ({cls.code})</option>
-                  ))}
-                </select>
-                <small style={{ marginTop: "4px", display: "block", color: "#666" }}>Pro tip: Class selection will auto-save and populate your course list after profile completion.</small>
+                <label className={styles.formLabel}>Class Section</label>
+                <div className={styles.classPanelCompact}>
+                  <select
+                    value={formData.classId || ""}
+                    disabled={classLocked}
+                    onChange={(e) => setFormData({ ...formData, classId: e.target.value ? Number(e.target.value) : null })}
+                    className={styles.formInput}
+                  >
+                    <option value="">Select your section</option>
+                    {classes.map((cls) => (
+                      <option key={cls.id} value={cls.id}>{cls.name} ({cls.code})</option>
+                    ))}
+                  </select>
+                  <small className={styles.classPanelHintInline}>
+                    {classLocked
+                      ? `Locked section: ${selectedClassLabel || "Assigned section"}.`
+                      : "Pick your section carefully. It becomes locked after saving."}
+                  </small>
+                </div>
               </div>
               <div className={styles.buttonGroup}>
                 <button onClick={() => setCurrentStep(1)} className={styles.btnSecondary}>
