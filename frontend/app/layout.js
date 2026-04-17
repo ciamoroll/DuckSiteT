@@ -13,7 +13,7 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/images/favicon.png" />
       </head>
       <body>
-        <AudioProvider>{children}</AudioProvider>
+        {children}
       </body>
     </html>
   );
