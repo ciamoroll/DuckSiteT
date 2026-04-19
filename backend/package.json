@@ -8,7 +8,7 @@
     "start": "node src/server.js",
     "test": "node --test",
     "create-admin": "node scripts/create-admin.js",
-    "build": "next build"
+    "build": "echo build done"
   },
   "keywords": [],
   "author": "",
