@@ -16,7 +16,29 @@ const { makeErrorId } = require("./utils/response");
 
 const app = express();
 
-app.use(cors());
+const defaultAllowedOrigins = [
+  "https://ducksite-ne14006pn-patricias-projects-ee9e3b1c.vercel.app",
+  "http://localhost:3000",
+];
+
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  : defaultAllowedOrigins;
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Allow non-browser tools (no Origin header) and configured frontend origins.
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(requestLogger);
 
