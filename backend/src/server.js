@@ -17,7 +17,7 @@ const { makeErrorId } = require("./utils/response");
 const app = express();
 
 const defaultAllowedOrigins = [
-  "https://ducksite-ne14006pn-patricias-projects-ee9e3b1c.vercel.app",
+  "https://ducksitet.vercel.app/",
   "http://localhost:3000",
 ];
 
