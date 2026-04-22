@@ -2,7 +2,7 @@ import "./globals.css";
 import AudioProvider from "@/components/AudioProvider";
 
 export const metadata = {
-  title: "Ducksite",
+  title: "DuckSiteT", 
   description: "Learning platform frontend",
 };
 
