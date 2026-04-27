@@ -3,26 +3,26 @@
 .btn_primary, .btn_secondary, .btn_edit, .btn_delete { border-radius: 8px; border: 1px solid transparent; font-weight: 700; cursor: pointer; }
 
 .btn_primary {
-  background: linear-gradient(180deg, #5e82d5, #476bbf);
+  background: linear-gradient(180deg, #3c9932, #368d2c);
   color: #f4f8ff;
-  border-color: #3f62aa;
+  border-color: #234f1e;
   padding: 10px 14px;
   width: fit-content;
 }
 
-.btn_primary:hover { background: linear-gradient(180deg, #6d91de, #5276c8); }
+.btn_primary:hover { background: linear-gradient(180deg, #2a8121, #368a2d); }
 
 .btn_secondary {
   background: #edf2ff;
-  color: #3f5f99;
+  color: #234f1e;
   border-color: #ccd8f2;
   padding: 10px 14px;
 }
 
 .btn_edit {
-  background: linear-gradient(180deg, #5f83d6, #4a6fbe);
+  background: linear-gradient(180deg, #2d9622, #34a028);
   color: #f4f8ff;
-  border-color: #3e60a8;
+  border-color: #234f1e;
   padding: 7px 11px;
   font-size: 12px;
 }
@@ -42,14 +42,14 @@
   padding: 14px;
 }
 
-.form h3 { margin: 0 0 12px; color: #2a467f; font-size: 26px; }
+.form h3 { margin: 0 0 12px; color: #234f1e; font-size: 26px; }
 
 .form input, .form textarea, .form select {
   width: 100%;
   border: 1px solid #d6dff3;
   border-radius: 7px;
   background: #fdfefe;
-  color: #263d6e;
+  color: #234f1e;
   padding: 10px 11px;
   font-size: 14px;
   margin-bottom: 10px;
@@ -57,8 +57,8 @@
 
 .form input:focus, .form textarea:focus, .form select:focus {
   outline: none;
-  border-color: #5f84d3;
-  box-shadow: 0 0 0 3px rgba(96, 133, 211, 0.14);
+  border-color: #489140;
+  box-shadow: 0 0 0 3px #34832b;
 }
 
 .form textarea { min-height: 84px; resize: vertical; }
@@ -69,12 +69,12 @@
 .tableWrap { overflow-x: auto; border: 1px solid #dbe4f8; border-radius: 9px; background: #ffffff; }
 .table { width: 100%; border-collapse: collapse; background: #fff; }
 .table thead { background: #eef2ff; }
-.table th, .table td { border-bottom: 1px solid #e4ebfa; color: #39507e; padding: 9px 10px; text-align: left; font-size: 14px; }
-.table th { font-size: 13px; color: #5770a4; }
+.table th, .table td { border-bottom: 1px solid #e4ebfa; color: #234f1e; padding: 9px 10px; text-align: left; font-size: 14px; }
+.table th { font-size: 13px; color: #234f1e; }
 .table tbody tr:hover { background: #f5f8ff; }
 
 .actions { white-space: nowrap; }
 .actionButtons { display: flex; gap: 8px; align-items: center; }
 
-.table a { color: #416ac2; text-decoration: none; font-weight: 700; }
+.table a { color: #234f1e; text-decoration: none; font-weight: 700; }
 .table a:hover { text-decoration: underline; }

@@ -3,9 +3,9 @@
 .btn_primary, .btn_secondary, .btn_delete { border-radius: 8px; border: 1px solid transparent; font-weight: 700; cursor: pointer; }
 
 .btn_primary, .btn_primary_link {
-  background: linear-gradient(180deg, #5e82d5, #476bbf);
+  background: linear-gradient(180deg, #4a8a43, #47a13d);
   color: #f4f8ff;
-  border: 1px solid #3f62aa;
+  border: 1px solid #234f1e;
   padding: 10px 14px;
   width: fit-content;
   text-decoration: none;
@@ -16,15 +16,15 @@
 
 .btn_secondary {
   background: #edf2ff;
-  color: #3f5f99;
+  color: #234f1e;
   border-color: #ccd8f2;
   padding: 10px 14px;
 }
 
 .btn_edit, .btn_edit_link {
-  background: linear-gradient(180deg, #5f83d6, #4a6fbe);
+  background: linear-gradient(180deg, #3d8336, #46a53b);
   color: #f4f8ff;
-  border: 1px solid #3e60a8;
+  border: 1px solid #234f1e;
   border-radius: 8px;
   padding: 7px 11px;
   font-size: 12px;
@@ -54,7 +54,7 @@
   border: 1px solid #d6dff3;
   border-radius: 7px;
   background: #fdfefe;
-  color: #263d6e;
+  color: #234f1e;
   padding: 10px 11px;
   font-size: 14px;
   margin-bottom: 10px;
@@ -62,8 +62,8 @@
 
 .form input:focus, .form textarea:focus, .form select:focus {
   outline: none;
-  border-color: #5f84d3;
-  box-shadow: 0 0 0 3px rgba(96, 133, 211, 0.14);
+  border-color: #3c8b34;
+  box-shadow: 0 0 0 3px #5fb655;
 }
 
 .form_buttons { display: flex; gap: 10px; margin-top: 8px; }
@@ -72,8 +72,8 @@
 .tableWrap { overflow-x: auto; border: 1px solid #dbe4f8; border-radius: 9px; background: #ffffff; }
 .table { width: 100%; border-collapse: collapse; background: #fff; }
 .table thead { background: #eef2ff; }
-.table th, .table td { border-bottom: 1px solid #e4ebfa; color: #39507e; padding: 9px 10px; text-align: left; font-size: 14px; }
-.table th { font-size: 13px; color: #5770a4; }
+.table th, .table td { border-bottom: 1px solid #e4ebfa; color: #234f1e; padding: 9px 10px; text-align: left; font-size: 14px; }
+.table th { font-size: 13px; color: #234f1e; }
 .table tbody tr:hover { background: #f5f8ff; }
 .actions { white-space: nowrap; }
 .actionButtons { display: flex; gap: 8px; align-items: center; }

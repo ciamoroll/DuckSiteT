@@ -17,27 +17,27 @@
 }
 
 .btn_primary {
-  background: linear-gradient(180deg, #5e82d5, #476bbf);
+  background: linear-gradient(180deg, #458d3d, #54af4a);
   color: #f4f8ff;
-  border-color: #3f62aa;
+  border-color: #234f1e;
   padding: 10px 14px;
   width: fit-content;
 }
 
 .btn_primary:hover {
-  background: linear-gradient(180deg, #6d91de, #5276c8);
+  background: linear-gradient(180deg, #459e3b, #4ba142);
 }
 
 .btn_secondary {
   background: #edf2ff;
-  color: #3f5f99;
+  color: #234f1e;
   border-color: #ccd8f2;
   padding: 10px 14px;
 }
 
 .btn_ghost {
   background: #f8fbff;
-  color: #5f6f95;
+  color: #234f1e;
   border-color: #d9e3f8;
   padding: 10px 14px;
 }
@@ -53,7 +53,7 @@
 
 .formTitleRow h3 {
   margin: 0;
-  color: #2a467f;
+  color: #234f1e;
   font-size: 34px;
 }
 
@@ -73,7 +73,7 @@
 .formSection h4,
 .lessonSection h4 {
   margin: 0 0 10px;
-  color: #3f588a;
+  color: #234f1e;
   font-size: 24px;
 }
 
@@ -84,7 +84,7 @@
 .fieldLabel {
   display: block;
   margin-bottom: 5px;
-  color: #3e547d;
+  color: #234f1e;
   font-size: 15px;
   font-weight: 700;
 }
@@ -96,7 +96,7 @@
   border: 1px solid #d6dff3;
   border-radius: 7px;
   background: #fdfefe;
-  color: #263d6e;
+  color: #234f1e;
   padding: 10px 11px;
   font-size: 14px;
   margin-bottom: 10px;
@@ -106,8 +106,8 @@
 .form textarea:focus,
 .form select:focus {
   outline: none;
-  border-color: #5f84d3;
-  box-shadow: 0 0 0 3px rgba(96, 133, 211, 0.14);
+  border-color: #398331;
+  box-shadow: 0 0 0 3px #467e40;
 }
 
 .form textarea {
@@ -138,7 +138,7 @@
 .table th,
 .table td {
   border-bottom: 1px solid #e4ebfa;
-  color: #39507e;
+  color: #234f1e;
   padding: 9px 10px;
   text-align: left;
   font-size: 14px;
@@ -147,12 +147,12 @@
 .compactTable th,
 .table th {
   font-size: 13px;
-  color: #5770a4;
+  color: #45923c;
 }
 
 .emptyCell {
   text-align: center;
-  color: #7a89ac;
+  color: #75c46c;
 }
 
 .btn_small_primary,
@@ -163,9 +163,9 @@
 }
 
 .btn_small_primary {
-  background: linear-gradient(180deg, #6287d9, #4f72c2);
+  background: linear-gradient(180deg, #439639, #51aa47);
   color: #f4f8ff;
-  border-color: #4264ae;
+  border-color: #234f1e;
 }
 
 .btn_small_danger {
@@ -199,7 +199,7 @@
 }
 
 .loading {
-  color: #5a6f99;
+  color: #234f1e;
   padding: 8px 2px;
 }
 
@@ -228,9 +228,9 @@
 }
 
 .btn_edit {
-  background: linear-gradient(180deg, #5f83d6, #4a6fbe);
+  background: linear-gradient(180deg, #3e8635, #3d8634);
   color: #f4f8ff;
-  border-color: #3e60a8;
+  border-color: #234f1e;
 }
 
 .btn_delete {

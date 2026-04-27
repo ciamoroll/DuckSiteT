@@ -15,7 +15,7 @@
 
 .summary_card h4 {
   margin: 0;
-  color: #5d6e96;
+  color: #358f2b;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.4px;
@@ -23,7 +23,7 @@
 
 .summary_number {
   margin: 8px 0 0;
-  color: #375da8;
+  color: #36772f;
   font-size: 32px;
   font-weight: 800;
 }
@@ -40,7 +40,7 @@
 }
 
 .filters label {
-  color: #3f588a;
+  color: #3d9134;
   font-weight: 700;
 }
 
@@ -48,7 +48,7 @@
   border: 1px solid #d6dff3;
   border-radius: 7px;
   background: #fdfefe;
-  color: #263d6e;
+  color: #234f1e;
   padding: 10px 11px;
   font-size: 14px;
 }
@@ -73,7 +73,7 @@
 .table th,
 .table td {
   border-bottom: 1px solid #e4ebfa;
-  color: #39507e;
+  color: #234f1e;
   padding: 9px 10px;
   text-align: left;
   font-size: 14px;
@@ -81,7 +81,7 @@
 
 .table th {
   font-size: 13px;
-  color: #5770a4;
+  color: #234f1e;
 }
 
 .table tbody tr:hover {
@@ -95,7 +95,7 @@
   font-size: 11px;
   font-weight: 700;
   background: rgba(68, 109, 190, 0.14);
-  color: #3558aa;
+  color: #234f1e;
 }
 
 @media (max-width: 940px) {

@@ -11,7 +11,7 @@
   padding: 12px;
   display: grid;
   gap: 12px;
-  box-shadow: 0 10px 20px rgba(57, 79, 129, 0.12);
+  box-shadow: 0 10px 20px #39972f;
 }
 
 .cardHead {
@@ -23,7 +23,7 @@
 
 .cardHead h3 {
   margin: 0;
-  color: #2a457d;
+  color: #234f1e;
   font-size: 24px;
 }
 
@@ -40,15 +40,15 @@
 
 .card p {
   margin: 0;
-  color: #4f6290;
+  color: #234f1e;
   font-size: 16px;
   line-height: 1.35;
 }
 
 .card button {
-  border: 1px solid #3f62aa;
+  border: 1px solid #234f1e;
   border-radius: 8px;
-  background: linear-gradient(180deg, #5e82d5, #476bbf);
+  background: linear-gradient(180deg, #439639, #51aa47);
   color: #f4f8ff;
   font-size: 15px;
   font-weight: 700;
@@ -57,7 +57,7 @@
 }
 
 .card button:hover {
-  background: linear-gradient(180deg, #6a8ddb, #5275c7);
+  background: linear-gradient(180deg, #42a138, #398a30);
 }
 
 @media (max-width: 1080px) {
