@@ -4,15 +4,15 @@
   display: grid;
   gap: 8px;
   padding: 12px 14px;
-  border: 1px solid #d6dff3;
+  border: 1px solid #d3f3d6;
   border-radius: 12px;
-  background: linear-gradient(180deg, #fbfdff, #f4f8ff);
+  background: linear-gradient(180deg, #fbfffb, #f4fff4);
 }
 
 .searchBar label {
   font-size: 13px;
   font-weight: 700;
-  color: #34538f;
+  color: #348f53;
 }
 
 .searchControls {
@@ -25,25 +25,25 @@
 .searchBar input {
   width: 100%;
   min-width: 0;
-  border: 1px solid #d6dff3;
+  border: 1px solid #d3f3d6;
   border-radius: 8px;
   background: #ffffff;
-  color: #263d6e;
+  color: #263d26;
   padding: 10px 11px;
   font-size: 14px;
 }
 
 .searchBar input:focus {
   outline: none;
-  border-color: #5f84d3;
-  box-shadow: 0 0 0 3px rgba(96, 133, 211, 0.14);
+  border-color: #5fd384;
+  box-shadow: 0 0 0 3px rgba(96, 211, 133, 0.14);
 }
 
 .btn_clear {
   border-radius: 8px;
-  border: 1px solid #ccd8f2;
-  background: #edf2ff;
-  color: #3f5f99;
+  border: 1px solid #d8f2cc;
+  background: #edfff2;
+  color: #3f993f;
   font-weight: 700;
   cursor: pointer;
   padding: 10px 14px;
@@ -52,7 +52,7 @@
 }
 
 .btn_clear:hover:not(:disabled) {
-  background: #e3ebff;
+  background: #e3ffe3;
 }
 
 .btn_clear:disabled {
@@ -73,26 +73,26 @@
 .btn_primary, .btn_secondary, .btn_edit, .btn_delete { border-radius: 8px; border: 1px solid transparent; font-weight: 700; cursor: pointer; }
 
 .btn_primary {
-  background: linear-gradient(180deg, #5e82d5, #476bbf);
-  color: #f4f8ff;
-  border-color: #3f62aa;
+  background: linear-gradient(180deg, #5ed582, #47bf6b);
+  color: #f4fff4;
+  border-color: #3faa62;
   padding: 10px 14px;
   width: fit-content;
 }
 
-.btn_primary:hover { background: linear-gradient(180deg, #6d91de, #5276c8); }
+.btn_primary:hover { background: linear-gradient(180deg, #6dde91, #52c876); }
 
 .btn_secondary {
-  background: #edf2ff;
-  color: #3f5f99;
-  border-color: #ccd8f2;
+  background: #edfff2;
+  color: #3f993f;
+  border-color: #d8f2cc;
   padding: 10px 14px;
 }
 
 .btn_edit {
-  background: linear-gradient(180deg, #5f83d6, #4a6fbe);
-  color: #f4f8ff;
-  border-color: #3e60a8;
+  background: linear-gradient(180deg, #5fd683, #4abe6f);
+  color: #f4fff4;
+  border-color: #3ea860;
   padding: 7px 11px;
   font-size: 12px;
 }
@@ -106,20 +106,20 @@
 }
 
 .form {
-  border: 1px solid #d0dbf2;
+  border: 1px solid #d0f2db;
   border-radius: 12px;
-  background: #fbfdff;
+  background: #fbfffb;
   padding: 14px;
 }
 
-.form h3 { margin: 0 0 12px; color: #2a467f; font-size: 26px; }
+.form h3 { margin: 0 0 12px; color: #2a7f46; font-size: 26px; }
 
 .form input, .form select {
   width: 100%;
-  border: 1px solid #d6dff3;
+  border: 1px solid #d3f3d6;
   border-radius: 7px;
   background: #fdfefe;
-  color: #263d6e;
+  color: #263d26;
   padding: 10px 11px;
   font-size: 14px;
   margin-bottom: 10px;
@@ -127,25 +127,25 @@
 
 .form input:focus, .form select:focus {
   outline: none;
-  border-color: #5f84d3;
-  box-shadow: 0 0 0 3px rgba(96, 133, 211, 0.14);
+  border-color: #5fd384;
+  box-shadow: 0 0 0 3px rgba(96, 211, 133, 0.14);
 }
 
 .form_buttons { display: flex; gap: 10px; margin-top: 8px; }
 .form_buttons button { flex: 1; min-height: 42px; margin: 0; display: inline-flex; align-items: center; justify-content: center; }
 
-.loading, .empty { color: #5a6f99; padding: 8px 2px; }
+.loading, .empty { color: #5a9f6f; padding: 8px 2px; }
 
-.table_container { overflow-x: auto; border: 1px solid #dbe4f8; border-radius: 9px; background: #ffffff; }
+.table_container { overflow-x: auto; border: 1px solid #dbe8e4; border-radius: 9px; background: #ffffff; }
 .table { width: 100%; border-collapse: collapse; background: #fff; }
-.table thead { background: #eef2ff; }
-.table th, .table td { border-bottom: 1px solid #e4ebfa; color: #39507e; padding: 9px 10px; text-align: left; font-size: 14px; }
-.table th { font-size: 13px; color: #5770a4; }
-.table tbody tr:hover { background: #f5f8ff; }
+.table thead { background: #eefff2; }
+.table th, .table td { border-bottom: 1px solid #e4ebe8; color: #395078; padding: 9px 10px; text-align: left; font-size: 14px; }
+.table th { font-size: 13px; color: #57a470; }
+.table tbody tr:hover { background: #f5fff8; }
 
 .actions { white-space: nowrap; }
 .actionButtons { display: flex; gap: 8px; align-items: center; }
 
 .badge { display: inline-block; padding: 4px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
-.badge_admin { background: rgba(68, 109, 190, 0.14); color: #3558aa; }
+.badge_admin { background: rgba(68, 190, 109, 0.14); color: #35aa58; }
 .badge_student { background: rgba(64, 137, 100, 0.14); color: #2c8b56; }
