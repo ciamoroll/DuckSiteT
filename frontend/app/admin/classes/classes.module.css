@@ -12,12 +12,12 @@
   border-radius: 8px;
 }
 
-.btn_primary:hover, .btn_primary_link:hover { background: linear-gradient(180deg, #6d91de, #5276c8); }
+.btn_primary:hover, .btn_primary_link:hover { background: linear-gradient(180deg, #5a9e52, #3a8432); }
 
 .btn_secondary {
-  background: #edf2ff;
+  background: #ebf5eb;
   color: #234f1e;
-  border-color: #ccd8f2;
+  border-color: #c2d9c2;
   padding: 10px 14px;
 }
 
@@ -40,20 +40,20 @@
 }
 
 .form {
-  border: 1px solid #d0dbf2;
+  border: 1px solid #c7d9c7;
   border-radius: 12px;
-  background: #fbfdff;
+  background: #fbfdfc;
   padding: 14px;
   margin-bottom: 14px;
 }
 
-.form h3 { margin: 0 0 12px; color: #2a467f; font-size: 26px; }
+.form h3 { margin: 0 0 12px; color: #2a5f2a; font-size: 26px; }
 
 .form input, .form textarea, .form select {
   width: 100%;
-  border: 1px solid #d6dff3;
+  border: 1px solid #cdd9cd;
   border-radius: 7px;
-  background: #fdfefe;
+  background: #fdfffe;
   color: #234f1e;
   padding: 10px 11px;
   font-size: 14px;
@@ -69,12 +69,12 @@
 .form_buttons { display: flex; gap: 10px; margin-top: 8px; }
 .form_buttons button { flex: 1; min-height: 42px; margin: 0; display: inline-flex; align-items: center; justify-content: center; }
 
-.tableWrap { overflow-x: auto; border: 1px solid #dbe4f8; border-radius: 9px; background: #ffffff; }
+.tableWrap { overflow-x: auto; border: 1px solid #d4e4d4; border-radius: 9px; background: #ffffff; }
 .table { width: 100%; border-collapse: collapse; background: #fff; }
-.table thead { background: #eef2ff; }
-.table th, .table td { border-bottom: 1px solid #e4ebfa; color: #234f1e; padding: 9px 10px; text-align: left; font-size: 14px; }
+.table thead { background: #ecf5ec; }
+.table th, .table td { border-bottom: 1px solid #dce4dc; color: #234f1e; padding: 9px 10px; text-align: left; font-size: 14px; }
 .table th { font-size: 13px; color: #234f1e; }
-.table tbody tr:hover { background: #f5f8ff; }
+.table tbody tr:hover { background: #f5f8f5; }
 .actions { white-space: nowrap; }
 .actionButtons { display: flex; gap: 8px; align-items: center; }
 

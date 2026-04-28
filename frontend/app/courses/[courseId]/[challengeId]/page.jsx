@@ -20,6 +20,7 @@ export default function LessonChallengePage() {
   const [courseLessons, setCourseLessons] = useState([]);
   const [lessonIndex, setLessonIndex] = useState(0);
   const [attempts, setAttempts] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selected, setSelected] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +30,7 @@ export default function LessonChallengePage() {
   useEffect(() => {
     setResult(null);
     setSelected("");
+    setCurrentQuestionIndex(0);
     celebratedForChallengeRef.current = null;
   }, [courseId, challengeId]);
 
@@ -139,6 +141,29 @@ export default function LessonChallengePage() {
     return `This task is locked. Finish Task ${previousLessonNo} first.`;
   }, [isUnlocked, meetsXp, meetsPrerequisite, requiredXp, previousLessonNo]);
 
+  // Get current question (support both new format and old format)
+  const questions = useMemo(() => {
+    if (!challenge) return [];
+    if (Array.isArray(challenge.questions) && challenge.questions.length > 0) {
+      return challenge.questions;
+    }
+    // Fallback to old format
+    if (challenge.question_text) {
+      return [{
+        id: "q1",
+        text: challenge.question_text,
+        options: Array.isArray(challenge.options) ? challenge.options : [],
+        correct_answer: challenge.correct_answer,
+        explanation: challenge.explanation,
+      }];
+    }
+    return [];
+  }, [challenge]);
+
+  const currentQuestion = questions[currentQuestionIndex] || null;
+  const totalQuestions = questions.length;
+  const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
+
   async function submitAnswer() {
     if (!selected) {
       alert("Please select an answer first.");
@@ -163,6 +188,14 @@ export default function LessonChallengePage() {
       alert(error.message || "Failed to submit answer");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  function goToNextQuestion() {
+    if (currentQuestionIndex < totalQuestions - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setSelected("");
+      setResult(null);
     }
   }
 
@@ -198,11 +231,12 @@ export default function LessonChallengePage() {
             <section className={styles.lessonWrap}>
               <h1>{course?.name || "Course"}</h1>
               <h2>{challenge.title || "Task Challenge"}</h2>
-              <p className={styles.question}>{challenge.question_text || "No question provided."}</p>
+              {totalQuestions > 1 && <p className={styles.question}>Question {currentQuestionIndex + 1} of {totalQuestions}</p>}
+              {currentQuestion && <p className={styles.question}>{currentQuestion.text || "No question provided."}</p>}
               <p className={styles.reward}>Reward: {Number(challenge.points || 0)} XP</p>
 
               <div className={styles.options}>
-                {(Array.isArray(challenge.options) ? challenge.options : []).map((option) => (
+                {(currentQuestion?.options || []).map((option) => (
                   <button
                     key={option}
                     type="button"
@@ -215,9 +249,23 @@ export default function LessonChallengePage() {
               </div>
 
               <div className={styles.actions}>
-                <button type="button" onClick={submitAnswer} disabled={submitting || solved}>
-                  {solved ? "Completed" : submitting ? "Submitting..." : "Submit Answer"}
-                </button>
+                {solved ? (
+                  <button type="button" disabled className={styles.btn_primary}>
+                    Completed
+                  </button>
+                ) : result && !result.isCorrect && !isLastQuestion ? (
+                  <button type="button" onClick={() => setResult(null)}>
+                    Try Again
+                  </button>
+                ) : result && result.isCorrect && !isLastQuestion ? (
+                  <button type="button" onClick={goToNextQuestion}>
+                    Next Question
+                  </button>
+                ) : (
+                  <button type="button" onClick={submitAnswer} disabled={submitting}>
+                    {submitting ? "Submitting..." : isLastQuestion ? "Submit Challenge" : "Submit Answer"}
+                  </button>
+                )}
                 <button type="button" onClick={() => router.push(`/courses/${courseId}`)}>Back to Stages</button>
               </div>
 
@@ -226,11 +274,15 @@ export default function LessonChallengePage() {
               {result ? (
                 <div className={styles.resultBox}>
                   <p>{result.isCorrect ? "Correct answer!" : "Incorrect answer. Try again."}</p>
-                  {result.isCorrect && String(result.explanation || challenge?.explanation || "").trim() ? (
-                    <p className={styles.explanation}>Explanation: {String(result.explanation || challenge?.explanation || "").trim()}</p>
+                  {result.isCorrect && String(result.explanation || currentQuestion?.explanation || "").trim() ? (
+                    <p className={styles.explanation}>Explanation: {String(result.explanation || currentQuestion?.explanation || "").trim()}</p>
                   ) : null}
-                  <p>Awarded XP: {Number(result.awardedXp || 0)}</p>
-                  <p>Total XP: {Number(result.totalXp || 0)}</p>
+                  {result.isCorrect && isLastQuestion ? (
+                    <>
+                      <p>Awarded XP: {Number(result.awardedXp || 0)}</p>
+                      <p>Total XP: {Number(result.totalXp || 0)}</p>
+                    </>
+                  ) : null}
                 </div>
               ) : null}
             </section>

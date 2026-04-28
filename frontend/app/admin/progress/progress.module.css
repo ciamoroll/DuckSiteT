@@ -7,9 +7,9 @@
 }
 
 .summary_card {
-  border: 1px solid #d0dbf2;
+  border: 1px solid #ccdfc8;
   border-radius: 12px;
-  background: #fbfdff;
+  background: #f7fdf5;
   padding: 14px;
 }
 
@@ -29,9 +29,9 @@
 }
 
 .filters {
-  border: 1px solid #d0dbf2;
+  border: 1px solid #ccdfc8;
   border-radius: 12px;
-  background: #fbfdff;
+  background: #f7fdf5;
   padding: 12px;
   display: flex;
   flex-wrap: wrap;
@@ -45,9 +45,9 @@
 }
 
 .filters select {
-  border: 1px solid #d6dff3;
+  border: 1px solid #d0dfc9;
   border-radius: 7px;
-  background: #fdfefe;
+  background: #fbfdfb;
   color: #234f1e;
   padding: 10px 11px;
   font-size: 14px;
@@ -55,7 +55,7 @@
 
 .table_container {
   overflow-x: auto;
-  border: 1px solid #dbe4f8;
+  border: 1px solid #d5e4cf;
   border-radius: 9px;
   background: #ffffff;
 }
@@ -67,12 +67,12 @@
 }
 
 .table thead {
-  background: #eef2ff;
+  background: #e8f2e3;
 }
 
 .table th,
 .table td {
-  border-bottom: 1px solid #e4ebfa;
+  border-bottom: 1px solid #deebd0;
   color: #234f1e;
   padding: 9px 10px;
   text-align: left;
@@ -85,7 +85,7 @@
 }
 
 .table tbody tr:hover {
-  background: #f5f8ff;
+  background: #e8f5e3;
 }
 
 .badge {
@@ -94,7 +94,7 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  background: rgba(68, 109, 190, 0.14);
+  background: rgba(68, 140, 90, 0.14);
   color: #234f1e;
 }
 

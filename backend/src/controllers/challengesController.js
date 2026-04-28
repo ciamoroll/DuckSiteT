@@ -28,6 +28,26 @@ function toOptionsArray(value) {
   return value.map((item) => String(item || "").trim()).filter(Boolean);
 }
 
+function normalizeQuestions(questions) {
+  if (!Array.isArray(questions)) return [];
+  return questions
+    .map((q) => {
+      if (!q || typeof q !== "object") return null;
+      const options = toOptionsArray(q.options);
+      if (options.length < 2) return null;
+      const correctAnswer = String(q.correct_answer || "").trim();
+      if (!correctAnswer || !options.includes(correctAnswer)) return null;
+      return {
+        id: q.id || `q-${Date.now()}-${Math.random()}`,
+        text: String(q.text || q.question_text || "").trim(),
+        options,
+        correct_answer: correctAnswer,
+        explanation: String(q.explanation || "").trim(),
+      };
+    })
+    .filter(Boolean);
+}
+
 function isChallengeAttemptsMissing(error) {
   if (!error) return false;
   const message = String(error.message || "").toLowerCase();
@@ -96,27 +116,46 @@ async function listChallenges(req, res) {
 async function createChallenge(req, res) {
   try {
     const raw = req.body || {};
-    const options = toOptionsArray(raw.options);
+    
+    // Support both old format (single question) and new format (multiple questions)
+    let questions = [];
+    
+    if (Array.isArray(raw.questions) && raw.questions.length > 0) {
+      // New format: questions array
+      questions = normalizeQuestions(raw.questions);
+    } else if (raw.question_text || raw.options) {
+      // Old format: single question fields
+      const options = toOptionsArray(raw.options);
+      if (options.length >= 2) {
+        const correctAnswer = String(raw.correct_answer || "").trim();
+        if (correctAnswer && options.includes(correctAnswer)) {
+          questions = [{
+            id: `q-${Date.now()}`,
+            text: String(raw.question_text || "").trim(),
+            options,
+            correct_answer: correctAnswer,
+            explanation: String(raw.explanation || "").trim(),
+          }];
+        }
+      }
+    }
+    
+    if (questions.length === 0) {
+      return errorResponse(res, 400, "At least one valid question is required");
+    }
+
     const payload = {
       title: raw.title,
       course_id: raw.course_id ? Number(raw.course_id) : null,
-      question_text: raw.question_text,
-      options,
-      correct_answer: raw.correct_answer,
-      explanation: raw.explanation,
+      questions,
       lesson_order: Math.max(1, Number(raw.lesson_order || 1)),
       required_xp: Math.max(0, Number(raw.required_xp || 0)),
       points: raw.points,
       status: raw.status || "Active",
     };
+    
     if (!payload.title) return errorResponse(res, 400, "title is required");
     if (!payload.course_id) return errorResponse(res, 400, "course_id is required");
-    if (!payload.question_text) return errorResponse(res, 400, "question_text is required");
-    if (options.length < 2) return errorResponse(res, 400, "At least 2 options are required");
-    if (!payload.correct_answer) return errorResponse(res, 400, "correct_answer is required");
-    if (!options.includes(String(payload.correct_answer).trim())) {
-      return errorResponse(res, 400, "correct_answer must match one of the options");
-    }
 
     const owned = await ensureCourseOwnedByAdmin(payload.course_id, req);
     if (!owned) return errorResponse(res, 403, "You can only create challenges for your own courses");
@@ -136,7 +175,7 @@ async function updateChallenge(req, res) {
 
     const { data: existingChallenge, error: existingError } = await supabase
       .from("challenges")
-      .select("id, options, correct_answer, course_id")
+      .select("id, course_id, questions")
       .eq("id", id)
       .single();
     if (existingError || !existingChallenge) {
@@ -149,30 +188,54 @@ async function updateChallenge(req, res) {
     const payload = {};
     if (raw.title !== undefined) payload.title = raw.title;
     if (raw.course_id !== undefined) payload.course_id = raw.course_id ? Number(raw.course_id) : null;
-    if (raw.question_text !== undefined) payload.question_text = raw.question_text;
-    if (raw.options !== undefined) payload.options = toOptionsArray(raw.options);
-    if (raw.correct_answer !== undefined) payload.correct_answer = raw.correct_answer;
-    if (raw.explanation !== undefined) payload.explanation = raw.explanation;
     if (raw.lesson_order !== undefined) payload.lesson_order = Math.max(1, Number(raw.lesson_order || 1));
     if (raw.required_xp !== undefined) payload.required_xp = Math.max(0, Number(raw.required_xp || 0));
     if (raw.points !== undefined) payload.points = raw.points;
     if (raw.status !== undefined) payload.status = raw.status;
 
+    // Handle questions update (new format)
+    if (raw.questions !== undefined) {
+      const questions = normalizeQuestions(raw.questions);
+      if (questions.length === 0) {
+        return errorResponse(res, 400, "At least one valid question is required");
+      }
+      payload.questions = questions;
+    } else if (raw.question_text !== undefined || raw.options !== undefined || raw.correct_answer !== undefined) {
+      // Handle old format: single question fields
+      const existingQuestions = Array.isArray(existingChallenge.questions) 
+        ? existingChallenge.questions 
+        : [];
+      
+      const options = raw.options !== undefined 
+        ? toOptionsArray(raw.options)
+        : (existingQuestions[0]?.options || []);
+      
+      const correctAnswer = raw.correct_answer !== undefined 
+        ? String(raw.correct_answer || "").trim()
+        : (existingQuestions[0]?.correct_answer || "");
+      
+      const text = raw.question_text !== undefined 
+        ? String(raw.question_text || "").trim()
+        : (existingQuestions[0]?.text || "");
+
+      if (options.length < 2) {
+        return errorResponse(res, 400, "At least 2 options are required");
+      }
+      if (!correctAnswer || !options.includes(correctAnswer)) {
+        return errorResponse(res, 400, "correct_answer must match one of the options");
+      }
+
+      payload.questions = [{
+        id: existingQuestions[0]?.id || `q-${Date.now()}`,
+        text,
+        options,
+        correct_answer: correctAnswer,
+        explanation: raw.explanation !== undefined ? String(raw.explanation || "").trim() : (existingQuestions[0]?.explanation || ""),
+      }];
+    }
+
     if (Object.keys(payload).length === 0) {
       return errorResponse(res, 400, "No valid fields to update");
-    }
-
-    if (payload.options && payload.options.length < 2) {
-      return errorResponse(res, 400, "At least 2 options are required");
-    }
-
-    const mergedOptions = payload.options || toOptionsArray(existingChallenge.options);
-    const mergedCorrectAnswer = payload.correct_answer !== undefined
-      ? String(payload.correct_answer || "").trim()
-      : String(existingChallenge.correct_answer || "").trim();
-
-    if (mergedCorrectAnswer && !mergedOptions.includes(mergedCorrectAnswer)) {
-      return errorResponse(res, 400, "correct_answer must match one of the options");
     }
 
     if (payload.course_id) {

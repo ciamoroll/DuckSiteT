@@ -1,30 +1,30 @@
 .page {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 12% 10%, rgba(129, 163, 255, 0.24), transparent 38%),
-    radial-gradient(circle at 90% 8%, rgba(121, 183, 255, 0.22), transparent 36%),
-    linear-gradient(170deg, #e9eefb 0%, #f3f6ff 48%, #e8efff 100%);
+    radial-gradient(circle at 12% 10%, rgba(129, 180, 130, 0.24), transparent 38%),
+    radial-gradient(circle at 90% 8%, rgba(121, 190, 130, 0.22), transparent 36%),
+    linear-gradient(170deg, #e9f5e3 0%, #f3faf0 48%, #e8f5e0 100%);
   padding: 24px 14px 36px;
 }
 
 .shell {
-  --bg: #eef3ff;
+  --bg: #e8f2e3;
   --surface: #ffffff;
-  --surface-2: #f0f4ff;
+  --surface-2: #e8f2e3;
   --text: #213154;
   --muted: #5b6890;
-  --primary: #436cc9;
-  --primary-strong: #3558ad;
+  --primary: #43a86c;
+  --primary-strong: #358a4d;
   --danger: #b63c4e;
-  --border: #c4d1ef;
+  --border: #c8dcc0;
   --radius: 12px;
 
   width: min(1220px, 96vw);
   margin: 0 auto;
-  border: 1px solid #adc1ee;
+  border: 1px solid #b8d5b0;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 22px 44px rgba(46, 72, 131, 0.2);
+  box-shadow: 0 22px 44px rgba(60, 120, 60, 0.2);
   background: rgba(252, 254, 255, 0.94);
 }
 
@@ -34,7 +34,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 14px 20px;
-  background: linear-gradient(135deg, #3f61b4 0%, #5f80cc 60%, #86a0da 100%);
+  background: linear-gradient(135deg, #234f1e 0%, #388630 60%, #3c8334 100%); 
   border-bottom: 1px solid rgba(255, 255, 255, 0.24);
 }
 
@@ -50,7 +50,7 @@
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: linear-gradient(180deg, #dfe9ff, #b8cdf8);
+  background: linear-gradient(180deg, #e9f5e3, #c8dcc0);
   border: 1px solid rgba(255, 255, 255, 0.42);
   font-size: 24px;
 }
@@ -77,8 +77,8 @@
 }
 
 .headerBtn {
-  background: linear-gradient(180deg, rgba(245, 250, 255, 0.95), rgba(225, 237, 255, 0.95));
-  color: #244484;
+  background: linear-gradient(180deg, rgba(245, 255, 245, 0.95), rgba(225, 245, 225, 0.95));
+  color: #2a6b2a;
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 8px;
   padding: 9px 14px;
@@ -88,23 +88,23 @@
 }
 
 .headerBtn:hover {
-  background: linear-gradient(180deg, #ffffff, #ebf3ff);
+  background: linear-gradient(180deg, #ffffff, #e8f5e3);
 }
 
 .intro {
   padding: 14px 20px 8px;
-  border-bottom: 1px solid #d5e0f7;
+  border-bottom: 1px solid #d5e8cf;
 }
 
 .intro h2 {
   margin: 0;
-  color: #253b6b;
+  color: #2a5b2a;
   font-size: 29px;
 }
 
 .intro p {
   margin: 8px 0 0;
-  color: #4f5f8a;
+  color: #5b745b;
   font-size: 18px;
 }
 
@@ -113,14 +113,14 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 12px 20px 16px;
-  border-bottom: 1px solid #dbe4f8;
+  border-bottom: 1px solid #d5e8cf;
 }
 
 .navBtn,
 .navBtnActive {
-  border: 1px solid #a9bcdf;
-  background: linear-gradient(180deg, #f4f8ff, #e7efff);
-  color: #28477f;
+  border: 1px solid #b8d5b0;
+  background: linear-gradient(180deg, #f4fdf0, #e7f5e3);
+  color: #2a6b2a;
   border-radius: 9px;
   padding: 8px 14px;
   font-size: 14px;
@@ -129,18 +129,18 @@
 }
 
 .navBtn:hover {
-  background: linear-gradient(180deg, #ffffff, #eef4ff);
+  background: linear-gradient(180deg, #ffffff, #e8f5e3);
 }
 
 .navBtnActive {
-  background: linear-gradient(180deg, #4f77cf, #3e63b8);
-  color: #f2f7ff;
-  border-color: #35559f;
+  background: linear-gradient(180deg, #4fa76c, #3e8a52);
+  color: #f5faf2;
+  border-color: #2a6b2a;
 }
 
 .contentWrap {
   padding: 16px 18px 20px;
-  background: linear-gradient(180deg, #f8fbff 0%, #f1f6ff 100%);
+  background: linear-gradient(180deg, #f7fdf5 0%, #f0f9eb 100%);
 }
 
 @media (max-width: 900px) {

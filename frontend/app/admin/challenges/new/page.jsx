@@ -13,14 +13,19 @@ export default function NewChallengePage() {
   const [formData, setFormData] = useState({
     title: "",
     course_id: "",
-    question_text: "",
-    optionsText: "",
-    correct_answer: "",
-    explanation: "",
     lesson_order: 1,
     required_xp: 0,
     points: 10,
     status: "Active",
+    questions: [
+      {
+        id: "q1",
+        text: "",
+        optionsText: "",
+        correct_answer: "",
+        explanation: "",
+      },
+    ],
   });
 
   useEffect(() => {
@@ -55,24 +60,89 @@ export default function NewChallengePage() {
         lesson_order: maxLessonOrder + 1,
       }));
     } catch (_err) {
-      // Fallback: just set course_id without auto-suggestion
+      // Fallback
     }
+  }
+
+  function updateQuestion(index, field, value) {
+    const newQuestions = [...formData.questions];
+    newQuestions[index] = {
+      ...newQuestions[index],
+      [field]: value,
+    };
+    setFormData({ ...formData, questions: newQuestions });
+  }
+
+  function addQuestion() {
+    const newId = `q${formData.questions.length + 1}`;
+    setFormData({
+      ...formData,
+      questions: [
+        ...formData.questions,
+        {
+          id: newId,
+          text: "",
+          optionsText: "",
+          correct_answer: "",
+          explanation: "",
+        },
+      ],
+    });
+  }
+
+  function removeQuestion(index) {
+    if (formData.questions.length <= 1) {
+      alert("You must have at least one question");
+      return;
+    }
+    const newQuestions = formData.questions.filter((_, i) => i !== index);
+    setFormData({ ...formData, questions: newQuestions });
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const options = formData.optionsText
-      .split("\n")
-      .map((opt) => opt.trim())
-      .filter(Boolean);
+
+    const questions = formData.questions.map((q) => {
+      const options = q.optionsText
+        .split("\n")
+        .map((opt) => opt.trim())
+        .filter(Boolean);
+      return {
+        text: q.text.trim(),
+        options,
+        correct_answer: q.correct_answer.trim(),
+        explanation: q.explanation.trim(),
+      };
+    });
+
+    if (questions.length === 0) {
+      alert("Please add at least one question");
+      return;
+    }
+
+    for (const q of questions) {
+      if (!q.text) {
+        alert("All questions must have text");
+        return;
+      }
+      if (q.options.length < 2) {
+        alert("Each question must have at least 2 options");
+        return;
+      }
+      if (!q.correct_answer) {
+        alert("Each question must have a correct answer");
+        return;
+      }
+      if (!q.options.includes(q.correct_answer)) {
+        alert("Correct answer must match one of the options");
+        return;
+      }
+    }
 
     const payload = {
       title: formData.title,
       course_id: formData.course_id ? Number(formData.course_id) : null,
-      question_text: formData.question_text,
-      options,
-      correct_answer: formData.correct_answer.trim(),
-      explanation: formData.explanation,
+      questions,
       lesson_order: Number(formData.lesson_order || 1),
       required_xp: Number(formData.required_xp || 0),
       points: Number(formData.points || 0),
@@ -107,53 +177,164 @@ export default function NewChallengePage() {
             <section className={styles.formSection}>
               <h4>Challenge Information</h4>
               <label className={styles.fieldLabel}>Challenge Title</label>
-              <input type="text" placeholder="Challenge Title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
+              <input
+                type="text"
+                placeholder="Challenge Title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
 
               <label className={styles.fieldLabel}>Course</label>
-              <select value={formData.course_id} onChange={(e) => handleCourseChange(e.target.value)} required>
+              <select
+                value={formData.course_id}
+                onChange={(e) => handleCourseChange(e.target.value)}
+                required
+              >
                 <option value="">Select Course</option>
                 {courses.map((course) => (
-                  <option key={course.id} value={course.id}>{course.name}</option>
+                  <option key={course.id} value={course.id}>
+                    {course.name}
+                  </option>
                 ))}
               </select>
-
-              <label className={styles.fieldLabel}>Question Text</label>
-              <textarea placeholder="Question text" value={formData.question_text} onChange={(e) => setFormData({ ...formData, question_text: e.target.value })} required />
-
-              <label className={styles.fieldLabel}>Options</label>
-              <textarea placeholder="Options (one per line)" value={formData.optionsText} onChange={(e) => setFormData({ ...formData, optionsText: e.target.value })} required />
-
-              <label className={styles.fieldLabel}>Correct Answer</label>
-              <input type="text" placeholder="Correct answer (must match one option)" value={formData.correct_answer} onChange={(e) => setFormData({ ...formData, correct_answer: e.target.value })} required />
-
-              <label className={styles.fieldLabel}>Explanation</label>
-              <textarea placeholder="Explanation (optional)" value={formData.explanation} onChange={(e) => setFormData({ ...formData, explanation: e.target.value })} />
             </section>
 
             <section className={styles.formSection}>
               <h4>Progress & Rewards</h4>
 
               <label className={styles.fieldLabel}>Task Order</label>
-              <input type="number" placeholder="Task Order" value={formData.lesson_order} onChange={(e) => setFormData({ ...formData, lesson_order: parseInt(e.target.value, 10) || 1 })} min={1} />
+              <input
+                type="number"
+                placeholder="Task Order"
+                value={formData.lesson_order}
+                onChange={(e) =>
+                  setFormData({ ...formData, lesson_order: parseInt(e.target.value, 10) || 1 })
+                }
+                min={1}
+              />
 
               <label className={styles.fieldLabel}>Required XP</label>
-              <input type="number" placeholder="Required XP" value={formData.required_xp} onChange={(e) => setFormData({ ...formData, required_xp: parseInt(e.target.value, 10) || 0 })} min={0} />
+              <input
+                type="number"
+                placeholder="Required XP"
+                value={formData.required_xp}
+                onChange={(e) =>
+                  setFormData({ ...formData, required_xp: parseInt(e.target.value, 10) || 0 })
+                }
+                min={0}
+              />
 
               <label className={styles.fieldLabel}>Points</label>
-              <input type="number" placeholder="Points" value={formData.points} onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value, 10) || 0 })} />
+              <input
+                type="number"
+                placeholder="Points"
+                value={formData.points}
+                onChange={(e) =>
+                  setFormData({ ...formData, points: parseInt(e.target.value, 10) || 0 })
+                }
+              />
 
               <label className={styles.fieldLabel}>Status</label>
-              <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              >
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
             </section>
           </div>
 
+          <div style={{ marginTop: "20px" }}>
+            <h4>Questions ({formData.questions.length})</h4>
+            {formData.questions.map((question, index) => (
+              <div
+                key={question.id}
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "15px",
+                  marginBottom: "15px",
+                  borderRadius: "8px",
+                  backgroundColor: "#f9f9f9",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                  <h5>Question {index + 1}</h5>
+                  {formData.questions.length > 1 && (
+                    <button
+                      type="button"
+                      className={styles.btn_delete}
+                      onClick={() => removeQuestion(index)}
+                      style={{ padding: "5px 10px", fontSize: "12px" }}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                <label className={styles.fieldLabel}>Question Text</label>
+                <textarea
+                  placeholder="Question text"
+                  value={question.text}
+                  onChange={(e) => updateQuestion(index, "text", e.target.value)}
+                  required
+                />
+
+                <label className={styles.fieldLabel}>Options</label>
+                <textarea
+                  placeholder="Options (one per line)"
+                  value={question.optionsText}
+                  onChange={(e) => updateQuestion(index, "optionsText", e.target.value)}
+                  required
+                />
+
+                <label className={styles.fieldLabel}>Correct Answer</label>
+                <input
+                  type="text"
+                  placeholder="Correct answer (must match one option)"
+                  value={question.correct_answer}
+                  onChange={(e) => updateQuestion(index, "correct_answer", e.target.value)}
+                  required
+                />
+
+                <label className={styles.fieldLabel}>Explanation</label>
+                <textarea
+                  placeholder="Explanation (optional)"
+                  value={question.explanation}
+                  onChange={(e) => updateQuestion(index, "explanation", e.target.value)}
+                />
+              </div>
+            ))}
+
+            <button
+              type="button"
+              className={styles.btn_secondary}
+              onClick={addQuestion}
+              style={{ marginBottom: "20px" }}
+            >
+              + Add Another Question
+            </button>
+          </div>
+
           <div className={styles.form_buttons}>
-            <button type="submit" className={styles.btn_primary} disabled={saving}>{saving ? "Creating..." : "Create Challenge"}</button>
-            <button type="button" className={styles.btn_secondary} onClick={() => router.push("/admin/challenges")}>Back to Challenges</button>
-            <button type="button" className={styles.btn_ghost} onClick={() => router.push("/admin/courses")}>Manage Courses</button>
+            <button type="submit" className={styles.btn_primary} disabled={saving}>
+              {saving ? "Creating..." : "Create Challenge"}
+            </button>
+            <button
+              type="button"
+              className={styles.btn_secondary}
+              onClick={() => router.push("/admin/challenges")}
+            >
+              Back to Challenges
+            </button>
+            <button
+              type="button"
+              className={styles.btn_ghost}
+              onClick={() => router.push("/admin/courses")}
+            >
+              Manage Courses
+            </button>
           </div>
         </form>
       </div>

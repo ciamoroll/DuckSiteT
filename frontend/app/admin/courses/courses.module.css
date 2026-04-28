@@ -29,23 +29,23 @@
 }
 
 .btn_secondary {
-  background: #edf2ff;
+  background: #e8f2e3;
   color: #234f1e;
-  border-color: #ccd8f2;
+  border-color: #c8dcc0;
   padding: 10px 14px;
 }
 
 .btn_ghost {
-  background: #f8fbff;
+  background: #f3fbf3;
   color: #234f1e;
-  border-color: #d9e3f8;
+  border-color: #d3e4ce;
   padding: 10px 14px;
 }
 
 .form {
-  border: 1px solid #d0dbf2;
+  border: 1px solid #ccdfc8;
   border-radius: 12px;
-  background: #fbfdff;
+  background: #f7fdf5;
   padding: 14px;
   display: grid;
   gap: 14px;
@@ -64,7 +64,7 @@
 }
 
 .formSection {
-  border: 1px solid #dbe3f6;
+  border: 1px solid #d5e4cf;
   border-radius: 10px;
   background: #ffffff;
   padding: 12px;
@@ -93,9 +93,9 @@
 .form textarea,
 .form select {
   width: 100%;
-  border: 1px solid #d6dff3;
+  border: 1px solid #d0dfc9;
   border-radius: 7px;
-  background: #fdfefe;
+  background: #fbfdfb;
   color: #234f1e;
   padding: 10px 11px;
   font-size: 14px;
@@ -117,7 +117,7 @@
 
 .tableWrap {
   overflow-x: auto;
-  border: 1px solid #dbe4f8;
+  border: 1px solid #d5e4cf;
   border-radius: 9px;
   background: #ffffff;
 }
@@ -130,14 +130,14 @@
 
 .compactTable thead,
 .table thead {
-  background: #eef2ff;
+  background: #e8f2e3;
 }
 
 .compactTable th,
 .compactTable td,
 .table th,
 .table td {
-  border-bottom: 1px solid #e4ebfa;
+  border-bottom: 1px solid #deebd0;
   color: #234f1e;
   padding: 9px 10px;
   text-align: left;
@@ -175,7 +175,7 @@
 }
 
 .lessonSection {
-  border: 1px solid #dbe3f6;
+  border: 1px solid #d5e4cf;
   border-radius: 10px;
   background: #ffffff;
   padding: 12px;
