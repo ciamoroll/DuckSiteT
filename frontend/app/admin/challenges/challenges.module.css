@@ -70,7 +70,7 @@
 
 .formSection h4 {
   margin: 0 0 10px;
-  color: #3f588a;
+  color: #234f1e;
   font-size: 24px;
 }
 
@@ -126,7 +126,7 @@
 }
 
 .loading {
-  color: #5a6f99;
+  color: #2b6325;
   padding: 8px 2px;
 }
 
@@ -182,7 +182,7 @@
 }
 
 .btn_edit {
-  background: linear-gradient(180deg, #5f83d6, #4a6fbe);
+  background: linear-gradient(180deg, #387e30, #234f1e);
   color: #f4f8ff;
   border-color: #4a9b41;
 }
